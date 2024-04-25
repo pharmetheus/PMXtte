@@ -4,10 +4,12 @@
 \alias{prep_dataframe}
 \title{Title}
 \usage{
-prep_dataframe(RTTEdata)
+prep_dataframe(RTTEdata, plottype = "time_to_first_event")
 }
 \arguments{
-\item{RTTEdata}{}
+\item{RTTEdata}{dataframe for to be prepared for plots}
+
+\item{plottype}{string selecting type of plot}
 }
 \value{
 modified dataframe ready for plots

@@ -3,27 +3,19 @@
 #' @param RTTEdata dataframe for analysis
 #'
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
-#' @importFrom survival survfit
+#' @import rlang
 #' @importFrom survival Surv
-#' @importFrom survminer ggsurvplot
+#' @importFrom survminer ggsurvplot surv_fit
 #' @export
 #'
 #' @examples
-Kaplan_Meier_curves <- function(data, time_col = 'TSFDW', status_col='DV', cov_col= 'DOSEF'){
-  # Keep only event information
-  # RTTEdata <- RTTEdata %>% dplyr::filter(EVID==0&TYPE==0)
-  # RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
-  # # Add dose factors to the data (we arrange it to make the plots look nice and in order)
-  # RTTEdata <- RTTEdata %>%
-  #   dplyr::mutate(DOSEF = factor(DOSE,levels = sort(unique(RTTEdata$DOSE),decreasing = TRUE),
-  #                         labels = c("400 mg","200 mg", "100 mg", "Placebo")))
-  my_time <- data[[time_col]]
-  fit.FirstEventByArm <- survfit(Surv(time = my_time,
+Kaplan_Meier_curves <- function(data, time_col = "TSFDW", status_col="DV", cov_col= "DOSEF"){
+  fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
                                                           event = data[[status_col]]) ~
-                                             data[[cov_col]])
-browser()
-  FirstEventByArm <- ggsurvplot(fit=fit.FirstEventByArm,
-                                data          = data ,
+                                             data[[cov_col]], data = data)
+  browser()
+  FirstEventByArm <- survminer::ggsurvplot(fit=fit.FirstEventByArm,
+                                #data          = data ,
                                 #distinct(ID, .keep_all = TRUE),
                                 xlab          = "Time since first dose (week)",
                                 ylab          = "Fraction without events",
@@ -56,10 +48,10 @@ browser()
                                 pval.method  = TRUE,
                                 surv.median.line ="hv",
                                 legend        = c(0.25, 0.25),
-                                legend.title  = "Dose"
-                               # legend.labs   = sub(pattern="DOSEF=",
-                               #                     replacement="",
-                               #                     x=names(fit.FirstEventByArm$strata))
+                                legend.title  = "Dose",
+                                legend.labs   = sub(pattern="DOSEF=",
+                                                    replacement="",
+                                                    x=names(fit.FirstEventByArm$strata))
 
   )
   return(FirstEventByArm)

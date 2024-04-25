@@ -3,6 +3,7 @@
 export(Kaplan_Meier_curves)
 export(prep_dataframe)
 import(dplyr)
+import(rlang)
 importFrom(survival,Surv)
-importFrom(survival,survfit)
 importFrom(survminer,ggsurvplot)
+importFrom(survminer,surv_fit)

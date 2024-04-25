@@ -4,7 +4,12 @@
 \alias{Kaplan_Meier_curves}
 \title{Title}
 \usage{
-Kaplan_Meier_curves(data_frame_name)
+Kaplan_Meier_curves(
+  data,
+  time_col = "TSFDW",
+  status_col = "DV",
+  cov_col = "DOSEF"
+)
 }
 \arguments{
 \item{RTTEdata}{dataframe for analysis}
