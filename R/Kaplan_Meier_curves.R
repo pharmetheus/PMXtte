@@ -13,7 +13,6 @@ Kaplan_Meier_curves <- function(data, time_col = "TSFDW", status_col="DV", cov_c
   fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
                                                           event = data[[status_col]]) ~
                                              data[[cov_col]], data = data)
-  browser()
   FirstEventByArm <- survminer::ggsurvplot(fit=fit.FirstEventByArm,
                                 #data          = data ,
                                 #distinct(ID, .keep_all = TRUE),
