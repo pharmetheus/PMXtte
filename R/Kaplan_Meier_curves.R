@@ -17,11 +17,10 @@ Kaplan_Meier_curves <- function(data, time_col = 'TSFDW', status_col='DV', cov_c
   # RTTEdata <- RTTEdata %>%
   #   dplyr::mutate(DOSEF = factor(DOSE,levels = sort(unique(RTTEdata$DOSE),decreasing = TRUE),
   #                         labels = c("400 mg","200 mg", "100 mg", "Placebo")))
-  my_time <- data[[time_col]]
-  fit.FirstEventByArm <- survfit(Surv(time = my_time,
-                                                          event = data[[status_col]]) ~
-                                             data[[cov_col]])
-browser()
+
+  fit.FirstEventByArm <- survfit(Surv(time = data[[time_col]],
+                                      event = data[[status_col]]) ~ data[[cov_col]])
+
   FirstEventByArm <- ggsurvplot(fit=fit.FirstEventByArm,
                                 data          = data ,
                                 #distinct(ID, .keep_all = TRUE),
