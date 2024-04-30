@@ -8,6 +8,7 @@
 #' @inheritDotParams survminer::ggsurvplot
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
+#' @importFrom ggplot2 theme_bw
 #' @importFrom survival Surv
 #' @importFrom survminer ggsurvplot surv_fit
 #' @export
@@ -61,7 +62,7 @@ Kaplan_Meier_curves <- function(data,
     stop('one or more specified columns do not exist in the dataframe')
   }
   #fit survival curves
-   data$facets = data[[facet_by]]
+   #data$facets = data[[facet_by]]
    if (is.null(cov_col)){
     fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
                                                               event = data[[event_col]]) ~
@@ -94,7 +95,6 @@ Kaplan_Meier_curves <- function(data,
                                                  data[[cov_col]] , data = data)
 
   }
-browser()
   #Plot survival curves
   FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,
@@ -130,15 +130,15 @@ browser()
                                            #ncol            = 2,
                                            #palette       = regCols,
                                            #risk.table.title  = "Hej Siv",
-                                           data          = data
+                                           #data          = data
                                            #distinct(ID, .keep_all = TRUE),
 
   )
 
   if (!is.null(facet_by)){
     plot <- FirstEventByArm$plot +
-            theme_bw() +
-            facet_grid(as.formula(paste('~',data[[facet_by]])))
+            ggplot2::theme_bw() +
+            ggplot2::facet_grid(as.formula(paste('~',data[[facet_by]])))
     return(plot)}
   return(FirstEventByArm)
 }
