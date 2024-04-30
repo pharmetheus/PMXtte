@@ -17,7 +17,7 @@
 #'   RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
 #'   RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
 #'   Kaplan_Meier_curves(RTTEdata)
-#'   Kaplan_Meier_curves(RTTEdata2, cov_col = "DOSE", facet_by = 'SEX')
+#'   Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet_by = 'SEX')
 
 
 Kaplan_Meier_curves <- function(data,
@@ -61,7 +61,7 @@ Kaplan_Meier_curves <- function(data,
     stop('one or more specified columns do not exist in the dataframe')
   }
   #fit survival curves
-
+   data$facets = data[[facet_by]]
    if (is.null(cov_col)){
     fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
                                                               event = data[[event_col]]) ~
@@ -91,10 +91,10 @@ Kaplan_Meier_curves <- function(data,
     data[[facet_by]] <- as.factor(data[[facet_by]])
     fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
                                                               event = data[[event_col]]) ~
-                                                 data[[cov_col]] + data[[facet_by]], data = data)
+                                                 data[[cov_col]] , data = data)
 
   }
-
+browser()
   #Plot survival curves
   FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,
@@ -130,7 +130,7 @@ Kaplan_Meier_curves <- function(data,
                                            #ncol            = 2,
                                            #palette       = regCols,
                                            #risk.table.title  = "Hej Siv",
-                                           #data          = data
+                                           data          = data
                                            #distinct(ID, .keep_all = TRUE),
 
   )
