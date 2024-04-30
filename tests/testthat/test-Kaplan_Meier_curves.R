@@ -13,7 +13,8 @@ test_that("columns are in the dataframe", {
 
 data_frame <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv',
                                    package= 'PMXtte'),na.strings=c(".","-99","NA"))
-plot <- Kaplan_Meier_curves(data_frame)
+data_prep <- prep_dataframe(data_frame)
+plot <- Kaplan_Meier_curves(data_prep)
 plot_file <- "kaplan_meier.png"
 png(plot_file, width = 800, height = 600, units = 'px', res = 96)
 print(plot)

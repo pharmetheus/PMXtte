@@ -7,16 +7,134 @@
 Kaplan_Meier_curves(
   data,
   time_col = "TSFDW",
-  status_col = "DV",
-  cov_col = "DOSEF"
+  event_col = "DV",
+  cov_col = NULL,
+  facet_by = NULL,
+  xlab = "Time since first dose (week)",
+  ylab = "Fraction without events",
+  break.time.by = 4,
+  xlim = c(0, 52.1),
+  ylim = c(0, 1),
+  surv.scale = "percent",
+  ggtheme = ggplot2::theme_bw(),
+  conf.int = TRUE,
+  conf.inf.alpha = 0.9,
+  risk.table = TRUE,
+  risk.table.y.text = TRUE,
+  risk.table.y.text.col = TRUE,
+  pval = TRUE,
+  pval.method = TRUE,
+  surv.median.line = "hv",
+  legend = c(0.25, 0.25),
+  legend.labs = sub(pattern = "data\\\\[\\\\[cov_col\\\\]\\\\]=", replacement = "", x =
+    names(fit.FirstEventByArm$strata)),
+  legend.title = cov_col,
+  ...
 )
 }
 \arguments{
-\item{RTTEdata}{dataframe for analysis}
+\item{data}{dataframe used to fit survival curves}
+
+\item{time_col}{The name of the column containing the survival times.}
+
+\item{event_col}{The name of the column indicating an event occurrence (1) or censoring (0)}
+
+\item{cov_col}{The name of the column to stratify on, must be string (e.g. "DOSE") if null(default) there will be no stratification}
+
+\item{ggtheme}{function, ggplot2 theme name. Default value is
+\link[survminer]{theme_survminer}. Allowed values include ggplot2 official themes: see
+\code{\link[ggplot2]{theme}}.}
+
+\item{conf.int}{logical value. If TRUE, plots confidence interval.}
+
+\item{risk.table}{Allowed values include: \itemize{ \item TRUE or FALSE
+specifying whether to show or not the risk table. Default is FALSE. \item
+"absolute" or "percentage". Shows the \bold{absolute number} and the
+\bold{percentage} of subjects at risk by time, respectively. \item "abs_pct"
+to show both absolute number and percentage. \item "nrisk_cumcensor" and
+"nrisk_cumevents". Show the number at risk and, the cumulative number of
+censoring and events, respectively. }}
+
+\item{pval}{logical value, a numeric or a string. If logical and TRUE, the
+p-value is added on the plot. If numeric, than the computet p-value is
+substituted with the one passed with this parameter. If character, then the
+customized string appears on the plot. See examples - Example 3.}
+
+\item{pval.method}{whether to add a text with the test name used for
+calculating the pvalue, that corresponds to survival curves' comparison -
+used only when \code{pval=TRUE}}
+
+\item{surv.median.line}{character vector for drawing a horizontal/vertical
+line at median survival. Allowed values include one of c("none", "hv", "h",
+"v"). v: vertical, h:horizontal.}
+
+\item{...}{
+  Arguments passed on to \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot}}
+  \describe{
+    \item{\code{fit}}{allowed values include:
+\itemize{
+\item a survfit object
+\item a list of survfit objects. Passed to \code{\link[survminer]{ggsurvplot_list}()}
+\item a data frame containing survival curves summary. Passed to \code{\link[survminer]{ggsurvplot_df}()}.
+}}
+    \item{\code{fun}}{an arbitrary function defining a transformation of the survival
+curve.  Often used transformations can be specified with a character
+argument: "event" plots cumulative events (f(y) = 1-y), "cumhaz" plots the
+cumulative hazard function (f(y) = -log(y)), and "pct" for survival
+probability in percentage.}
+    \item{\code{color}}{color to be used for the survival curves. \itemize{ \item If the
+number of strata/group (n.strata) = 1, the expected value is the color name.
+For example color = "blue". \item If n.strata > 1, the expected value is the
+grouping variable name. By default, survival curves are colored by strata
+using the argument color = "strata",  but you can also color survival curves
+by any other grouping variables used to fit the survival curves. In this
+case, it's possible to specify a custom color palette by using the argument
+palette.}}
+    \item{\code{palette}}{the color palette to be used. Allowed values include "hue" for
+the default hue color scale; "grey" for grey color palettes; brewer palettes
+e.g. "RdBu", "Blues", ...; or custom color palette e.g. c("blue", "red"); and scientific journal palettes from ggsci R package, e.g.: "npg",
+ "aaas", "lancet", "jco", "ucscgb", "uchicago", "simpsons" and
+ "rickandmorty".
+See details section for more information.  Can be also a numeric vector of
+length(groups); in this case a basic color palette is created using the
+function \link[grDevices]{palette}.}
+    \item{\code{linetype}}{line types. Allowed values includes i) "strata" for changing
+linetypes by strata (i.e. groups); ii) a numeric vector (e.g., c(1, 2)) or a
+character vector c("solid", "dashed").}
+    \item{\code{test.for.trend}}{logical value. Default is FALSE. If TRUE, returns the
+test for trend p-values. Tests for trend are designed to detect ordered
+differences in survival curves. That is, for at least one group. The test
+for trend can be only performed when the number of groups is > 2.}
+    \item{\code{cumevents}}{logical value specifying whether to show or not the table of
+the cumulative number of events. Default is FALSE.}
+    \item{\code{cumcensor}}{logical value specifying whether to show or not the table of
+the cumulative number of censoring. Default is FALSE.}
+    \item{\code{tables.height}}{numeric value (in [0 - 1]) specifying the general height
+of all tables under the main survival plot.}
+    \item{\code{group.by}}{a character vector containing the name of grouping variables. Should be of length <= 2.
+Alias of the \code{\link[survminer]{ggsurvplot_group_by}()} function.}
+    \item{\code{facet.by}}{a character vector containing the name of grouping variables
+to facet the survival curves into multiple panels. Should be of length <= 2.
+Alias of the \code{\link[survminer]{ggsurvplot_facet}()} function.}
+    \item{\code{add.all}}{a logical value. If TRUE, add the survival curve of pooled patients (null model) onto the main plot.
+Alias of the \code{\link[survminer]{ggsurvplot_add_all}()} function.}
+    \item{\code{combine}}{a logical value. If TRUE, combine a list survfit objects on the same plot.
+Alias of the \code{\link[survminer]{ggsurvplot_combine}()} function.}
+    \item{\code{tables.theme}}{function, ggplot2 theme name. Default value is
+\link[survminer]{theme_survminer}. Allowed values include ggplot2 official themes: see
+\code{\link[ggplot2]{theme}}. Note that, \code{tables.theme} is incremental to \code{ggtheme}.}
+  }}
 }
 \value{
 Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 }
 \description{
 Title
+}
+\examples{
+exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+  RTTEdata <- exampledata \%>\% dplyr::filter(EVID==0&TYPE==0)
+  RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
+  Kaplan_Meier_curves(RTTEdata)
+  Kaplan_Meier_curves(RTTEdata2, cov_col = "DOSE", facet_by = 'SEX')
 }

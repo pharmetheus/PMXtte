@@ -1,9 +1,11 @@
 #' Title
 #'
-#' @param RTTEdata dataframe for analysis
+#' @param data dataframe used to fit survival curves
 #' @param time_col The name of the column containing the survival times.
 #' @param event_col The name of the column indicating an event occurrence (1) or censoring (0)
-#' @param ... Additional arguments to be passed to ggsurvplot (e.g., xlim, title, etc.).
+#' @param cov_col The name of the column to stratify on, must be string (e.g. "DOSE") if null(default) there will be no stratification
+#' @inheritParams survminer::ggsurvplot
+#' @inheritDotParams survminer::ggsurvplot
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @importFrom survival Surv
@@ -11,73 +13,132 @@
 #' @export
 #'
 #' @examples
-Kaplan_Meier_curves <- function(data, time_col = "TSFDW", event_col="DV", cov_col= "DOSEF",...){
+#' exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+#'   RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
+#'   RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+#'   Kaplan_Meier_curves(RTTEdata)
+#'   Kaplan_Meier_curves(RTTEdata2, cov_col = "DOSE", facet_by = 'SEX')
+
+
+Kaplan_Meier_curves <- function(data,
+                                time_col              = "TSFDW",
+                                event_col             ="DV",
+                                cov_col               = NULL,
+                                facet_by              = NULL,
+                                xlab                  = "Time since first dose (week)",
+                                ylab                  = "Fraction without events",
+                                break.time.by         = 4,
+                                xlim                  = c(0,52.1),
+                                ylim                  = c(0,1),
+                                surv.scale            = "percent",
+                                ggtheme               = ggplot2::theme_bw(),
+                                conf.int              = TRUE,
+                                conf.inf.alpha        = 0.9,
+                                risk.table            = TRUE,
+                                risk.table.y.text     = TRUE,
+                                risk.table.y.text.col = TRUE,
+                                pval                  = TRUE,
+                                pval.method           = TRUE,
+                                surv.median.line      ="hv",
+                                legend                = c(0.25, 0.25),
+                                legend.labs           = sub(pattern="data\\[\\[cov_col\\]\\]=",
+                                                            replacement="",
+                                                            x=names(fit.FirstEventByArm$strata)),
+                                legend.title          = cov_col,
+
+                                ...){
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
     stop('Input is not a dataframe')
   }
   # convert time_col, event_col, cov_col to strings if they are not already
-  time_col <- as.character(substitute(time_col))
+  time_col  <- as.character(substitute(time_col))
   event_col <- as.character(substitute(event_col))
-  cov_col <- as.character(substitute(cov_col))
 
-  data <- prep_dataframe(data)
-
+  #data <- prep_dataframe(data, exposure_col = data[[exposure_col]])
   # Check if the columns exist in the dataframe
-  if (!all(c(time_col, event_col, cov_col) %in% names(data))) {
+  if (!all(c(time_col, event_col) %in% names(data))) {
     stop('one or more specified columns do not exist in the dataframe')
   }
-
   #fit survival curves
-  fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
-                                                            event = data[[event_col]]) ~
-                                               data[[cov_col]] , data = data)
-  #set default plot values
-  default_args <- list(xlab          = "Time since first dose (week)",
-                       ylab          = "Fraction without events",
-                       #font.x        = 25,
-                       #font.y        = 25,
-                       #font.tickslab = 16,
-                       #font.legend   = 20,
-                       #cumevents = TRUE,
-                       #cumcensor=TRUE,
-                       #linetype = "DOSEF",
-                       break.time.by = 4,
-                       xlim          = c(0,52.1),
-                       ylim          = c(0,1),
-                       axes.offset   = TRUE,
-                       surv.scale    = "percent",
-                       #tables.height = 0.15,
-                       #facet.by        = c("PROJF"),
-                       #short.panel.labs=TRUE,
-                       ggtheme         = ggplot2::theme_bw(),
-                       censor           = TRUE,
-                       #ncol            = 2,
-                       conf.int      = TRUE,
-                       conf.inf.alpha = 0.9,
-                       #palette       = regCols,
-                       risk.table    = TRUE,
-                       #risk.table.title  = "Hej Siv",
-                       risk.table.y.text = TRUE,
-                       risk.table.y.text.col = TRUE,
-                       pval         = TRUE,
-                       pval.method  = TRUE,
-                       surv.median.line ="hv",
-                       legend        = c(0.25, 0.25),
-                       fit=fit.FirstEventByArm,
-                       #data          = data ,
-                       #distinct(ID, .keep_all = TRUE),
-                       legend.title  = cov_col,
-                       legend.labs   = sub(pattern="data\\[\\[cov_col\\]\\]=",
-                                           replacement="",
-                                           x=names(fit.FirstEventByArm$strata))
-  )
 
-  #merge and override default and user arguments
-  args <- modifyList(default_args, list(...), keep.null = TRUE)
+   if (is.null(cov_col)){
+    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
+                                                              event = data[[event_col]]) ~
+                                                 1 , data = data)
+    legend                = "none"
+    legend.labs           = "all"
+    legend.title          = "all"
+
+  }
+  else if (is.null(facet_by)) {
+    cov_col <- as.character(substitute(cov_col))
+    if (!cov_col %in% names(data)){
+      stop('covariate column does not exist in the dataframe')
+    }
+
+    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
+                                                              event = data[[event_col]]) ~
+                                                              data[[cov_col]] ,
+                                                              data = data)
+
+  }
+  else {
+    cov_col <- as.character(substitute(cov_col))
+    if (!cov_col %in% names(data)){
+      stop('covariate column does not exist in the dataframe')
+    }
+    data[[facet_by]] <- as.factor(data[[facet_by]])
+    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
+                                                              event = data[[event_col]]) ~
+                                                 data[[cov_col]] + data[[facet_by]], data = data)
+
+  }
 
   #Plot survival curves
-  FirstEventByArm <- do.call(survminer::ggsurvplot, args)
+  FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
+                                           ylab                  = ylab,
+                                           break.time.by         = break.time.by,
+                                           xlim                  = xlim,
+                                           ylim                  = ylim,
+                                           surv.scale            = surv.scale,
+                                           ggtheme               = ggtheme,
+                                           conf.int              = conf.int,
+                                           conf.inf.alpha        = conf.inf.alpha,
+                                           risk.table            = risk.table,
+                                           risk.table.y.text     = risk.table.y.text,
+                                           risk.table.y.text.col = risk.table.y.text.col,
+                                           pval                  = pval,
+                                           pval.method           = pval.method,
+                                           surv.median.line      = surv.median.line,
+                                           legend                = legend,
+                                           fit                   = fit.FirstEventByArm,
+                                           legend.title          = legend.title,
+                                           legend.labs           = legend.labs,
+                                           #font.x        = 25,
+                                           #font.y        = 25,
+                                           #font.tickslab = 16,
+                                           #font.legend   = 20,
+                                           #cumevents = TRUE,
+                                           #cumcensor=TRUE,
+                                           #linetype = "DOSEF",
+                                           #tables.height = 0.15,
+                                           #facet.by        = c("PROJF"),
+                                           #short.panel.labs=TRUE,
+                                           #axes.offset   = TRUE, #default is TRUE
+                                           #censor           = TRUE, #default is true
+                                           #ncol            = 2,
+                                           #palette       = regCols,
+                                           #risk.table.title  = "Hej Siv",
+                                           #data          = data
+                                           #distinct(ID, .keep_all = TRUE),
 
+  )
+
+  if (!is.null(facet_by)){
+    plot <- FirstEventByArm$plot +
+            theme_bw() +
+            facet_grid(as.formula(paste('~',data[[facet_by]])))
+    return(plot)}
   return(FirstEventByArm)
 }
