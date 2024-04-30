@@ -8,7 +8,7 @@
 #' @inheritDotParams survminer::ggsurvplot
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
-#' @importFrom ggplot2 theme_bw
+#' @import ggplot2
 #' @importFrom survival Surv
 #' @importFrom survminer ggsurvplot surv_fit
 #' @export
