@@ -9,4 +9,8 @@ Kaplan_Meier_curves(RTTEdata)
 #create plot with stratification by dose
 Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE")
 #create plot with faceted plots by SEX
-Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet_by = 'SEX')
+Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+
+#create plot with faceted plots by SEX and exp.tertile
+RTTEdata2 <- prep_dataframe(exampledata)
+Kaplan_Meier_curves(RTTEdata2, cov_col = 'DOSE', facet.by = c('SEX','exp.tertileF'))

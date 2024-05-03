@@ -9,7 +9,7 @@ Kaplan_Meier_curves(
   time_col = "TSFDW",
   event_col = "DV",
   cov_col = NULL,
-  facet_by = NULL,
+  facet.by = NULL,
   xlab = "Time since first dose (week)",
   ylab = "Fraction without events",
   break.time.by = 4,
@@ -26,7 +26,7 @@ Kaplan_Meier_curves(
   pval.method = TRUE,
   surv.median.line = "hv",
   legend = c(0.25, 0.25),
-  legend.labs = sub(pattern = "data\\\\[\\\\[cov_col\\\\]\\\\]=", replacement = "", x =
+  legend.labs = sub(pattern = paste(cov_col, "=", sep = ""), replacement = "", x =
     names(fit.FirstEventByArm$strata)),
   legend.title = cov_col,
   ...
@@ -40,6 +40,10 @@ Kaplan_Meier_curves(
 \item{event_col}{The name of the column indicating an event occurrence (1) or censoring (0)}
 
 \item{cov_col}{The name of the column to stratify on, must be string (e.g. "DOSE") if null(default) there will be no stratification}
+
+\item{facet.by}{a character vector containing the name of grouping variables
+to facet the survival curves into multiple panels. Should be of length <= 2.
+Alias of the \code{\link[survminer]{ggsurvplot_facet}()} function.}
 
 \item{ggtheme}{function, ggplot2 theme name. Default value is
 \link[survminer]{theme_survminer}. Allowed values include ggplot2 official themes: see
@@ -113,9 +117,6 @@ the cumulative number of censoring. Default is FALSE.}
 of all tables under the main survival plot.}
     \item{\code{group.by}}{a character vector containing the name of grouping variables. Should be of length <= 2.
 Alias of the \code{\link[survminer]{ggsurvplot_group_by}()} function.}
-    \item{\code{facet.by}}{a character vector containing the name of grouping variables
-to facet the survival curves into multiple panels. Should be of length <= 2.
-Alias of the \code{\link[survminer]{ggsurvplot_facet}()} function.}
     \item{\code{add.all}}{a logical value. If TRUE, add the survival curve of pooled patients (null model) onto the main plot.
 Alias of the \code{\link[survminer]{ggsurvplot_add_all}()} function.}
     \item{\code{combine}}{a logical value. If TRUE, combine a list survfit objects on the same plot.
@@ -136,5 +137,5 @@ exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', p
   RTTEdata <- exampledata \%>\% dplyr::filter(EVID==0&TYPE==0)
   RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
   Kaplan_Meier_curves(RTTEdata)
-  Kaplan_Meier_curves(RTTEdata2, cov_col = "DOSE", facet_by = 'SEX')
+  Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
 }

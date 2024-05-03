@@ -4,7 +4,11 @@
 \alias{prep_dataframe}
 \title{Title}
 \usage{
-prep_dataframe(RTTEdata, plottype = "time_to_first_event")
+prep_dataframe(
+  RTTEdata,
+  plottype = "time_to_first_event",
+  exposure_col = CMINSS
+)
 }
 \arguments{
 \item{RTTEdata}{dataframe for to be prepared for plots}

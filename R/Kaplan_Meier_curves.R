@@ -3,7 +3,7 @@
 #' @param data dataframe used to fit survival curves
 #' @param time_col The name of the column containing the survival times.
 #' @param event_col The name of the column indicating an event occurrence (1) or censoring (0)
-#' @param cov_col The name of the column to stratify on, must be string (e.g. "DOSE") if null(default) there will be no stratification
+#' @param cov_col The name of the column to stratify on, must be string (e.g. "DOSE") if (1) there will be no stratification
 #' @inheritParams survminer::ggsurvplot
 #' @inheritDotParams survminer::ggsurvplot
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
@@ -15,17 +15,17 @@
 #'
 #' @examples
 #' exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
-#'   RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
-#'   RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
-#'   Kaplan_Meier_curves(RTTEdata)
-#'   Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet_by = 'SEX')
+#' RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
+#' RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+#' Kaplan_Meier_curves(RTTEdata)
+#' Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
 
 
 Kaplan_Meier_curves <- function(data,
                                 time_col              = "TSFDW",
                                 event_col             ="DV",
-                                cov_col               = NULL,
-                                facet_by              = NULL,
+                                cov_col               = 1 ,
+                                facet.by              = NULL,
                                 xlab                  = "Time since first dose (week)",
                                 ylab                  = "Fraction without events",
                                 break.time.by         = 4,
@@ -42,11 +42,10 @@ Kaplan_Meier_curves <- function(data,
                                 pval.method           = TRUE,
                                 surv.median.line      ="hv",
                                 legend                = c(0.25, 0.25),
-                                legend.labs           = sub(pattern="data\\[\\[cov_col\\]\\]=",
+                                legend.labs           = sub(pattern=paste(cov_col,'=', sep = ''),
                                                             replacement="",
                                                             x=names(fit.FirstEventByArm$strata)),
                                 legend.title          = cov_col,
-
                                 ...){
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
@@ -56,45 +55,33 @@ Kaplan_Meier_curves <- function(data,
   time_col  <- as.character(substitute(time_col))
   event_col <- as.character(substitute(event_col))
 
-  #data <- prep_dataframe(data, exposure_col = data[[exposure_col]])
   # Check if the columns exist in the dataframe
   if (!all(c(time_col, event_col) %in% names(data))) {
     stop('one or more specified columns do not exist in the dataframe')
   }
-  #fit survival curves
-   #data$facets = data[[facet_by]]
-   if (is.null(cov_col)){
-    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
-                                                              event = data[[event_col]]) ~
-                                                 1 , data = data)
+  #change settings based on covariates and facets input
+   if (cov_col == 1){
     legend                = "none"
     legend.labs           = "all"
     legend.title          = "all"
-
-  }
-  else if (is.null(facet_by)) {
-    cov_col <- as.character(substitute(cov_col))
-    if (!cov_col %in% names(data)){
-      stop('covariate column does not exist in the dataframe')
+    pval                  = FALSE
+    pval.method           = FALSE
     }
-
-    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
-                                                              event = data[[event_col]]) ~
-                                                              data[[cov_col]] ,
-                                                              data = data)
-
-  }
   else {
     cov_col <- as.character(substitute(cov_col))
     if (!cov_col %in% names(data)){
       stop('covariate column does not exist in the dataframe')
     }
-    data[[facet_by]] <- as.factor(data[[facet_by]])
-    fit.FirstEventByArm <- survminer::surv_fit(survival::Surv(time = data[[time_col]],
-                                                              event = data[[event_col]]) ~
-                                                 data[[cov_col]] , data = data)
-
   }
+  if (!is.null(facet.by)){
+    pval = FALSE
+    pval.method = FALSE
+  }
+
+  #fit survival curves
+  formula_text        <- paste("survival::Surv(",time_col,",",event_col,")~",cov_col)
+  fit.FirstEventByArm <- survminer::surv_fit(as.formula(formula_text) , data = data)
+
   #Plot survival curves
   FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,
@@ -115,6 +102,7 @@ Kaplan_Meier_curves <- function(data,
                                            fit                   = fit.FirstEventByArm,
                                            legend.title          = legend.title,
                                            legend.labs           = legend.labs,
+                                           facet.by              = facet.by,
                                            #font.x        = 25,
                                            #font.y        = 25,
                                            #font.tickslab = 16,
@@ -123,7 +111,6 @@ Kaplan_Meier_curves <- function(data,
                                            #cumcensor=TRUE,
                                            #linetype = "DOSEF",
                                            #tables.height = 0.15,
-                                           #facet.by        = c("PROJF"),
                                            #short.panel.labs=TRUE,
                                            #axes.offset   = TRUE, #default is TRUE
                                            #censor           = TRUE, #default is true
@@ -135,10 +122,6 @@ Kaplan_Meier_curves <- function(data,
 
   )
 
-  if (!is.null(facet_by)){
-    plot <- FirstEventByArm$plot +
-            ggplot2::theme_bw() +
-            ggplot2::facet_grid(as.formula(paste('~',data[[facet_by]])))
-    return(plot)}
+
   return(FirstEventByArm)
 }

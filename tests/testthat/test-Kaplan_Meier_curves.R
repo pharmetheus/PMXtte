@@ -1,26 +1,30 @@
-#test input validation
-test_that("Function throughs error if in input is not dataframe", {
+PMXRenv::library.unqualified("vdiffr")
+
+test_that("Kaplan Meier curves work", {
   x <- c('x','y')
   expect_error(Kaplan_Meier_curves(data = x),'Input is not a dataframe')
-})
 
-test_that("columns are in the dataframe", {
   data_frame <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv',
                                      package= 'PMXtte'),na.strings=c(".","-99","NA"))
   expect_error(Kaplan_Meier_curves(data_frame, time_col = 'times'),
                'one or more specified columns do not exist in the dataframe')
+  expect_error(Kaplan_Meier_curves(data_frame, cov_col = 1),
+               'covariate column does not exist in the dataframe')
+  RTTEdata <- data_frame %>% dplyr::filter(EVID==0&TYPE==0)
+  RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+
+  svg()
+  p1 <-  Kaplan_Meier_curves(RTTEdata)
+  p2 <- Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE")
+  p3 <- Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+  dev.off()
+
+  vdiffr::expect_doppelganger("Kaplan Meier plot with default options", p1)
+  vdiffr::expect_doppelganger("Kaplan Meier plot by dose", p2)
+  vdiffr::expect_doppelganger("Kaplan Meier plot by dose faceted by SEX", p3)
+
+
+
+
 })
 
-data_frame <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv',
-                                   package= 'PMXtte'),na.strings=c(".","-99","NA"))
-data_prep <- prep_dataframe(data_frame)
-plot <- Kaplan_Meier_curves(data_prep)
-plot_file <- "kaplan_meier.png"
-png(plot_file, width = 800, height = 600, units = 'px', res = 96)
-print(plot)
-dev.off()
-#Test the plot against a snapshot
-test_that("Plot matches snapshot", {
-
-  expect_snapshot_file(plot_file, 'Kaplan_meier_curves_snapshot')
-})
