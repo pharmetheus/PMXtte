@@ -5,12 +5,15 @@ exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', p
 RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
 RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
 #create plot with a single curve
-Kaplan_Meier_curves(RTTEdata)
+plotKaplanMeier(RTTEdata)
 #create plot with stratification by dose
-Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE")
+plotKaplanMeier(RTTEdata, cov_col = "DOSE")
 #create plot with faceted plots by SEX
-Kaplan_Meier_curves(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
-
+plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+#create facet plots changing panel labs
+plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('MALE','Female')))
 #create plot with faceted plots by SEX and exp.tertile
 RTTEdata2 <- prep_dataframe(exampledata)
-Kaplan_Meier_curves(RTTEdata2, cov_col = 'DOSE', facet.by = c('SEX','exp.tertileF'))
+plotKaplanMeier(RTTEdata2, cov_col = 'DOSE', facet.by = c('SEX','exp.tertileF'))
+
+
