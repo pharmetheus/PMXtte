@@ -165,6 +165,7 @@ plotKaplanMeier <- function(data,
                  fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
                  linetype = guide_legend(order = 3))
 
+
     if (label.parsed == TRUE) {
       if(length(facet.by) == 1){
         facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
