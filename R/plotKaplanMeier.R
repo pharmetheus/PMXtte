@@ -68,6 +68,7 @@ plotKaplanMeier <- function(data,
                             palette                 = PMXColors::pmx_palettes(),
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,
+                            add.ciWidth.to.legend   = TRUE,
                             conf.inf.alpha          = 0.9,
                             risk.table              = TRUE,
                             risk.table.y.text       = TRUE,
@@ -80,6 +81,8 @@ plotKaplanMeier <- function(data,
                             surv.median.line.legend = 'Median Survival',
                             legend                  = "top",
                             legend.title            = cov_col,
+                            conf.int.legend         = 'Confidence intervals',
+                            surv.curve.legend       = 'Survival Curves',
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
                                                         replacement="",
                                                         x=names(fit.FirstEventByArm$strata)),
@@ -224,11 +227,16 @@ if (surv.median.line %in% c('hv', 'v', 'h')){
     scale_linetype_manual(name = '',
                           values = c("Median" = "dashed"),
                           label = surv.median.line.legend
-                          )+
-   guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
+                          )
 
 
 }
-
+if (add.ciWidth.to.legend){
+  conf.int.legend <- paste(ciWidth*100, '% ',conf.int.legend, collapse = '')
+  }
+FirstEventByArm$plot <- FirstEventByArm$plot +
+  guides(color= guide_legend(order=1, title = surv.curve.legend),
+         fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
+         linetype = guide_legend(order = 3))
   return(FirstEventByArm)
 }
