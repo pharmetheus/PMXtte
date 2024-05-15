@@ -52,9 +52,7 @@ plotKaplanMeier(
 
 \item{cov_col}{The name of the column to stratify on, must be string (e.g. "DOSE") if (1) there will be no stratification}
 
-\item{facet.by}{a character vector containing the name of grouping variables
-to facet the survival curves into multiple panels. Should be of length <= 2.
-Alias of the \code{\link[survminer]{ggsurvplot_facet}()} function.}
+\item{facet.by}{a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.}
 
 \item{panel.labs}{a list of one or two character vectors to modify facet label
 text. For example, panel.labs = list(sex = c("Male", "Female")) specifies
@@ -172,6 +170,10 @@ Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 \description{
 This function generates Kaplan Meier curves plot using ggsurvplot from a dataframe
 }
+\details{
+The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
+The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes.
+}
 \examples{
 #load example data
 exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
@@ -190,7 +192,7 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
  plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
 
 # Change the size of pval text
- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 4)
+ plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
 
 # Change the starting color in the palette
  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))

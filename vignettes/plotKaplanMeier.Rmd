@@ -36,7 +36,7 @@ RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
 
 ```
 
-To create a basic plot with a single you can use the default settings 
+To create a basic plot with a single curve you can use the default settings 
 ```{r, fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
 plotKaplanMeier(RTTEdata,
                 time_col = 'TSFDW' #The default value

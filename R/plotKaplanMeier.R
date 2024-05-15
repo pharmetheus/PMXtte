@@ -10,10 +10,13 @@
 #' @param ggtheme function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.
 #' @param risk.table.fontsize size of the font for survival table in points
 #' @param pval.size size of font for the pval in points
+#' @param facet.by a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.
 #' @inheritParams survminer::ggsurvplot
 #' @inheritParams survminer::ggsurvplot_facet
 #' @inheritDotParams survminer::ggsurvplot
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
+#' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
+#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes.
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @import ggplot2
@@ -39,7 +42,7 @@
 #'  plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
 #'
 #' # Change the size of pval text
-#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 4)
+#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
 #'
 #' # Change the starting color in the palette
 #'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
