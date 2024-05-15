@@ -68,6 +68,7 @@ plotKaplanMeier <- function(data,
                             palette                 = PMXColors::pmx_palettes(),
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,
+                            add.ciWidth.to.legend   = TRUE,
                             conf.inf.alpha          = 0.9,
                             risk.table              = TRUE,
                             risk.table.y.text       = TRUE,
@@ -80,9 +81,11 @@ plotKaplanMeier <- function(data,
                             surv.median.line.legend = 'Median Survival',
                             legend                  = "top",
                             legend.title            = cov_col,
+                            conf.int.legend         = 'Confidence intervals',
+                            surv.curve.legend       = 'Survival Curves',
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
-                                                        replacement="",
-                                                        x=names(fit.FirstEventByArm$strata)),
+                                                          replacement="",
+                                                          x=names(fit.FirstEventByArm$strata)),
                             nrow = NULL,
                             ncol = NULL,
                             scales = "fixed",
@@ -121,51 +124,51 @@ plotKaplanMeier <- function(data,
 
   if (!is.null(facet.by)){
     facetPlots <- survminer::ggsurvplot_facet(fit                = fit.FirstEventByArm,
-                                               data                   = data,
-                                               facet.by               = facet.by,
-                                               pval                   = pval,
-                                               short.panel.labs       = short.panel.labs,
-                                               pval.method            = pval.method,
-                                               panel.labs             = panel.labs,
-                                               surv.scale             = surv.scale,
-                                               ggtheme                = ggtheme,
-                                               conf.int               = conf.int,
-                                               conf.inf.alpha         = conf.inf.alpha,
-                                               surv.median.line       = surv.median.line,
-                                               legend                 = legend,
-                                               legend.title           = legend.title,
-                                               legend.labs            = legend.labs,
-                                               xlab                   = xlab,
-                                               ylab                   = ylab,
-                                               break.time.by          = break.time.by,
-                                               xlim                   = xlim,
-                                               ylim                   = ylim,
-                                               palette                = palette,
-                                               pval.size              = pval.size * 0.36,
-                                               ...
-                                               )
+                                              data                   = data,
+                                              facet.by               = facet.by,
+                                              pval                   = pval,
+                                              short.panel.labs       = short.panel.labs,
+                                              pval.method            = pval.method,
+                                              panel.labs             = panel.labs,
+                                              surv.scale             = surv.scale,
+                                              ggtheme                = ggtheme,
+                                              conf.int               = conf.int,
+                                              conf.inf.alpha         = conf.inf.alpha,
+                                              surv.median.line       = surv.median.line,
+                                              legend                 = legend,
+                                              legend.title           = legend.title,
+                                              legend.labs            = legend.labs,
+                                              xlab                   = xlab,
+                                              ylab                   = ylab,
+                                              break.time.by          = break.time.by,
+                                              xlim                   = xlim,
+                                              ylim                   = ylim,
+                                              palette                = palette,
+                                              pval.size              = pval.size * 0.36,
+                                              ...
+    )
     if (surv.median.line %in% c('hv', 'v', 'h')){
       facetPlots <- facetPlots +
-      geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
-      scale_linetype_manual(name = '',
-                            values = c("Median" = "dashed"),
-                            label = surv.median.line.legend
-      )+
-      guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
+        geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
+        scale_linetype_manual(name = '',
+                              values = c("Median" = "dashed"),
+                              label = surv.median.line.legend
+        )+
+        guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
     }
     if (label.parsed == TRUE) {
-    if(length(facet.by) == 1){
-      facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
-      facetPlots <- facetPlots + facet_wrap(facet_formula,
-                                            scales = scales,
-                                            nrow = nrow,
-                                            ncol = ncol,
-                                            labeller = label_parsed)
-    }
-    else if(length(facet.by) == 2){
-      facet_formula <- paste(facet.by, collapse = " ~ ") %>% stats::as.formula()
-      facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
-    }}
+      if(length(facet.by) == 1){
+        facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
+        facetPlots <- facetPlots + facet_wrap(facet_formula,
+                                              scales = scales,
+                                              nrow = nrow,
+                                              ncol = ncol,
+                                              labeller = label_parsed)
+      }
+      else if(length(facet.by) == 2){
+        facet_formula <- paste(facet.by, collapse = " ~ ") %>% stats::as.formula()
+        facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
+      }}
 
     return(facetPlots)
   }
@@ -218,17 +221,22 @@ plotKaplanMeier <- function(data,
 
   )
 
-if (surv.median.line %in% c('hv', 'v', 'h')){
+  if (surv.median.line %in% c('hv', 'v', 'h')){
+    FirstEventByArm$plot <- FirstEventByArm$plot +
+      geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
+      scale_linetype_manual(name = '',
+                            values = c("Median" = "dashed"),
+                            label = surv.median.line.legend
+      )
+
+
+  }
+  if (add.ciWidth.to.legend){
+    conf.int.legend <- paste0(ciWidth*100, '% ',conf.int.legend)
+  }
   FirstEventByArm$plot <- FirstEventByArm$plot +
-    geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
-    scale_linetype_manual(name = '',
-                          values = c("Median" = "dashed"),
-                          label = surv.median.line.legend
-                          )+
-   guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
-
-
-}
-
+    guides(color= guide_legend(order=1, title = surv.curve.legend),
+           fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
+           linetype = guide_legend(order = 3))
   return(FirstEventByArm)
 }
