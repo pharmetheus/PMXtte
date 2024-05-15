@@ -1,0 +1,93 @@
+---
+title: "Plot Kaplan Meier curves for tte data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plot Kaplan Meier curves for tte data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::load_all("/PMX/Projects/Pharmetheus/PMXtte/PMXtte/")
+#suppressPackageStartupMessages(library(PMXtte))
+#suppressPackageStartupMessages(library(dplyr))
+#suppressPackageStartupMessages(library(ggplot2))
+
+```
+
+# Introduction
+
+This vignette describes the use of the plotKaplanMeier function and its arguments. The function fits the data using surv_fit then plots the curves using ggsurvplot. The function requires at least a dataset with a time variable and event variable. 
+
+The following code prepares the example data to create a first time to event dataframe.
+
+```{r}
+exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+
+RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
+RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+
+```
+
+To create a basic plot with a single curve you can use the default settings 
+```{r, fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW' #The default value
+                )
+```
+
+Then we can create a kaplan-Meier plot stratified by Arm using the cov_col argument
+```{r,fig.width=10,fig.height=6,out.width="100%"}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW', #The default value
+                cov_col = "DOSE"
+                )
+```
+
+Extra modification on the plot to remove the median line and p-value can be done by passing parameters to ggsurvplot.
+```{r, fig.width=10,fig.height=6,out.width="100%"}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW', #The default value
+                cov_col = "DOSE",
+                pval = FALSE,
+                surv.median.line = 'none'
+                )
+```
+
+we can also change the colors by modifying the palette and theme. 
+```{r,fig.width=10,fig.height=6,out.width="100%"}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW', #The default value
+                cov_col = "DOSE",
+                palette = PMXColors::pmx_palettes(firstColorNum = 3),
+                legend.title = 'Dose (mg)'
+                )
+```
+
+To change font size for the table and table height we can pass arguments to ggsurvplot. The arguments risk.table.fontsize and pval.size use points which will then be converted to be used as ggplot arguments. 
+```{r,fig.width=10,fig.height=6,out.width="100%"}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW', #The default value
+                cov_col = "DOSE",
+                risk.table.fontsize = 9,
+                table.height = 0.3
+                )
+```
+
+To create facets by a covariate we can use the facet.by argument. currently the function does not support faceting tables, therfore only the plot will be faceted. the option panel.labs can be used to change the labels of the panels. 
+```{r,fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
+plotKaplanMeier(RTTEdata,
+                time_col = 'TSFDW', #The default value
+                cov_col = "DOSE",
+                facet.by = 'SEX',
+                panel.labs = list('SEX' = c('Male','Female'))
+                )
+```
+
