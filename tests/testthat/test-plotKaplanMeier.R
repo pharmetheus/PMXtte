@@ -17,11 +17,15 @@ test_that("plotKaplanMeier work", {
   p1 <-  plotKaplanMeier(RTTEdata)
   p2 <- plotKaplanMeier(RTTEdata, cov_col = "DOSE")
   p3 <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+  p4 <- plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
+
   dev.off()
 
   vdiffr::expect_doppelganger("Kaplan Meier plot with default options", p1)
   vdiffr::expect_doppelganger("Kaplan Meier plot by dose", p2)
   vdiffr::expect_doppelganger("Kaplan Meier plot by dose faceted by SEX", p3)
+  vdiffr::expect_doppelganger("Change panel labs of facets", p4)
+
 
 
 

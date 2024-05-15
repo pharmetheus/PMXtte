@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotKaplanMeier.R
 \name{plotKaplanMeier}
 \alias{plotKaplanMeier}
-\title{Title}
+\title{Create Kaplan Meier plots}
 \usage{
 plotKaplanMeier(
   data,
@@ -11,26 +11,35 @@ plotKaplanMeier(
   cov_col = 1,
   facet.by = NULL,
   panel.labs = NULL,
+  short.panel.labs = TRUE,
+  label.parsed = TRUE,
   xlab = "Time since first dose (week)",
   ylab = "Fraction without events",
   break.time.by = 4,
   xlim = c(0, 52.1),
   ylim = c(0, 1),
   surv.scale = "percent",
-  ggtheme = ggplot2::theme_bw(),
+  ggtheme = PMXColors::theme_pmx(),
+  palette = PMXColors::pmx_palettes(),
   conf.int = TRUE,
+  ciWidth = 0.95,
   conf.inf.alpha = 0.9,
   risk.table = TRUE,
   risk.table.y.text = TRUE,
   risk.table.y.text.col = TRUE,
-  risk.table.fontsize = 4,
+  risk.table.fontsize = 10,
   pval = TRUE,
   pval.method = TRUE,
+  pval.size = 10,
   surv.median.line = "hv",
+  surv.median.line.legend = "Median Survival",
   legend = "top",
+  legend.title = cov_col,
   legend.labs = sub(pattern = paste(cov_col, "=", sep = ""), replacement = "", x =
     names(fit.FirstEventByArm$strata)),
-  legend.title = cov_col,
+  nrow = NULL,
+  ncol = NULL,
+  scales = "fixed",
   ...
 )
 }
@@ -53,11 +62,26 @@ the labels for the "sex" variable. For two grouping variables, you can use
 for example panel.labs = list(sex = c("Male", "Female"), rx = c("Obs",
 "Lev", "Lev2") ).}
 
-\item{ggtheme}{function, ggplot2 theme name. Default value is
-\link[survminer]{theme_survminer}. Allowed values include ggplot2 official themes: see
-\code{\link[ggplot2]{theme}}.}
+\item{short.panel.labs}{logical value. Default is FALSE. If TRUE, create short
+labels for panels by omitting variable names; in other words panels will be
+labelled only by variable grouping levels.}
+
+\item{label.parsed}{if TRUE (default), facet labels can include superscipts and greek letters}
+
+\item{ggtheme}{function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.}
+
+\item{palette}{the color palette to be used. Allowed values include "hue" for
+the default hue color scale; "grey" for grey color palettes; brewer palettes
+e.g. "RdBu", "Blues", ...; or custom color palette e.g. c("blue", "red"); and scientific journal palettes from ggsci R package, e.g.: "npg",
+ "aaas", "lancet", "jco", "ucscgb", "uchicago", "simpsons" and
+ "rickandmorty".
+See details section for more information.  Can be also a numeric vector of
+length(groups); in this case a basic color palette is created using the
+function \link[grDevices]{palette}.}
 
 \item{conf.int}{logical value. If TRUE, plots confidence interval.}
+
+\item{ciWidth}{confidence intervals to be passed in surv_fit default is 0.95}
 
 \item{risk.table}{Allowed values include: \itemize{ \item TRUE or FALSE
 specifying whether to show or not the risk table. Default is FALSE. \item
@@ -66,6 +90,8 @@ specifying whether to show or not the risk table. Default is FALSE. \item
 to show both absolute number and percentage. \item "nrisk_cumcensor" and
 "nrisk_cumevents". Show the number at risk and, the cumulative number of
 censoring and events, respectively. }}
+
+\item{risk.table.fontsize}{size of the font for survival table in points}
 
 \item{pval}{logical value, a numeric or a string. If logical and TRUE, the
 p-value is added on the plot. If numeric, than the computet p-value is
@@ -76,13 +102,23 @@ customized string appears on the plot. See examples - Example 3.}
 calculating the pvalue, that corresponds to survival curves' comparison -
 used only when \code{pval=TRUE}}
 
+\item{pval.size}{size of font for the pval in points}
+
 \item{surv.median.line}{character vector for drawing a horizontal/vertical
 line at median survival. Allowed values include one of c("none", "hv", "h",
 "v"). v: vertical, h:horizontal.}
 
+\item{surv.median.line.legend}{Text to be used for median survival line in the legend}
+
 \item{legend.labs}{character vector specifying legend labels. Used to replace
 the names of the strata from the fit. Should be given in the same order as
 those strata.}
+
+\item{nrow, ncol}{Number of rows and columns in the pannel. Used only when the
+data is faceted by one grouping variable.}
+
+\item{scales}{should axis scales of panels be fixed ("fixed", the default),
+free ("free"), or free in one dimension ("free_x", "free_y").}
 
 \item{...}{
   Arguments passed on to \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot}}
@@ -106,14 +142,6 @@ using the argument color = "strata",  but you can also color survival curves
 by any other grouping variables used to fit the survival curves. In this
 case, it's possible to specify a custom color palette by using the argument
 palette.}}
-    \item{\code{palette}}{the color palette to be used. Allowed values include "hue" for
-the default hue color scale; "grey" for grey color palettes; brewer palettes
-e.g. "RdBu", "Blues", ...; or custom color palette e.g. c("blue", "red"); and scientific journal palettes from ggsci R package, e.g.: "npg",
- "aaas", "lancet", "jco", "ucscgb", "uchicago", "simpsons" and
- "rickandmorty".
-See details section for more information.  Can be also a numeric vector of
-length(groups); in this case a basic color palette is created using the
-function \link[grDevices]{palette}.}
     \item{\code{linetype}}{line types. Allowed values includes i) "strata" for changing
 linetypes by strata (i.e. groups); ii) a numeric vector (e.g., c(1, 2)) or a
 character vector c("solid", "dashed").}
@@ -142,12 +170,28 @@ Alias of the \code{\link[survminer]{ggsurvplot_combine}()} function.}
 Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 }
 \description{
-Title
+This function generates Kaplan Meier curves plot using ggsurvplot from a dataframe
 }
 \examples{
+#load example data
 exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+
+#generate time to first event dataframe
 RTTEdata <- exampledata \%>\% dplyr::filter(EVID==0&TYPE==0)
 RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
-plotKaplanMeier(RTTEdata)
-plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+
+#default plot with one curve
+ plotKaplanMeier(RTTEdata)
+
+# Kaplan Meier plot stratified by Dose and faceted by SEX
+ plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+
+# Change the panel labs of the facets
+ plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
+
+# Change the size of pval text
+ plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 4)
+
+# Change the starting color in the palette
+ plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
 }

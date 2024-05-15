@@ -13,10 +13,14 @@ RoxygenNote: 7.2.1
 Imports: 
     dplyr,
     ggplot2,
+    PMXColors,
     rlang,
     survival,
     survminer
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3
+VignetteBuilder: knitr

@@ -10,10 +10,18 @@ plotKaplanMeier(RTTEdata)
 plotKaplanMeier(RTTEdata, cov_col = "DOSE")
 #create plot with faceted plots by SEX
 plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
-#create facet plots changing panel labs
-plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('MALE','Female')))
+#create facet plots and change panel labs
+ # RTTEdata2$SEX <- factor(RTTEdata2$SEX, labels = c('alpha^2','FEMALE'), levels = c(0,1))
+ #levels(RTTEdata2$SEX) <- c('alpha^2','female')
+plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
+
 #create plot with faceted plots by SEX and exp.tertile
 RTTEdata2 <- prep_dataframe(exampledata)
-plotKaplanMeier(RTTEdata2, cov_col = 'DOSE', facet.by = c('SEX','exp.tertileF'))
+plotKaplanMeier(RTTEdata2, cov_col = 'DOSE', facet.by = c('SEX','exp.tertileF'),panel.labs = list('SEX' = c('alpha^2','female')))
 
 
+p1 <- plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('alpha^2','female')))
+p1 <- p1 + facet_wrap(~ SEX, labeller = label_parsed)
+p1
+
+p1 <- plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('alpha^2','female')), ncol =1)
