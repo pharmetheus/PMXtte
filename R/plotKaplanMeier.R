@@ -241,9 +241,7 @@ plotKaplanMeier <- function(data,
 
 
   }
-  if (add.ciWidth.to.legend){
-    conf.int.legend <- paste0(ciWidth*100, '% ',conf.int.legend)
-  }
+
   FirstEventByArm$plot <- FirstEventByArm$plot +
     guides(color= guide_legend(order=1, title = surv.curve.legend),
            fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
