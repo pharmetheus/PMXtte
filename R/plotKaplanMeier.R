@@ -69,7 +69,7 @@ plotKaplanMeier <- function(data,
                             xlab                    = "Time since first dose (week)",
                             ylab                    = "Fraction without events",
                             break.time.by           = 4,
-                            xlim                    = c(0,52.1),
+                            xlim                    = NULL,
                             ylim                    = c(0,1),
                             surv.scale              = "percent",
                             ggtheme                 = PMXColors::theme_pmx(),
@@ -82,7 +82,7 @@ plotKaplanMeier <- function(data,
                             risk.table.y.text       = TRUE,
                             risk.table.y.text.col   = TRUE,
                             risk.table.fontsize     = 10,
-                            pval                    = TRUE,
+                            pval                    = FALSE,
                             pval.method             = TRUE,
                             pval.size               = 10,
                             surv.median.line        ="hv",
@@ -192,7 +192,7 @@ plotKaplanMeier <- function(data,
 
     if (label.parsed == TRUE) {
       if(length(facet.by) == 1){
-        facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
+        facet_formula <- paste0("~", facet.by) %>% as.formula()
         facetPlots <- facetPlots + facet_wrap(facet_formula,
                                               scales = scales,
                                               nrow = nrow,
@@ -200,7 +200,7 @@ plotKaplanMeier <- function(data,
                                               labeller = label_parsed)
       }
       else if(length(facet.by) == 2){
-        facet_formula <- paste(facet.by, collapse = " ~ ") %>% stats::as.formula()
+        facet_formula <- paste(facet.by, collapse = " ~ ") %>% as.formula()
         facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
       }}
 
