@@ -9,14 +9,22 @@
 #' @param ciWidth confidence intervals to be passed in surv_fit default is 0.95
 #' @param ggtheme function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.
 #' @param risk.table.fontsize size of the font for survival table in points
+#' @param risk.table Allowed values include: \itemize{ \item TRUE or FALSE
+#'  specifying whether to show or not the risk table. Default is TRUE \item
+#'  "absolute" or "percentage". Shows the \bold{absolute number} and the
+#'  \bold{percentage} of subjects at risk by time, respectively. \item "abs_pct"
+#'  to show both absolute number and percentage. \item "nrisk_cumcensor" and
+#'  "nrisk_cumevents". Show the number at risk and, the cumulative number of
+#'  censoring and events, respectively. }
 #' @param pval.size size of font for the pval in points
+#' @param pval logical value, a numeric or a string. If logical and TRUE, the p-value is added on the plot. If numeric, then the computed p-value is substituted with the one passed with this parameter. If character, then the customized string appears on the plot.
 #' @param facet.by a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.
 #' @inheritParams survminer::ggsurvplot
 #' @inheritParams survminer::ggsurvplot_facet
 #' @inheritDotParams survminer::ggsurvplot
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
 #' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
-#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes.
+#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @import ggplot2
@@ -46,6 +54,13 @@
 #'
 #' # Change the starting color in the palette
 #'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+#'
+#'  # Change the color for a single curve plot
+#'  plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+#'
+#'  # Create custom palette of colors
+#'  Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
+#'  plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
 #' @export
 
 
@@ -53,7 +68,7 @@
 plotKaplanMeier <- function(data,
                             time_col                = "TSFDW",
                             event_col               ="DV",
-                            cov_col                 = 1 ,
+                            cov_col                 = NULL ,
                             facet.by                = NULL,
                             panel.labs              = NULL,
                             short.panel.labs        = TRUE,
@@ -61,28 +76,32 @@ plotKaplanMeier <- function(data,
                             xlab                    = "Time since first dose (week)",
                             ylab                    = "Fraction without events",
                             break.time.by           = 4,
-                            xlim                    = c(0,52.1),
+                            xlim                    = NULL,
                             ylim                    = c(0,1),
                             surv.scale              = "percent",
                             ggtheme                 = PMXColors::theme_pmx(),
                             palette                 = PMXColors::pmx_palettes(),
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,
-                            conf.inf.alpha          = 0.9,
+                            add.ciWidth.to.legend   = TRUE,
+                            conf.int.alpha          = 0.3,
+                            conf.int.fill           = 'gray',
                             risk.table              = TRUE,
                             risk.table.y.text       = TRUE,
                             risk.table.y.text.col   = TRUE,
                             risk.table.fontsize     = 10,
-                            pval                    = TRUE,
+                            pval                    = FALSE,
                             pval.method             = TRUE,
                             pval.size               = 10,
                             surv.median.line        ="hv",
                             surv.median.line.legend = 'Median Survival',
                             legend                  = "top",
                             legend.title            = cov_col,
+                            conf.int.legend         = 'Confidence intervals',
+                            surv.curve.legend       = 'Survival Curves',
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
-                                                        replacement="",
-                                                        x=names(fit.FirstEventByArm$strata)),
+                                                          replacement="",
+                                                          x=names(fit$strata)),
                             nrow = NULL,
                             ncol = NULL,
                             scales = "fixed",
@@ -100,79 +119,123 @@ plotKaplanMeier <- function(data,
   if (!all(c(time_col, event_col) %in% names(data))) {
     stop('one or more specified columns do not exist in the dataframe')
   }
-  #change settings based on covariates and facets input
-  if (cov_col == 1){
-    legend                <- "none"
-    legend.labs           <- "all"
-    legend.title          <- "all"
-    pval                  <- FALSE
-    pval.method           <- FALSE
-  }
-  else {
+
+
+  if (!is.null(cov_col)) {
     cov_col <- as.character(substitute(cov_col))
     if (!cov_col %in% names(data)){
       stop('covariate column does not exist in the dataframe')
     }
   }
+  else {
+    cov_col <- 1
+    pval                  <- FALSE
+    pval.method           <- FALSE
+    conf.int.fill         <- 'strata'
+
+    if (surv.curve.legend == 'Survival Curves'){
+      surv.curve.legend <- 'Survival Curve'
+    }
+    if (conf.int.legend == 'Confidence intervals'){
+      conf.int.legend <- 'Confidence interval'
+    }
+
+  }
 
   #fit survival curves
   formula_text        <- paste("survival::Surv(",time_col,",",event_col,")~",cov_col)
-  fit.FirstEventByArm <- survminer::surv_fit(as.formula(formula_text) , data = data , conf.int = ciWidth)
+  fit <- survminer::surv_fit(as.formula(formula_text) , data = data , conf.int = ciWidth)
+
+  # title for confidence interval legend
+  if (add.ciWidth.to.legend){
+    conf.int.legend <- paste0(ciWidth*100, '% ',conf.int.legend)
+  }
 
   if (!is.null(facet.by)){
-    facetPlots <- survminer::ggsurvplot_facet(fit                = fit.FirstEventByArm,
-                                               data                   = data,
-                                               facet.by               = facet.by,
-                                               pval                   = pval,
-                                               short.panel.labs       = short.panel.labs,
-                                               pval.method            = pval.method,
-                                               panel.labs             = panel.labs,
-                                               surv.scale             = surv.scale,
-                                               ggtheme                = ggtheme,
-                                               conf.int               = conf.int,
-                                               conf.inf.alpha         = conf.inf.alpha,
-                                               surv.median.line       = surv.median.line,
-                                               legend                 = legend,
-                                               legend.title           = legend.title,
-                                               legend.labs            = legend.labs,
-                                               xlab                   = xlab,
-                                               ylab                   = ylab,
-                                               break.time.by          = break.time.by,
-                                               xlim                   = xlim,
-                                               ylim                   = ylim,
-                                               palette                = palette,
-                                               pval.size              = pval.size * 0.36,
-                                               ...
-                                               )
+    facetPlots <- survminer::ggsurvplot_facet(fit                = fit,
+                                              data                   = data,
+                                              facet.by               = facet.by,
+                                              pval                   = pval,
+                                              short.panel.labs       = short.panel.labs,
+                                              pval.method            = pval.method,
+                                              panel.labs             = panel.labs,
+                                              surv.scale             = surv.scale,
+                                              ggtheme                = ggtheme,
+                                              conf.int               = conf.int,
+                                              conf.int.alpha         = conf.int.alpha,
+                                              surv.median.line       = surv.median.line,
+                                              legend                 = legend,
+                                              legend.title           = legend.title,
+                                              legend.labs            = legend.labs,
+                                              xlab                   = xlab,
+                                              ylab                   = ylab,
+                                              break.time.by          = break.time.by,
+                                              xlim                   = xlim,
+                                              ylim                   = ylim,
+                                              palette                = palette,
+                                              pval.size              = pval.size * 0.36,
+                                              ...
+    )
     if (surv.median.line %in% c('hv', 'v', 'h')){
+      if(!is.null(fit$strata) | is.matrix(fit$surv)){
+        .table <- as.data.frame(summary(fit)$table)
+      }
+      else{
+        .table <- t(as.data.frame(summary(fit)$table))
+        rownames(.table) <- "All"
+      }
+
+      surv_median <- as.vector(.table[, "median"])
+      df <- data.frame(x1 = surv_median, x2 = surv_median,
+                       y1 = rep(0, length(surv_median)),
+                       y2 = rep(0.5, length(surv_median))
+      )
+      df <- na.omit(df)
+      if (nrow(df)>0){
       facetPlots <- facetPlots +
-      geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
-      scale_linetype_manual(name = '',
-                            values = c("Median" = "dashed"),
-                            label = surv.median.line.legend
-      )+
-      guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
-    }
+        geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
+        scale_linetype_manual(name = '',
+                              values = c("Median" = "dashed"),
+                              label = surv.median.line.legend
+        )
+      }}
+
+        facetPlots <- facetPlots +
+          guides(color= guide_legend(order=1, title = surv.curve.legend),
+                 fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
+                 linetype = guide_legend(order = 3))
+
+
     if (label.parsed == TRUE) {
-    if(length(facet.by) == 1){
-      facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
-      facetPlots <- facetPlots + facet_wrap(facet_formula,
-                                            scales = scales,
-                                            nrow = nrow,
-                                            ncol = ncol,
-                                            labeller = label_parsed)
-    }
-    else if(length(facet.by) == 2){
-      facet_formula <- paste(facet.by, collapse = " ~ ") %>% stats::as.formula()
-      facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
-    }}
+      if(length(facet.by) == 1){
+        facet_formula <- paste0("~", facet.by) %>% as.formula()
+        facetPlots <- facetPlots + facet_wrap(facet_formula,
+                                              scales = scales,
+                                              nrow = nrow,
+                                              ncol = ncol,
+                                              labeller = label_parsed)
+      }
+      else if(length(facet.by) == 2){
+        facet_formula <- paste(facet.by, collapse = " ~ ") %>% as.formula()
+        facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
+      }}
 
     return(facetPlots)
   }
 
+  #change settings for legend in single curve plots
+  if (cov_col == 1){
+    if (length(legend.labs) != 1) {
+      legend.labs <- ''
+    }
+    if (legend.title == 1){
+      legend.title = 'All'
+    }
+  }
+
 
   #Plot survival curves
-  FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
+  kaplanPlot <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,
                                            break.time.by         = break.time.by,
                                            xlim                  = xlim,
@@ -180,7 +243,7 @@ plotKaplanMeier <- function(data,
                                            surv.scale            = surv.scale,
                                            ggtheme               = ggtheme,
                                            conf.int              = conf.int,
-                                           conf.inf.alpha        = conf.inf.alpha,
+                                           conf.int.alpha        = conf.int.alpha,
                                            risk.table            = risk.table,
                                            risk.table.y.text     = risk.table.y.text,
                                            risk.table.y.text.col = risk.table.y.text.col,
@@ -188,12 +251,13 @@ plotKaplanMeier <- function(data,
                                            pval.method           = pval.method,
                                            surv.median.line      = surv.median.line,
                                            legend                = legend,
-                                           fit                   = fit.FirstEventByArm,
+                                           fit                   = fit,
                                            legend.title          = legend.title,
                                            legend.labs           = legend.labs,
                                            risk.table.fontsize   = risk.table.fontsize * 0.36,
                                            palette               = palette,
-                                           pval.size = pval.size * 0.36,
+                                           pval.size             = pval.size * 0.36,
+                                          conf.int.fill          = conf.int.fill,
                                            ...
                                            #font.x               = 25,
                                            #font.y        = 25,
@@ -206,29 +270,44 @@ plotKaplanMeier <- function(data,
                                            #short.panel.labs=TRUE,
                                            #axes.offset   = TRUE, #default is TRUE
                                            #censor           = TRUE, #default is true
-                                           #ncol            = 2,
-                                           #palette       = regCols,
-                                           #risk.table.title  = "Hej Siv",
-                                           #data          = data
-                                           #distinct(ID, .keep_all = TRUE),
-
                                            #pval.size
                                            #pval.method.size
                                            #pval.coord
 
   )
 
-if (surv.median.line %in% c('hv', 'v', 'h')){
-  FirstEventByArm$plot <- FirstEventByArm$plot +
-    geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
-    scale_linetype_manual(name = '',
-                          values = c("Median" = "dashed"),
-                          label = surv.median.line.legend
-                          )+
-   guides(color= guide_legend(order=1), fill = guide_legend(order=1) ,linetype = guide_legend(order = 2))
+  if (surv.median.line %in% c('hv', 'v', 'h')){
+    if(!is.null(fit$strata) | is.matrix(fit$surv)){
+      .table <- as.data.frame(summary(fit)$table)
+    }
+    else{
+      .table <- t(as.data.frame(summary(fit)$table))
+      rownames(.table) <- "All"
+    }
 
+    surv_median <- as.vector(.table[, "median"])
+    df <- data.frame(x1 = surv_median, x2 = surv_median,
+                     y1 = rep(0, length(surv_median)),
+                     y2 = rep(0.5, length(surv_median))
+                     )
+    df <- na.omit(df)
+    if (nrow(df)>0){
 
-}
+    kaplanPlot$plot <- kaplanPlot$plot +
+      geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
+      scale_linetype_manual(name = '',
+                            values = c("Median" = "dashed"),
+                            label = surv.median.line.legend,
+      )
+    }
 
-  return(FirstEventByArm)
+  }
+  kaplanPlot$plot <- kaplanPlot$plot +
+    guides(color= guide_legend(order=1, title = surv.curve.legend),
+             fill = guide_legend(order=2,
+                               title = conf.int.legend,
+                               override.aes = list(color = NA)
+                               ) ,
+           linetype = guide_legend(order = 3))
+  return(kaplanPlot)
 }

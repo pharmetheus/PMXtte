@@ -8,7 +8,7 @@ plotKaplanMeier(
   data,
   time_col = "TSFDW",
   event_col = "DV",
-  cov_col = 1,
+  cov_col = NULL,
   facet.by = NULL,
   panel.labs = NULL,
   short.panel.labs = TRUE,
@@ -16,27 +16,31 @@ plotKaplanMeier(
   xlab = "Time since first dose (week)",
   ylab = "Fraction without events",
   break.time.by = 4,
-  xlim = c(0, 52.1),
+  xlim = NULL,
   ylim = c(0, 1),
   surv.scale = "percent",
   ggtheme = PMXColors::theme_pmx(),
   palette = PMXColors::pmx_palettes(),
   conf.int = TRUE,
   ciWidth = 0.95,
-  conf.inf.alpha = 0.9,
+  add.ciWidth.to.legend = TRUE,
+  conf.int.alpha = 0.3,
+  conf.int.fill = "gray",
   risk.table = TRUE,
   risk.table.y.text = TRUE,
   risk.table.y.text.col = TRUE,
   risk.table.fontsize = 10,
-  pval = TRUE,
+  pval = FALSE,
   pval.method = TRUE,
   pval.size = 10,
   surv.median.line = "hv",
   surv.median.line.legend = "Median Survival",
   legend = "top",
   legend.title = cov_col,
+  conf.int.legend = "Confidence intervals",
+  surv.curve.legend = "Survival Curves",
   legend.labs = sub(pattern = paste(cov_col, "=", sep = ""), replacement = "", x =
-    names(fit.FirstEventByArm$strata)),
+    names(fit$strata)),
   nrow = NULL,
   ncol = NULL,
   scales = "fixed",
@@ -82,7 +86,7 @@ function \link[grDevices]{palette}.}
 \item{ciWidth}{confidence intervals to be passed in surv_fit default is 0.95}
 
 \item{risk.table}{Allowed values include: \itemize{ \item TRUE or FALSE
-specifying whether to show or not the risk table. Default is FALSE. \item
+specifying whether to show or not the risk table. Default is TRUE \item
 "absolute" or "percentage". Shows the \bold{absolute number} and the
 \bold{percentage} of subjects at risk by time, respectively. \item "abs_pct"
 to show both absolute number and percentage. \item "nrisk_cumcensor" and
@@ -91,10 +95,7 @@ censoring and events, respectively. }}
 
 \item{risk.table.fontsize}{size of the font for survival table in points}
 
-\item{pval}{logical value, a numeric or a string. If logical and TRUE, the
-p-value is added on the plot. If numeric, than the computet p-value is
-substituted with the one passed with this parameter. If character, then the
-customized string appears on the plot. See examples - Example 3.}
+\item{pval}{logical value, a numeric or a string. If logical and TRUE, the p-value is added on the plot. If numeric, then the computed p-value is substituted with the one passed with this parameter. If character, then the customized string appears on the plot.}
 
 \item{pval.method}{whether to add a text with the test name used for
 calculating the pvalue, that corresponds to survival curves' comparison -
@@ -196,4 +197,11 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
 
 # Change the starting color in the palette
  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+
+ # Change the color for a single curve plot
+ plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+
+ # Create custom palette of colors
+ Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue2')
+ plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
 }
