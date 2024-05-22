@@ -24,7 +24,7 @@
 #' @inheritDotParams survminer::ggsurvplot
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
 #' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
-#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes.
+#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @import ggplot2
@@ -54,6 +54,13 @@
 #'
 #' # Change the starting color in the palette
 #'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+#'
+#'  # Change the color for a single curve plot
+#'  plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+#'
+#'  # Create custom palette of colors
+#'  Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
+#'  plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
 #' @export
 
 
@@ -61,7 +68,7 @@
 plotKaplanMeier <- function(data,
                             time_col                = "TSFDW",
                             event_col               ="DV",
-                            cov_col                 = 1 ,
+                            cov_col                 = NULL ,
                             facet.by                = NULL,
                             panel.labs              = NULL,
                             short.panel.labs        = TRUE,
@@ -112,26 +119,27 @@ plotKaplanMeier <- function(data,
   if (!all(c(time_col, event_col) %in% names(data))) {
     stop('one or more specified columns do not exist in the dataframe')
   }
-  #change settings based on covariates and facets input
-  if (cov_col == 1){
-    #legend.labs           <- NULL
-    pval                  <- FALSE
-    pval.method           <- FALSE
-    if (surv.curve.legend == 'Survival Curves'){
-      surv.curve.legend <- 'Survival Curve'
-    if (conf.int.legend == 'Confidence intervals'){
-      conf.int.legend <- 'Confidence interval'
-    }
-    }
 
 
-
-  }
-  else {
+  if (!is.null(cov_col)) {
     cov_col <- as.character(substitute(cov_col))
     if (!cov_col %in% names(data)){
       stop('covariate column does not exist in the dataframe')
     }
+  }
+  else {
+    cov_col <- 1
+    pval                  <- FALSE
+    pval.method           <- FALSE
+    conf.int.fill         <- 'strata'
+
+    if (surv.curve.legend == 'Survival Curves'){
+      surv.curve.legend <- 'Survival Curve'
+    }
+    if (conf.int.legend == 'Confidence intervals'){
+      conf.int.legend <- 'Confidence interval'
+    }
+
   }
 
   #fit survival curves
@@ -215,15 +223,17 @@ plotKaplanMeier <- function(data,
     return(facetPlots)
   }
 
-if (cov_col == 1){
-  if (length(legend.labs) != 1) {
-    legend.labs <- 'All'
-  }
-  if (conf.int.fill == 'gray'){
-    conf.int.fill <- 'strata'
+  #change settings for legend in single curve plots
+  if (cov_col == 1){
+    if (length(legend.labs) != 1) {
+      legend.labs <- ''
+    }
+    if (legend.title == 1){
+      legend.title = 'All'
+    }
   }
 
-}
+
   #Plot survival curves
   kaplanPlot <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,

@@ -61,7 +61,7 @@ plotKaplanMeier(RTTEdata,
                 )
 ```
 
-we can also change the colors by modifying the palette and theme. 
+You can also change the colors by modifying the palette using arguments in pmx_palettes function 
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
 plotKaplanMeier(RTTEdata,
                 time_col = 'TSFDW', #The default value
@@ -70,6 +70,21 @@ plotKaplanMeier(RTTEdata,
                 legend.title = 'Dose (mg)'
                 )
 ```
+
+You can also modify using custome colors in the argument palette
+```{r,fig.width=10,fig.height=6,out.width="100%"}
+plotKaplanMeier(RTTEdata, 
+                palette = 'cadetblue')
+```
+
+You can create a custom palette to be used for multiple curves
+```{r,fig.width=10,fig.height=6,out.width="100%"}
+Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
+plotKaplanMeier(RTTEdata, 
+                palette = Colors)
+```
+
+
 
 To change font size for the table and table height we can pass arguments to ggsurvplot. The arguments risk.table.fontsize and pval.size use points which will then be converted to be used as ggplot arguments. 
 ```{r,fig.width=10,fig.height=6,out.width="100%"}

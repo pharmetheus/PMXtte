@@ -8,7 +8,7 @@ plotKaplanMeier(
   data,
   time_col = "TSFDW",
   event_col = "DV",
-  cov_col = 1,
+  cov_col = NULL,
   facet.by = NULL,
   panel.labs = NULL,
   short.panel.labs = TRUE,
@@ -16,7 +16,7 @@ plotKaplanMeier(
   xlab = "Time since first dose (week)",
   ylab = "Fraction without events",
   break.time.by = 4,
-  xlim = c(0, 52.1),
+  xlim = NULL,
   ylim = c(0, 1),
   surv.scale = "percent",
   ggtheme = PMXColors::theme_pmx(),
@@ -24,12 +24,13 @@ plotKaplanMeier(
   conf.int = TRUE,
   ciWidth = 0.95,
   add.ciWidth.to.legend = TRUE,
-  conf.inf.alpha = 0.9,
+  conf.int.alpha = 0.3,
+  conf.int.fill = "gray",
   risk.table = TRUE,
   risk.table.y.text = TRUE,
   risk.table.y.text.col = TRUE,
   risk.table.fontsize = 10,
-  pval = TRUE,
+  pval = FALSE,
   pval.method = TRUE,
   pval.size = 10,
   surv.median.line = "hv",
@@ -39,7 +40,7 @@ plotKaplanMeier(
   conf.int.legend = "Confidence intervals",
   surv.curve.legend = "Survival Curves",
   legend.labs = sub(pattern = paste(cov_col, "=", sep = ""), replacement = "", x =
-    names(fit.FirstEventByArm$strata)),
+    names(fit$strata)),
   nrow = NULL,
   ncol = NULL,
   scales = "fixed",
@@ -196,4 +197,11 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
 
 # Change the starting color in the palette
  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+
+ # Change the color for a single curve plot
+ plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+
+ # Create custom palette of colors
+ Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue2')
+ plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
 }
