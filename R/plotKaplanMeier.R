@@ -118,7 +118,10 @@ plotKaplanMeier <- function(data,
     pval                  <- FALSE
     pval.method           <- FALSE
     if (surv.curve.legend == 'Survival Curves'){
-      surv.curve.legend = 'Survival Curve'
+      surv.curve.legend <- 'Survival Curve'
+    if (conf.int.legend == 'Confidence intervals'){
+      conf.int.legend <- 'Confidence interval'
+    }
     }
 
 
