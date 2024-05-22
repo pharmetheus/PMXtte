@@ -77,7 +77,8 @@ plotKaplanMeier <- function(data,
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,
                             add.ciWidth.to.legend   = TRUE,
-                            conf.inf.alpha          = 0.9,
+                            conf.int.alpha          = 0.3,
+                            conf.int.fill           = 'gray',
                             risk.table              = TRUE,
                             risk.table.y.text       = TRUE,
                             risk.table.y.text.col   = TRUE,
@@ -93,7 +94,7 @@ plotKaplanMeier <- function(data,
                             surv.curve.legend       = 'Survival Curves',
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
                                                           replacement="",
-                                                          x=names(fit.FirstEventByArm$strata)),
+                                                          x=names(fit$strata)),
                             nrow = NULL,
                             ncol = NULL,
                             scales = "fixed",
@@ -113,11 +114,15 @@ plotKaplanMeier <- function(data,
   }
   #change settings based on covariates and facets input
   if (cov_col == 1){
-    #legend                <- "none"
-    legend.labs           <- NULL
-    #legend.title          <- NULL
+    #legend.labs           <- NULL
     pval                  <- FALSE
     pval.method           <- FALSE
+    if (surv.curve.legend == 'Survival Curves'){
+      surv.curve.legend = 'Survival Curve'
+    }
+
+
+
   }
   else {
     cov_col <- as.character(substitute(cov_col))
@@ -128,7 +133,7 @@ plotKaplanMeier <- function(data,
 
   #fit survival curves
   formula_text        <- paste("survival::Surv(",time_col,",",event_col,")~",cov_col)
-  fit.FirstEventByArm <- survminer::surv_fit(as.formula(formula_text) , data = data , conf.int = ciWidth)
+  fit <- survminer::surv_fit(as.formula(formula_text) , data = data , conf.int = ciWidth)
 
   # title for confidence interval legend
   if (add.ciWidth.to.legend){
@@ -136,7 +141,7 @@ plotKaplanMeier <- function(data,
   }
 
   if (!is.null(facet.by)){
-    facetPlots <- survminer::ggsurvplot_facet(fit                = fit.FirstEventByArm,
+    facetPlots <- survminer::ggsurvplot_facet(fit                = fit,
                                               data                   = data,
                                               facet.by               = facet.by,
                                               pval                   = pval,
@@ -146,7 +151,7 @@ plotKaplanMeier <- function(data,
                                               surv.scale             = surv.scale,
                                               ggtheme                = ggtheme,
                                               conf.int               = conf.int,
-                                              conf.inf.alpha         = conf.inf.alpha,
+                                              conf.int.alpha         = conf.int.alpha,
                                               surv.median.line       = surv.median.line,
                                               legend                 = legend,
                                               legend.title           = legend.title,
@@ -161,11 +166,11 @@ plotKaplanMeier <- function(data,
                                               ...
     )
     if (surv.median.line %in% c('hv', 'v', 'h')){
-      if(!is.null(fit.FirstEventByArm$strata) | is.matrix(fit.FirstEventByArm$surv)){
-        .table <- as.data.frame(summary(fit.FirstEventByArm)$table)
+      if(!is.null(fit$strata) | is.matrix(fit$surv)){
+        .table <- as.data.frame(summary(fit)$table)
       }
       else{
-        .table <- t(as.data.frame(summary(fit.FirstEventByArm)$table))
+        .table <- t(as.data.frame(summary(fit)$table))
         rownames(.table) <- "All"
       }
 
@@ -207,9 +212,17 @@ plotKaplanMeier <- function(data,
     return(facetPlots)
   }
 
+if (cov_col == 1){
+  if (length(legend.labs) != 1) {
+    legend.labs <- 'All'
+  }
+  if (conf.int.fill == 'gray'){
+    conf.int.fill <- 'strata'
+  }
 
+}
   #Plot survival curves
-  FirstEventByArm <- survminer::ggsurvplot(xlab                  = xlab,
+  kaplanPlot <- survminer::ggsurvplot(xlab                  = xlab,
                                            ylab                  = ylab,
                                            break.time.by         = break.time.by,
                                            xlim                  = xlim,
@@ -217,7 +230,7 @@ plotKaplanMeier <- function(data,
                                            surv.scale            = surv.scale,
                                            ggtheme               = ggtheme,
                                            conf.int              = conf.int,
-                                           conf.inf.alpha        = conf.inf.alpha,
+                                           conf.int.alpha        = conf.int.alpha,
                                            risk.table            = risk.table,
                                            risk.table.y.text     = risk.table.y.text,
                                            risk.table.y.text.col = risk.table.y.text.col,
@@ -225,12 +238,13 @@ plotKaplanMeier <- function(data,
                                            pval.method           = pval.method,
                                            surv.median.line      = surv.median.line,
                                            legend                = legend,
-                                           fit                   = fit.FirstEventByArm,
+                                           fit                   = fit,
                                            legend.title          = legend.title,
                                            legend.labs           = legend.labs,
                                            risk.table.fontsize   = risk.table.fontsize * 0.36,
                                            palette               = palette,
-                                           pval.size = pval.size * 0.36,
+                                           pval.size             = pval.size * 0.36,
+                                          conf.int.fill          = conf.int.fill,
                                            ...
                                            #font.x               = 25,
                                            #font.y        = 25,
@@ -250,11 +264,11 @@ plotKaplanMeier <- function(data,
   )
 
   if (surv.median.line %in% c('hv', 'v', 'h')){
-    if(!is.null(fit.FirstEventByArm$strata) | is.matrix(fit.FirstEventByArm$surv)){
-      .table <- as.data.frame(summary(fit.FirstEventByArm)$table)
+    if(!is.null(fit$strata) | is.matrix(fit$surv)){
+      .table <- as.data.frame(summary(fit)$table)
     }
     else{
-      .table <- t(as.data.frame(summary(fit.FirstEventByArm)$table))
+      .table <- t(as.data.frame(summary(fit)$table))
       rownames(.table) <- "All"
     }
 
@@ -266,21 +280,21 @@ plotKaplanMeier <- function(data,
     df <- na.omit(df)
     if (nrow(df)>0){
 
-    FirstEventByArm$plot <- FirstEventByArm$plot +
+    kaplanPlot$plot <- kaplanPlot$plot +
       geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
       scale_linetype_manual(name = '',
                             values = c("Median" = "dashed"),
-                            label = surv.median.line.legend
+                            label = surv.median.line.legend,
       )
     }
 
   }
-  FirstEventByArm$plot <- FirstEventByArm$plot +
+  kaplanPlot$plot <- kaplanPlot$plot +
     guides(color= guide_legend(order=1, title = surv.curve.legend),
-           fill = guide_legend(order=2,
+             fill = guide_legend(order=2,
                                title = conf.int.legend,
                                override.aes = list(color = NA)
                                ) ,
            linetype = guide_legend(order = 3))
-  return(FirstEventByArm)
+  return(kaplanPlot)
 }
