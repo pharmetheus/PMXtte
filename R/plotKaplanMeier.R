@@ -4,7 +4,7 @@
 #' @param data dataframe used to fit survival curves
 #' @param time_col The name of the column containing the survival times.
 #' @param event_col The name of the column indicating an event occurrence (1) or censoring (0)
-#' @param cov_col The name of the column to stratify on, must be string (e.g. "DOSE") if (1) there will be no stratification
+#' @param cov_col The name of the column to stratify on, must be string (e.g. "DOSE") if NULL there will be no stratification
 #' @param label.parsed if TRUE (default), facet labels can include superscipts and greek letters
 #' @param ciWidth confidence intervals to be passed in surv_fit default is 0.95
 #' @param ggtheme function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.
@@ -89,7 +89,7 @@ plotKaplanMeier <- function(data,
                             risk.table              = TRUE,
                             risk.table.y.text       = TRUE,
                             risk.table.y.text.col   = TRUE,
-                            risk.table.fontsize     = 10,
+                            risk.table.fontsize     = 8,
                             pval                    = FALSE,
                             pval.method             = TRUE,
                             pval.size               = 10,
@@ -102,10 +102,12 @@ plotKaplanMeier <- function(data,
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
                                                           replacement="",
                                                           x=names(fit$strata)),
-                            nrow = NULL,
-                            ncol = NULL,
-                            scales = "fixed",
-
+                            nrow                    = NULL,
+                            ncol                    = NULL,
+                            scales                  = "fixed",
+                            legend.box              = 'vertical',
+                            legend.title.size       = 10,
+                            legend.margin           = 5,
                             ...){
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
@@ -152,7 +154,7 @@ plotKaplanMeier <- function(data,
   }
 
   if (!is.null(facet.by)){
-    facetPlots <- survminer::ggsurvplot_facet(fit                = fit,
+    facetPlots <- survminer::ggsurvplot_facet(fit                    = fit,
                                               data                   = data,
                                               facet.by               = facet.by,
                                               pval                   = pval,
@@ -219,7 +221,9 @@ plotKaplanMeier <- function(data,
         facet_formula <- paste(facet.by, collapse = " ~ ") %>% as.formula()
         facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
       }}
-
+        facetPlots <- facetPlots + theme(legend.box = legend.box,
+                                         legend.title = element_text(size= legend.title.size),
+                                         legend.margin = unit(legend.margin, 'pt'))
     return(facetPlots)
   }
 
@@ -230,6 +234,13 @@ plotKaplanMeier <- function(data,
     }
     if (legend.title == 1){
       legend.title = 'All'
+    }
+  } else {
+    if (length(unique(data[[cov_col]])) ==1) {
+      if (length(legend.labs) != 1) {
+        legend.labs <- unique(data[[cov_col]])
+      }
+      conf.int.fill <- 'strata'
     }
   }
 
@@ -303,11 +314,16 @@ plotKaplanMeier <- function(data,
 
   }
   kaplanPlot$plot <- kaplanPlot$plot +
-    guides(color= guide_legend(order=1, title = surv.curve.legend),
+    guides(color= guide_legend(order=1,
+                               title = surv.curve.legend
+                               ),
              fill = guide_legend(order=2,
                                title = conf.int.legend,
                                override.aes = list(color = NA)
                                ) ,
-           linetype = guide_legend(order = 3))
+           linetype = guide_legend(order = 3)) +
+    theme(legend.box = legend.box,
+          legend.title = element_text(size= legend.title.size),
+          legend.margin = unit(legend.margin, 'pt'))
   return(kaplanPlot)
 }

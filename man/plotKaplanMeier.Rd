@@ -54,7 +54,7 @@ plotKaplanMeier(
 
 \item{event_col}{The name of the column indicating an event occurrence (1) or censoring (0)}
 
-\item{cov_col}{The name of the column to stratify on, must be string (e.g. "DOSE") if (1) there will be no stratification}
+\item{cov_col}{The name of the column to stratify on, must be string (e.g. "DOSE") if NULL there will be no stratification}
 
 \item{facet.by}{a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.}
 
@@ -173,7 +173,7 @@ This function generates Kaplan Meier curves plot using ggsurvplot from a datafra
 }
 \details{
 The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
-The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes.
+The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 }
 \examples{
 #load example data
@@ -202,6 +202,6 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
  plotKaplanMeier(RTTEdata, palette = 'cadetblue')
 
  # Create custom palette of colors
- Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue2')
+ Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
  plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
 }
