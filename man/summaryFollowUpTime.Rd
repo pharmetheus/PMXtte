@@ -16,14 +16,14 @@ summaryFollowUpTime(
   outerLabel = NULL,
   innerLabel = NULL,
   digits = 3,
+  digits_rate = 2,
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
   fTimeColNm = "\\\\textbf{TotalFollowUpTime\\\\textsuperscript{b}}",
   EventRateColNm = "\\\\textbf{AnnualizedEventRate/nID\\\\textsuperscript{c}}",
-  caption =
-    "PK analysis data set: Number of subjects with observations and number of observations",
+  caption = "Annual Follow Up time",
   label = "tab:anaSummary",
   footnote =
-    "\\\\textsuperscript{a}Number of subjects\\\\newline\\\\textsuperscript{b}Number of observations\\\\newline\\\\textsuperscript{c}Average number of observations per subject",
+    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Sum of individual follow-up times per group.\\\\newline\\\\textsuperscript{c}Annual event rate",
   asList = FALSE,
   ...
 )

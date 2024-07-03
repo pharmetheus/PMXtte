@@ -90,23 +90,26 @@ plotKaplanMeier <- function(data,
                             risk.table.y.text       = TRUE,
                             risk.table.y.text.col   = TRUE,
                             risk.table.fontsize     = 8,
+                            table.clip              = 'off',
                             pval                    = FALSE,
                             pval.method             = TRUE,
                             pval.size               = 10,
                             surv.median.line        ="hv",
-                            surv.median.line.legend = 'Median Survival',
+                            surv.median.line.legend = TRUE,
+                            surv.median.line.title  = 'Median Survival',
                             legend                  = "top",
-                            legend.title            = cov_col,
-                            conf.int.legend         = 'Confidence intervals',
-                            surv.curve.legend       = 'Survival Curves',
+                            legend.title            = 'Survival curves',
+                            legend.nrow             = NULL,
+                            legend.ncol             = NULL,
+                            risk.table.ylab         = cov_col,
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
                                                           replacement="",
                                                           x=names(fit$strata)),
                             nrow                    = NULL,
                             ncol                    = NULL,
                             scales                  = "fixed",
-                            legend.box              = 'vertical',
-                            legend.title.size       = 10,
+                            legend.box              = 'horizontal',
+                            legend.title.size       = 9,
                             legend.margin           = 5,
                             ...){
   # Check if the input is a dataframe
@@ -135,13 +138,15 @@ plotKaplanMeier <- function(data,
     pval.method           <- FALSE
     conf.int.fill         <- 'strata'
 
-    if (surv.curve.legend == 'Survival Curves'){
-      surv.curve.legend <- 'Survival Curve'
+    # if (surv.curve.legend == 'Survival Curves'){
+    #   surv.curve.legend <- 'Survival Curve'
+    # }
+    # if (conf.int.legend == 'Confidence intervals'){
+    #   conf.int.legend <- 'Confidence interval'
+    # }
+    if (legend.title == 'Survival curves'){
+      legend.title <- 'Survival curve'
     }
-    if (conf.int.legend == 'Confidence intervals'){
-      conf.int.legend <- 'Confidence interval'
-    }
-
   }
 
   #fit survival curves
@@ -150,7 +155,7 @@ plotKaplanMeier <- function(data,
 
   # title for confidence interval legend
   if (add.ciWidth.to.legend){
-    conf.int.legend <- paste0(ciWidth*100, '% ',conf.int.legend)
+    legend.title <- paste0(legend.title,' & ', ciWidth*100, '% CI')
   }
 
   if (!is.null(facet.by)){
@@ -193,18 +198,24 @@ plotKaplanMeier <- function(data,
                        y2 = rep(0.5, length(surv_median))
       )
       df <- na.omit(df)
-      if (nrow(df)>0){
+      if (nrow(df)>0 & surv.median.line.legend){
       facetPlots <- facetPlots +
         geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
         scale_linetype_manual(name = '',
                               values = c("Median" = "dashed"),
-                              label = surv.median.line.legend
+                              label = surv.median.line.title
         )
       }}
 
         facetPlots <- facetPlots +
-          guides(color= guide_legend(order=1, title = surv.curve.legend),
-                 fill = guide_legend(order=2, title = conf.int.legend, override.aes = list(color = NA)) ,
+          guides(color= guide_legend(order=1,
+                                     nrow = legend.nrow,
+                                     ncol = legend.ncol
+                                     ),
+                 fill = guide_legend(order=1,
+                                     nrow = legend.nrow,
+                                     ncol = legend.ncol
+                                     ) ,
                  linetype = guide_legend(order = 3))
 
 
@@ -232,8 +243,11 @@ plotKaplanMeier <- function(data,
     if (length(legend.labs) != 1) {
       legend.labs <- ''
     }
-    if (legend.title == 1){
-      legend.title = 'All'
+    # if (legend.title == 1){
+    #   legend.title = 'All'
+    #}
+    if(risk.table.ylab ==1){
+      risk.table.ylab <- 'All'
     }
   } else {
     if (length(unique(data[[cov_col]])) ==1) {
@@ -302,28 +316,40 @@ plotKaplanMeier <- function(data,
                      y2 = rep(0.5, length(surv_median))
                      )
     df <- na.omit(df)
-    if (nrow(df)>0){
+    if (nrow(df)>0 & surv.median.line.legend){
 
     kaplanPlot$plot <- kaplanPlot$plot +
       geom_line(aes(x = 0 , y= 0,linetype = 'Median'),data= data, show.legend = TRUE) +
       scale_linetype_manual(name = '',
                             values = c("Median" = "dashed"),
-                            label = surv.median.line.legend,
+                            label = surv.median.line.title,
       )
     }
 
   }
   kaplanPlot$plot <- kaplanPlot$plot +
     guides(color= guide_legend(order=1,
-                               title = surv.curve.legend
-                               ),
-             fill = guide_legend(order=2,
-                               title = conf.int.legend,
-                               override.aes = list(color = NA)
+                               nrow = legend.nrow,
+                               ncol = legend.ncol
+                      ),
+             fill = guide_legend(order=1,
+                                 nrow = legend.nrow,
+                                 ncol = legend.ncol
                                ) ,
            linetype = guide_legend(order = 3)) +
     theme(legend.box = legend.box,
           legend.title = element_text(size= legend.title.size),
           legend.margin = unit(legend.margin, 'pt'))
+
+  # table specifications
+if(!is.null(kaplanPlot$table)) {
+  kaplanPlot$table <- kaplanPlot$table +
+                      theme(panel.grid = element_blank()) +
+                      ylab(label = risk.table.ylab)
+  if(table.clip == 'off'){
+    kaplanPlot$table <- kaplanPlot$table +
+                         coord_cartesian(xlim = xlim, clip = 'off')
+  }
+}
   return(kaplanPlot)
 }

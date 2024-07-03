@@ -1,16 +1,43 @@
-ggKMvpc <- function(odata, # the observed data with one row per subject with a time and event indicator (1==event, 0==censored)
-                    sdata,  # the simulated data with one row per subject and replicate with a time and event indicator (1==event, 0==censored)
-                    time=TIME, # what indicates event/censoring time
-                    event=DV, # what indicates if an event occurred
-                    iter=ITER, # what indicates the replicate number
-                    strat=NULL, # character vector: what stratifications need to be applied
-                    ci=c(0.05,0.95), # what level of confidence to we want for the simulated Kaplan-Meier
-                    cuminc=T, # do we want to show the inverse Kaplan-Meier (1-KM) then set to TRUE, for survival-like set to FALSE
-                    simCol='blue', # color for the simulation interval
-                    obsCol='blue', # color for the observed line
-                    posObs=NULL, # provide an explicit set of times to smoothen the CI for simulations
-                    show.censor=T # logical to indicate whether the censoring times should be shown for the observed
-){
+#' Title
+#'
+#' @param odata the observed data with one row per subject with a time and event indicator (1==event, 0==censored)
+#' @param sdata the simulated data with one row per subject and replicate with a time and event indicator (1==event, 0==censored)
+#' @param time what indicates event/censoring time
+#' @param event what indicates if an event occurred
+#' @param iter what indicates the replicate number
+#' @param strat character vector: what stratifications need to be applied
+#' @param ci what level of confidence to we want for the simulated Kaplan-Meier
+#' @param cuminc do we want to show the inverse Kaplan-Meier (1-KM) then set to TRUE, for survival-like set to FALSE
+#' @param simCol color for the simulation interval
+#' @param obsCol color for the observed line
+#' @param posObs provide an explicit set of times to smoothen the CI for simulations
+#' @param show.censor logical to indicate whether the censoring times should be shown for the observed
+#' @param censor.shape
+#' @param censor.size
+#'
+#' @return
+#' @export
+#'
+#' @examples
+ggKMvpc <- function(odata,
+                    sdata,
+                    time=TIME,
+                    event=DV,
+                    iter=ITER,
+                    strat=NULL,
+                    ci=c(0.05,0.95),
+                    cuminc=T,
+                    simCol='blue',
+                    obsCol='blue',
+                    posObs=NULL,
+                    show.censor=T,
+                    censor.shape = '|',
+                    censor.size = 4,
+                    palette = pmx_palettes(),
+                    scale.percent = TRUE,
+                    ylab = 'Fraction without events (%)',
+                    xlab = 'Time (Weeks)'
+                    ){
 
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
 
@@ -220,7 +247,7 @@ ggKMvpc <- function(odata, # the observed data with one row per subject with a t
     # ribbon for simulated CI
     geom_ribbon(data=sdata_km_sum,aes(x=time,ymin=lci,ymax=uci,fill=names(simCol)),alpha=0.5)+
     # step function for observed KM
-    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=1.25)+
+    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=1)+
     geom_step(data=odata_km,aes(x=time,y=obs,color=names(obsCol)),size=1)+
     #
     scale_color_manual(values = obsCol)+
@@ -233,8 +260,8 @@ ggKMvpc <- function(odata, # the observed data with one row per subject with a t
     cens_data <- left_join(odata %>% filter(event==0) %>% distinct(time,!!!grps),
                            odata_km  %>% select(time,obs,!!!grps),by=c("time",as.character(grps)))
     p <- p +
-      geom_point(data=cens_data,aes(x=time,y=obs,shape="Censored"),color='black',size=3)+
-      scale_shape_manual(values = "|")
+      geom_point(data=cens_data,aes(x=time,y=obs,shape="Censored"),color='black',size=censor.size)+
+      scale_shape_manual(values = censor.shape)
   }
   # if we want to show the observed SE
   if(show.obse) {
@@ -259,5 +286,12 @@ ggKMvpc <- function(odata, # the observed data with one row per subject with a t
     p <- p+facet_wrap(~paste0("n = ",nrow(odata)))
   }
   p$simSum <- sdata_km_sum
+  p <- ggpubr::ggpar(p, palette = palette)
+  p <- p +
+       xlab(xlab) +
+       ylab(ylab)
+  if(scale.percent){
+    p <- p + scale_y_continuous(labels = scales::percent)
+  }
   p
 }
