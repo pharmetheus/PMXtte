@@ -29,6 +29,7 @@ ggKMvpc <- function(odata,
                     cuminc=T,
                     simCol='blue',
                     obsCol='blue',
+                    obs.size = 0.8,
                     posObs=NULL,
                     show.censor=T,
                     censor.shape = '|',
@@ -36,7 +37,10 @@ ggKMvpc <- function(odata,
                     palette = pmx_palettes(),
                     scale.percent = TRUE,
                     ylab = 'Fraction without events (%)',
-                    xlab = 'Time (Weeks)'
+                    xlab = 'Time (Weeks)',
+                    legend.position = 'top',
+                    xlim = NULL,
+                    ylim = NULL
                     ){
 
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
@@ -189,7 +193,7 @@ ggKMvpc <- function(odata,
         expr <- rlang::parse_expr(names(posObs)[i]) #filter
         sdata_km_i <- sdata_km %>%
           filter(!!expr)
-
+browser()
         # derive the stepfun to smooth it
         survatt <- stepfun(sdata_km_i$time[-1], sdata_km_i$KM)
         # apply the stepfun
@@ -247,12 +251,12 @@ ggKMvpc <- function(odata,
     # ribbon for simulated CI
     geom_ribbon(data=sdata_km_sum,aes(x=time,ymin=lci,ymax=uci,fill=names(simCol)),alpha=0.5)+
     # step function for observed KM
-    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=1)+
-    geom_step(data=odata_km,aes(x=time,y=obs,color=names(obsCol)),size=1)+
+    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=obs.size)+
+    geom_step(data=odata_km,aes(x=time,y=obs,color=names(obsCol)),size=obs.size)+
     #
     scale_color_manual(values = obsCol)+
     scale_fill_manual(values = simCol)+
-    theme(legend.position = 'top',legend.title=element_blank())
+    theme(legend.position = legend.position,legend.title=element_blank())
 
 
   if(show.censor) {
@@ -277,6 +281,7 @@ ggKMvpc <- function(odata,
       strats=table(odata[[strat]])
       strats_n <- paste0(names(strats),"\n n = ",strats)
       names(strats_n) <- names(strats)
+
       p <- p+facet_wrap(reformulate(strat),labeller = as_labeller(strats_n))
     } else {
       p <- p+facet_wrap(reformulate(strat))
@@ -289,9 +294,15 @@ ggKMvpc <- function(odata,
   p <- ggpubr::ggpar(p, palette = palette)
   p <- p +
        xlab(xlab) +
-       ylab(ylab)
+       ylab(ylab) +
+       coord_cartesian(xlim = xlim, ylim = ylim)
   if(scale.percent){
     p <- p + scale_y_continuous(labels = scales::percent)
   }
   p
 }
+
+#prepare data for RTTE
+# Sdata <- Sdata %>% group_by(ID) %>% mutate(EVCOUNT = cumsum(DV))
+# Sdata <- Sdata %>% group_by(ID) %>% mutate(latestEventTime = lag(TIME)) %>% ungroup() %>% mutate(TimeSincelastEvent = TIME - latestEventTime)
+ #Sdata <- Sdata %>% mutate(TimeSincelastEvent2 = ifelse(is.na(TimeSincelastEvent), TIME, TimeSincelastEvent))

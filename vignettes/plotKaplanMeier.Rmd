@@ -106,3 +106,10 @@ plotKaplanMeier(RTTEdata,
                 )
 ```
 
+To modify the plot we can also use ggplot syntax using $ sign to access either table or plot in case the plot includes a table or directly in the case it is only a plot like in the case of using facets
+```{r,fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
+p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+  p$table <- p$table + ylab('Dose (mg)')
+  p$
+  p
+```

@@ -6,6 +6,8 @@
 #' @param nEventColNm the charactrer string to be printed as the column name with the number of events
 #' @param fTimeColNm the charactrer string to be printed as the column name with follow up time
 #' @param EventRateColNm the charactrer string to be printed as the column name with Event rate
+#' @param digits_rate the number of significant digits for the Event rate column
+#' @param digits the number of significant digits for the follow up time column
 #' @inheritDotParams PhRame::makeSummaryTable
 #' @inheritParams PhRame::makeSummaryTable
 #' @return
