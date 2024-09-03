@@ -12,8 +12,15 @@
 #' @param obsCol color for the observed line
 #' @param posObs provide an explicit set of times to smoothen the CI for simulations
 #' @param show.censor logical to indicate whether the censoring times should be shown for the observed
-#' @param censor.shape
-#' @param censor.size
+#' @param censor.shape sympol for censored items to be passed to geom point
+#' @param censor.size size of the censor item
+#' @param palette palette of colors will override the simCol and obsCol arguments
+#' @param scale.percent logical to convert y axis to percent
+#' @param ylab Y-axis label
+#' @param xlab X-axis label
+#' @param legend.position the position of the legend, default 'top'
+#' @param xlim override the limits of x axis
+#' @param ylim override the limits of y axis
 #'
 #' @return
 #' @export
