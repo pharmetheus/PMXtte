@@ -54,7 +54,7 @@ ggKMvpc <- function(odata,
 
   # group by stratifications if present
   if(!is.null(strat)) {
-    strat_gr <- map(seq_along(strat),function(i) as.name(strat[i]))
+    strat_gr <- purrr::map(seq_along(strat),function(i) as.name(strat[i]))
     odata <-  odata %>%
       group_by(!!!unlist(strat_gr))
     sdata <-  sdata %>%
@@ -85,10 +85,10 @@ ggKMvpc <- function(odata,
     # with stratification the standard is to sequence daily from 0 to the maximum observed time within each stratum (combination) to smooth out the simulations
     if(is.null(posObs)){
       # retrieve all combinations
-      all_levels = map(strat,function(i){paste(i,paste0('\'',levels(odata[[i]]),'\''),sep="==")})
-      mlength <- max(map_dbl(all_levels,length))
+      all_levels = purrr::map(strat,function(i){paste(i,paste0('\'',levels(odata[[i]]),'\''),sep="==")})
+      mlength <- max(purrr::map_dbl(all_levels,length))
       # get all levels for each factor
-      map(seq_along(all_levels),function(i){ # seq_along the lists in all_levels
+      purrr::map(seq_along(all_levels),function(i){ # seq_along the lists in all_levels
         var= all_levels[[i]]
         if(length(var)<mlength) var <- c(var,rep(NA,(mlength-length(var)) ))
         df_tmp = data.frame(var)
@@ -97,14 +97,14 @@ ggKMvpc <- function(odata,
       }) %>%
         as.data.frame() -> tmpdf # a list of e.g.CAVCYC1QF=='Q1 [0-194.7]'
       # complete to get all possible combinations
-      eval(parse(text=paste0('complete(tmpdf,',paste(paste0('strat',1:length(strat)),collapse = ","),")"))) %>%
+      eval(parse(text=paste0('tidyr::complete(tmpdf,',paste(paste0('strat',1:length(strat)),collapse = ","),")"))) %>%
         # remove the NA rows
         filter(!if_any(1:ncol(.), is.na)) %>%
         # turn into filter expression
         mutate(combi=eval(parse(text=paste0('paste(',paste(paste0('strat',1:length(strat)),collapse = ","),",sep=\'&\')")))) %>%
         pull(combi) -> filterExpr # filter of e.g.CAVCYC1QF=='Q1 [0-194.7]' & XXF=='...'
       # for each filter expression / covariate combination retrieve the time window
-      map(filterExpr,function(i){
+      purrr::map(filterExpr,function(i){
         expr <- rlang::parse_expr(i)
         odata %>%
           filter(!!expr) %>%
@@ -147,14 +147,14 @@ ggKMvpc <- function(odata,
            greenwood_se=KM * sqrt(cumevent / (nrisk1 * (nrisk1 - cumevent))), # RA: this gives the correct estimate at time <=16
            greenwood_se=ifelse(newevent==0,NA,greenwood_se),
            INC=1-KM) %>%
-    fill(greenwood_se)-> odata_km
+    tidyr::fill(greenwood_se)-> odata_km
 
   ### Simulated #####
   NREP = sdata %>% pull(!!enquo(iter)) %>% max
 
 
 
-  map_df(1:NREP,function(r){
+  purrr::map_df(1:NREP,function(r){
     # stime=Sys.time()
     sdata_r <- sdata %>%
       # filter(ITER==r)
@@ -195,13 +195,13 @@ ggKMvpc <- function(odata,
 
 
       # apply the smoother for each stratum combination
-      sdata_km_stepped <- map_df(seq_along(posObs),function(i){
+      sdata_km_stepped <- purrr::map_df(seq_along(posObs),function(i){
         # filter the data according to the expression (i.e. strata combination)
         expr <- rlang::parse_expr(names(posObs)[i]) #filter
         sdata_km_i <- sdata_km %>%
           filter(!!expr)
-browser()
-        # derive the stepfun to smooth it
+
+      # derive the stepfun to smooth it
         survatt <- stepfun(sdata_km_i$time[-1], sdata_km_i$KM)
         # apply the stepfun
         tmp_df = data.frame(time=posObs[[i]],KM=survatt(posObs[[i]])) %>%

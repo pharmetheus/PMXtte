@@ -14,7 +14,7 @@
 #' @export
 #' @import PhRame
 #' @examples
-#' ttedata  <- read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
+#' ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
 #'
 #' #create summary as a list
 #' summaryFollowUpTime(ttedata,
@@ -87,7 +87,7 @@ summaryFollowUpTime <- function (df,
                   nObs=round(sum(annualT[!duplicated(!!rlang::sym(myID))]), digits = digits),
                   avnObs=out.digits(subjects/nObs, dig = digits_rate))
     }
-  PhRame::makeSummaryTable(df = sum_data,
+  makeSummaryTable(df = sum_data,
                            myID = myID,
                            myDV = myDV,
                            outerLevel = outerLevel,

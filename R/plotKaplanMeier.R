@@ -31,6 +31,7 @@
 #' @importFrom PMXColors theme_pmx pmx_palettes
 #' @importFrom survival Surv
 #' @importFrom survminer ggsurvplot surv_fit ggsurvplot_facet
+#' @importFrom rlang set_names
 #'
 #' @examples
 #' #load example data

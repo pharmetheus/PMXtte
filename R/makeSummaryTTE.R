@@ -8,23 +8,25 @@
 #' @return
 #' @export
 #'
+#' @importFrom PhRame makeSummaryTable
+#'
 #' @examples
-#' ttedata  <- read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
-#'
-#' #create summary as a list
-#' makeSummaryTableTTE(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study",
-#'                     asList = TRUE)
-#'
-#' #output as latex table
-#' makeSummaryTableTTE(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study")
+# ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
+#
+# #create summary as a list
+# makeSummaryTableTTE(ttedata,
+#                     outerLevel   = "DOSEN",
+#                     outerLabel   = "Dose",
+#                     innerLevel   = "STUDYIDN",
+#                     innerLabel   = "Study",
+#                     asList = TRUE)
+#
+# #output as latex table
+# makeSummaryTableTTE(ttedata,
+#                     outerLevel   = "DOSEN",
+#                     outerLabel   = "Dose",
+#                     innerLevel   = "STUDYIDN",
+#                     innerLabel   = "Study")
 makeSummaryTableTTE <- function(df,
                                 myID = "ID",
                                 myDV = "DV",
@@ -45,17 +47,17 @@ tteFun <- function(df){
               nObs     = length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1]),
               avnObs   = out.digits(length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1])/length(unique(!!rlang::sym(myID))), dig = digits, numeric = F))
 }
-PhRame::makeSummaryTable(df = df,
-                         myID = myID,
-                         myDV = myDV,
-                         digits = digits,
-                         nIdColNm = nIdColNm,
-                         nObsColNm = nEventColNm,
-                         avnObsColNm = avnEventColNm,
-                         caption = caption,
-                         label = label,
-                         footnote = footnote,
-                         myFun = tteFun,
-                         ...
-                         )
+makeSummaryTable(df = df,
+                 myID = myID,
+                 myDV = myDV,
+                 digits = digits,
+                 nIdColNm = nIdColNm,
+                 nObsColNm = nEventColNm,
+                 avnObsColNm = avnEventColNm,
+                 caption = caption,
+                 label = label,
+                 footnote = footnote,
+                 myFun = tteFun,
+                 ...
+)
 }

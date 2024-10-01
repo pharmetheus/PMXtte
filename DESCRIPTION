@@ -13,12 +13,17 @@ RoxygenNote: 7.2.1
 Imports: 
     dplyr,
     ggplot2,
+    PhRame,
     PMXColors,
+    purrr,
+    readr,
     rlang,
     survival,
-    survminer
+    survminer,
+    tidyr
 Suggests: 
     knitr,
+    PMXRenv,
     rmarkdown,
     testthat (>= 3.0.0),
     vdiffr

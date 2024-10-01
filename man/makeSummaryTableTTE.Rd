@@ -104,21 +104,3 @@ Default is \strong{"/"}.}
 \description{
 Title
 }
-\examples{
-ttedata  <- read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
-
-#create summary as a list
-makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
-                    asList = TRUE)
-
-#output as latex table
-makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study")
-}

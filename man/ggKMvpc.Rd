@@ -15,12 +15,18 @@ ggKMvpc(
   cuminc = T,
   simCol = "blue",
   obsCol = "blue",
+  obs.size = 0.8,
   posObs = NULL,
   show.censor = T,
   censor.shape = "|",
   censor.size = 4,
   palette = pmx_palettes(),
-  scale.percent = TRUE
+  scale.percent = TRUE,
+  ylab = "Fraction without events (\%)",
+  xlab = "Time (Weeks)",
+  legend.position = "top",
+  xlim = NULL,
+  ylim = NULL
 )
 }
 \arguments{
@@ -48,7 +54,23 @@ ggKMvpc(
 
 \item{show.censor}{logical to indicate whether the censoring times should be shown for the observed}
 
-\item{censor.size}{}
+\item{censor.shape}{sympol for censored items to be passed to geom point}
+
+\item{censor.size}{size of the censor item}
+
+\item{palette}{palette of colors will override the simCol and obsCol arguments}
+
+\item{scale.percent}{logical to convert y axis to percent}
+
+\item{ylab}{Y-axis label}
+
+\item{xlab}{X-axis label}
+
+\item{legend.position}{the position of the legend, default 'top'}
+
+\item{xlim}{override the limits of x axis}
+
+\item{ylim}{override the limits of y axis}
 }
 \description{
 Title

@@ -54,7 +54,9 @@ stratification variable, eg. "Study")}
 \item{innerLabel}{is the label for the inner level (2nd level) of
 stratification variable, eg. "Dose"}
 
-\item{digits}{is the number of significant digits}
+\item{digits}{the number of significant digits for the follow up time column}
+
+\item{digits_rate}{the number of significant digits for the Event rate column}
 
 \item{nEventColNm}{the charactrer string to be printed as the column name with the number of events}
 
@@ -126,7 +128,7 @@ Default is \strong{"/"}.}
 Title
 }
 \examples{
-ttedata  <- read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
+ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
 
 #create summary as a list
 summaryFollowUpTime(ttedata,

@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::load_all("/PMX/Projects/Pharmetheus/PMXtte/PMXtte/")
+devtools::load_all()
 #suppressPackageStartupMessages(library(PMXtte))
 #suppressPackageStartupMessages(library(dplyr))
 #suppressPackageStartupMessages(library(ggplot2))

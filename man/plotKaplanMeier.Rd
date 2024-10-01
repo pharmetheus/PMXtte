@@ -210,4 +210,12 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
  # Create custom palette of colors
  Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
  plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
+
+ #modify plot using ggplot syntax
+ p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+ p$table <- p$table + ylab('Dose (mg)')
+ p
+
+# remove median line from legend
+plotKaplanMeier(RTTEdata, cov_col = "DOSE", surv.median.line.legend = FALSE)
 }

@@ -1,10 +1,14 @@
 PMXRenv::library.unqualified("vdiffr")
 
 test_that('similar plots', {
-  odata <- read_csv(system.file('extdata/odata.csv',
-                                     package= 'PMXtte'))
-  sdata <- read_csv(system.file('extdata/sdata.csv',
-                                package= 'PMXtte'))
+  odata <- readr::read_csv(
+    system.file('extdata/odata.csv', package= 'PMXtte'),
+    show_col_types = FALSE
+  )
+  sdata <- readr::read_csv(
+    system.file('extdata/sdata.csv', package= 'PMXtte'),
+    show_col_types = FALSE
+  )
 
   svg()
   p1 <- ggKMvpc(odata,
