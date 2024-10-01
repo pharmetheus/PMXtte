@@ -19,7 +19,7 @@ plotKaplanMeier(
   xlim = NULL,
   ylim = c(0, 1),
   surv.scale = "percent",
-  ggtheme = PMXColors::theme_pmx(),
+  ggtheme = PMXColors_theme_pmx(),
   palette = PMXColors::pmx_palettes(),
   conf.int = TRUE,
   ciWidth = 0.95,
@@ -183,6 +183,7 @@ The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot 
 }
 \examples{
 #load example data
+library(magrittr)
 exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
 
 #generate time to first event dataframe
@@ -213,7 +214,7 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
 
  #modify plot using ggplot syntax
  p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
- p$table <- p$table + ylab('Dose (mg)')
+ p$table <- p$table + ggplot2::ylab('Dose (mg)')
  p
 
 # remove median line from legend

@@ -28,13 +28,14 @@
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @import ggplot2
-#' @importFrom PMXColors theme_pmx pmx_palettes
+#' @importFrom PMXColors pmx_palettes
 #' @importFrom survival Surv
 #' @importFrom survminer ggsurvplot surv_fit ggsurvplot_facet
 #' @importFrom rlang set_names
 #'
 #' @examples
 #' #load example data
+#' library(magrittr)
 #' exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
 #'
 #' #generate time to first event dataframe
@@ -65,7 +66,7 @@
 #'
 #'  #modify plot using ggplot syntax
 #'  p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
-#'  p$table <- p$table + ylab('Dose (mg)')
+#'  p$table <- p$table + ggplot2::ylab('Dose (mg)')
 #'  p
 #'
 #' # remove median line from legend
@@ -88,7 +89,7 @@ plotKaplanMeier <- function(data,
                             xlim                    = NULL,
                             ylim                    = c(0,1),
                             surv.scale              = "percent",
-                            ggtheme                 = PMXColors::theme_pmx(),
+                            ggtheme                 = PMXColors_theme_pmx(),
                             palette                 = PMXColors::pmx_palettes(),
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,

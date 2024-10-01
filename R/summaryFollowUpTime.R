@@ -8,11 +8,8 @@
 #' @param EventRateColNm the charactrer string to be printed as the column name with Event rate
 #' @param digits_rate the number of significant digits for the Event rate column
 #' @param digits the number of significant digits for the follow up time column
-#' @inheritDotParams PhRame::makeSummaryTable
-#' @inheritParams PhRame::makeSummaryTable
 #' @return
 #' @export
-#' @import PhRame
 #' @examples
 #' ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
 #'
@@ -67,13 +64,13 @@ summaryFollowUpTime <- function (df,
     df %>%
       summarise(nEvent=sum(finalCount),
                 TotalFollowUpTime=sum(annualT[!duplicated(!!rlang::sym(myID))]),
-                AnnualizedEventRate=out.digits(nEvent/TotalFollowUpTime, dig = digits, numeric = TRUE))
+                AnnualizedEventRate=PhRame_out.digits(nEvent/TotalFollowUpTime, dig = digits, numeric = TRUE))
   }
   if(asList & (!is.null(outerLevel) | !is.null(innerLevel))){
-      res_tab <- PhRame:::dataSummaryBy_all(sum_data, fn = followUpFun, grp_var = c(outerLevel, innerLevel))
+      res_tab <- PhRame_dataSummaryBy_all(sum_data, fn = followUpFun, grp_var = c(outerLevel, innerLevel))
     }
   if(is.null(outerLevel) & is.null(innerLevel)){
-      tab_comb <- PhRame:::dataSummaryBy_comb(sum_data, fn = followUpFun)
+      tab_comb <- PhRame_dataSummaryBy_comb(sum_data, fn = followUpFun)
       res_tab <- list(nEvent    = as.numeric(tab_comb$nEvent),
                       TotalFollowUpTime   = as.numeric(tab_comb$TotalFollowUpTime),
                       AnnualizedEventRate = as.numeric(tab_comb$AnnualizedEventRate))
@@ -85,9 +82,9 @@ summaryFollowUpTime <- function (df,
       df %>%
         summarise(subjects=sum(finalCount),
                   nObs=round(sum(annualT[!duplicated(!!rlang::sym(myID))]), digits = digits),
-                  avnObs=out.digits(subjects/nObs, dig = digits_rate))
+                  avnObs=PhRame_out.digits(subjects/nObs, dig = digits_rate))
     }
-  makeSummaryTable(df = sum_data,
+  PhRame_makeSummaryTable(df = sum_data,
                            myID = myID,
                            myDV = myDV,
                            outerLevel = outerLevel,

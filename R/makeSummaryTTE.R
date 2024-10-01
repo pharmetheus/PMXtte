@@ -2,13 +2,9 @@
 #'
 #' @param nEventColNm the charactrer string to be printed as the column name with number of events
 #' @param avnEventColNm the charactrer string to be printed as the column name with average number of events
-#' @inheritDotParams PhRame::makeSummaryTable
-#' @inheritParams PhRame::makeSummaryTable
 #'
 #' @return
 #' @export
-#'
-#' @importFrom PhRame makeSummaryTable
 #'
 #' @examples
 # ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
@@ -45,9 +41,9 @@ tteFun <- function(df){
   df %>%
     summarise(subjects = length(unique(!!rlang::sym(myID))),
               nObs     = length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1]),
-              avnObs   = out.digits(length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1])/length(unique(!!rlang::sym(myID))), dig = digits, numeric = F))
+              avnObs   = PhRame_out.digits(length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1])/length(unique(!!rlang::sym(myID))), dig = digits, numeric = F))
 }
-makeSummaryTable(df = df,
+PhRame_makeSummaryTable(df = df,
                  myID = myID,
                  myDV = myDV,
                  digits = digits,
