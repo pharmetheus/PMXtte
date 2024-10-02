@@ -71,9 +71,13 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
   }
   if (is.null(myFun)) {
     myFun <- function(x) {
-      x %>% dplyr::summarise(subjects = length(unique(!!rlang::sym(myID))),
-                             nObs = length(!!rlang::sym(myDV)), avnObs = PhRame_out.digits(length(!!rlang::sym(myDV))/length(unique(!!rlang::sym(myID))),
-                                                                                    dig = digits, numeric = TRUE))
+      x %>% dplyr::summarise(
+        subjects = length(unique(!!rlang::sym(myID))),
+        nObs = length(!!rlang::sym(myDV)),
+        avnObs = PhRame_out.digits(
+          length(!!rlang::sym(myDV))/length(unique(!!rlang::sym(myID))),
+          dig = digits, numeric = TRUE)
+        )
     }
   }
   if (!is.null(outerLevel) | !is.null(innerLevel)) {

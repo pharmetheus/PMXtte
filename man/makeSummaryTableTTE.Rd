@@ -9,13 +9,12 @@ makeSummaryTableTTE(
   myID = "ID",
   myDV = "DV",
   digits = 3,
-  nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
-  nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
-  avnEventColNm = "\\\\textbf{pEvent/nID\\\\textsuperscript{c}}",
+  nObsColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
+  avnObsColNm = "\\\\textbf{pEvent/nID\\\\textsuperscript{c}}",
   caption = "Number of patients and number of events",
-  label = "tab:anaSummary",
   footnote =
     "\\\\textsuperscript{a}Number of patients\\\\newline\\\\textsuperscript{b}Number of events\\\\newline\\\\textsuperscript{c}Proportion of number of events",
+  myFun = NULL,
   ...
 )
 }
@@ -26,4 +25,21 @@ makeSummaryTableTTE(
 }
 \description{
 Title
+}
+\examples{
+ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'), show_col_types = FALSE)
+
+makeSummaryTableTTE(ttedata,
+                    outerLevel   = "DOSEN",
+                    outerLabel   = "Dose",
+                    innerLevel   = "STUDYIDN",
+                    innerLabel   = "Study",
+                    asList = TRUE)
+
+#output as latex table
+makeSummaryTableTTE(ttedata,
+                    outerLevel   = "DOSEN",
+                    outerLabel   = "Dose",
+                    innerLevel   = "STUDYIDN",
+                    innerLabel   = "Study")
 }
