@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeSummaryTTE.R
 \name{makeSummaryTableTTE}
 \alias{makeSummaryTableTTE}
-\title{Title}
+\title{Single data summary table for (R)TTE data}
 \usage{
 makeSummaryTableTTE(
   df,
@@ -19,16 +19,39 @@ makeSummaryTableTTE(
 )
 }
 \arguments{
-\item{nEventColNm}{the charactrer string to be printed as the column name with number of events}
+\item{df}{is the data frame}
 
-\item{avnEventColNm}{the charactrer string to be printed as the column name with average number of events}
+\item{myID}{is the name of the ID column, default is "ID"}
+
+\item{myDV}{is the name of the DV column, default is "DV"}
+
+\item{digits}{is the number of significant digits}
+
+\item{nObsColNm}{is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"}
+
+\item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"}
+
+\item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
+
+\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events"}
+
+\item{myFun}{internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.}
+
+\item{...}{passed to \code{PhRame_makeSummaryTable()}, possibly for the additional optional arguments compatible with latex}
+}
+\value{
+By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a list of data.frame tables
 }
 \description{
-Title
+Derive a single data summary table with up to 2 levels of stratification, specifically tailored for (R)TTE data.
+It is a wrapper around \code{PhRame_makeSummaryTable()}, which means that it is the same function but defaulted with arguments
+that use "event" instead of "observation". Any argument available in the documentation of \code{PhRame_makeSummaryTable()} can
+be used (except for \code{myFun}, see the details in \code{Arguments} below).
 }
 \examples{
 ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'), show_col_types = FALSE)
 
+# create summary as a list
 makeSummaryTableTTE(ttedata,
                     outerLevel   = "DOSEN",
                     outerLabel   = "Dose",
@@ -36,7 +59,7 @@ makeSummaryTableTTE(ttedata,
                     innerLabel   = "Study",
                     asList = TRUE)
 
-#output as latex table
+# output as latex table
 makeSummaryTableTTE(ttedata,
                     outerLevel   = "DOSEN",
                     outerLabel   = "Dose",

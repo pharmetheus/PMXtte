@@ -1,15 +1,28 @@
-#' Title
+#' Single data summary table for (R)TTE data
 #'
-#' @param nEventColNm the charactrer string to be printed as the column name with number of events
-#' @param avnEventColNm the charactrer string to be printed as the column name with average number of events
+#' @description Derive a single data summary table with up to 2 levels of stratification, specifically tailored for (R)TTE data.
+#' It is a wrapper around `PhRame_makeSummaryTable()`, which means that it is the same function but defaulted with arguments
+#' that use "event" instead of "observation". Any argument available in the documentation of `PhRame_makeSummaryTable()` can
+#' be used (except for `myFun`, see the details in `Arguments` below).
 #'
-#' @return
+#' @param df is the data frame
+#' @param myID is the name of the ID column, default is "ID"
+#' @param myDV is the name of the DV column, default is "DV"
+#' @param digits is the number of significant digits
+#' @param nObsColNm is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"
+#' @param avnObsColNm is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"
+#' @param caption is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"
+#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events"
+#' @param myFun internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.
+#' @param ...  passed to `PhRame_makeSummaryTable()`, possibly for the additional optional arguments compatible with latex
+#'
+#' @return By default, the table at Latex format. Alternatively, if `asList = TRUE`, a list of data.frame tables
 #' @export
 #'
 #' @examples
 #' ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'), show_col_types = FALSE)
 #'
-#create summary as a list
+#' # create summary as a list
 #' makeSummaryTableTTE(ttedata,
 #'                     outerLevel   = "DOSEN",
 #'                     outerLabel   = "Dose",
@@ -17,7 +30,7 @@
 #'                     innerLabel   = "Study",
 #'                     asList = TRUE)
 #'
-#' #output as latex table
+#' # output as latex table
 #' makeSummaryTableTTE(ttedata,
 #'                     outerLevel   = "DOSEN",
 #'                     outerLabel   = "Dose",
