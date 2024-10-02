@@ -20,7 +20,7 @@ plotKaplanMeier(
   ylim = c(0, 1),
   surv.scale = "percent",
   ggtheme = PMXColors_theme_pmx(),
-  palette = PMXColors::pmx_palettes(),
+  palette = PMXColors_pmx_palettes(),
   conf.int = TRUE,
   ciWidth = 0.95,
   add.ciWidth.to.legend = TRUE,
@@ -203,7 +203,7 @@ RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
  plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
 
 # Change the starting color in the palette
- plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+ plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 
  # Change the color for a single curve plot
  plotKaplanMeier(RTTEdata, palette = 'cadetblue')

@@ -28,7 +28,6 @@
 #' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
 #' @import rlang
 #' @import ggplot2
-#' @importFrom PMXColors pmx_palettes
 #' @importFrom survival Surv
 #' @importFrom survminer ggsurvplot surv_fit ggsurvplot_facet
 #' @importFrom rlang set_names
@@ -55,7 +54,7 @@
 #'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
 #'
 #' # Change the starting color in the palette
-#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 #'
 #'  # Change the color for a single curve plot
 #'  plotKaplanMeier(RTTEdata, palette = 'cadetblue')
@@ -90,7 +89,7 @@ plotKaplanMeier <- function(data,
                             ylim                    = c(0,1),
                             surv.scale              = "percent",
                             ggtheme                 = PMXColors_theme_pmx(),
-                            palette                 = PMXColors::pmx_palettes(),
+                            palette                 = PMXColors_pmx_palettes(),
                             conf.int                = TRUE,
                             ciWidth                 = 0.95,
                             add.ciWidth.to.legend   = TRUE,

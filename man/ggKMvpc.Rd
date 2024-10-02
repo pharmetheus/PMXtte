@@ -20,7 +20,7 @@ ggKMvpc(
   show.censor = T,
   censor.shape = "|",
   censor.size = 4,
-  palette = pmx_palettes(),
+  palette = PMXtte:::PMXColors_pmx_palettes(),
   scale.percent = TRUE,
   ylab = "Fraction without events (\%)",
   xlab = "Time (Weeks)",

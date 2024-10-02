@@ -49,7 +49,7 @@ test_that('similar plots', {
                 obsCol='blue',
                 posObs=NULL,
                 show.censor=T,
-                palette = pmx_palettes(),
+                palette = PMXColors_pmx_palettes(),
                 scale.percent = TRUE,
                 ylab = 'Fraction without events (%)',
                 xlab = 'Time (Weeks)',
