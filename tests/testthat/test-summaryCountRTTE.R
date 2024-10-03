@@ -1,9 +1,8 @@
-learndata  <- readr::read_csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'), na = ".", show_col_types = FALSE)
-learndata <- learndata %>% mutate(STUDYIDN = 1) %>% filter(EVID==0 & TYPE==0)
-
+ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 test_that("summaryCountRTTE() works", {
-  ans <- summaryCountRTTE(learndata,
-                          outerLevel   = "DOSE",
+  ans <- summaryCountRTTE(ttedata,
+                          outerLevel   = "DOSEN",
                           outerLabel   = "Dose",
                           innerLevel   = "STUDYIDN",
                           innerLabel   = "Study",
@@ -11,20 +10,20 @@ test_that("summaryCountRTTE() works", {
 
   expect_type(ans, "list")
   expect_length(ans, 3)
-  expect_named(ans[[1]], c(as.character(0:6), "subjects", 'stratlvl',"DOSE", "STUDYIDN"))
+  expect_named(ans[[1]], c(as.character(0:6), "subjects", 'stratlvl',"DOSEN", "STUDYIDN"))
 })
 
 test_that("inner/outer levels work", {
-  ans <- summaryCountRTTE(learndata,
-                          outerLevel   = "DOSE",
+  ans <- summaryCountRTTE(ttedata,
+                          outerLevel   = "DOSEN",
                           outerLabel   = "Dose",
                           asList = TRUE)
 
   expect_type(ans, "list")
   expect_length(ans, 2)
-  expect_true("DOSE" %in% names(ans[[2]]))
+  expect_true("DOSEN" %in% names(ans[[2]]))
 
-  ans <- summaryCountRTTE(learndata,
+  ans <- summaryCountRTTE(ttedata,
                           innerLevel   = "STUDYIDN",
                           innerLabel   = "Study",
                           asList = TRUE)
@@ -33,7 +32,7 @@ test_that("inner/outer levels work", {
   expect_length(ans, 2)
   expect_true("STUDYIDN" %in% names(ans[[2]]))
 
-  ans <- summaryCountRTTE(learndata,
+  ans <- summaryCountRTTE(ttedata,
                           asList = TRUE)
 
   expect_type(ans, "list")
@@ -65,13 +64,14 @@ test_that("factor_and_lump() works", {
 
   expect_error(factor_and_lump(num, 0), "Cannot lump counts")
 
-  ans <- summaryCountRTTE(learndata, asList = TRUE, lumpCount = 3)
+  ans <- summaryCountRTTE(ttedata, asList = TRUE, lumpCount = 3)
   expect_named(ans, c("0", "1", "2", "3 or more", "subjects", "stratlvl"))
 
-  learndata2 <- learndata %>% mutate(EVCOUNT = ifelse(EVCOUNT == 2, 3, EVCOUNT))
-  ans <- summaryCountRTTE(learndata2, asList = TRUE)
-  expect_equal(ans[["2"]], 0)
+  ttedata2 <- ttedata %>% mutate(EVCOUNT = ifelse(EVCOUNT==4|(EVCOUNT == 2 & STUDYIDN == 1), 3, EVCOUNT))
+  ans <- summaryCountRTTE(ttedata2, innerLevel = "DOSEN", outerLevel = "STUDYIDN", asList = TRUE)
+  expect_equal(ans[[2]][1,"2",drop=TRUE], 0)
+  expect_equal(ans[[2]][ ,"4",drop=TRUE], c(0,0))
 
-  ans <- summaryCountRTTE(learndata2, asList = TRUE, dropCount0 = TRUE)
-  expect_null(ans[["2"]])
+  ans <- summaryCountRTTE(ttedata2, innerLevel="STUDYIDN", asList = TRUE, dropCount0 = TRUE)
+  expect_null(ans[[2]][["4"]])
 })

@@ -132,6 +132,7 @@ summaryCountRTTE <- function(
       ans1 <- x %>%
         mutate(EVCOUNT = factor_and_lump(!!rlang::sym(myEVCOUNT), lump = lumpCount)) %>%
         count(EVCOUNT, .drop = dropCount0) %>%
+        filter(!all(n == 0)) %>%
         tidyr::pivot_wider(
           names_from = !!rlang::sym(myEVCOUNT),
           values_from = n
@@ -142,7 +143,8 @@ summaryCountRTTE <- function(
           subjects = length(unique(!!rlang::sym(myID)))
           )
       ans1$subjects <- ans2$subjects # no mutate() we dont want a groupwise operation
-      ans1
+      ans1 %>%
+        as.data.frame()
     }
   }
   if (!is.null(outerLevel) | !is.null(innerLevel)) {
@@ -157,14 +159,18 @@ summaryCountRTTE <- function(
   }
   else {
     tab_comb <- PhRame_dataSummaryBy_comb(df, fn = myFun)
-    res_tab <- lapply(tab_comb, as.numeric)
+    res_tab <- as.list(tab_comb)
   }
   if (asList | (is.null(outerLevel) & is.null(innerLevel))) {
     return(res_tab)
   }
   else {
     res_tab <- res_tab %>% droplevels() %>% as.data.frame()
-    Ntable <- res_tab %>% dplyr::select(subjects, matches("^\\d+$"))
+    countnames <- names(res_tab)[grepl("^\\d+", names(res_tab))]
+    #countnames_ordered <- countnames[order(as.numeric(regmatches(countnames, m = regexpr("^\\d+", countnames))))]
+    Ntable <- res_tab %>%
+      dplyr::select(all_of(c(countnames, "subjects"))) %>%
+      mutate(across(everything(), ~ ifelse(is.na(.x), 0, .x)))
     if (is.null(outerLabel)) {
       outerLabel <- outerLevel
     }
@@ -172,8 +178,7 @@ summaryCountRTTE <- function(
       innerLabel <- innerLevel
     }
     if (!is.null(outerLabel) & !is.null(innerLabel)) {
-      rowLabel <- paste0("\\textbf{", outerLabel, " / ",
-                         innerLabel, "}")
+      rowLabel <- paste0("\\textbf{", outerLabel, " / ", innerLabel, "}")
     }
     if (!is.null(outerLabel) & is.null(innerLabel)) {
       rowLabel <- paste0("\\textbf{", outerLabel, "}")

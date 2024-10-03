@@ -15,7 +15,7 @@ summaryFollowUpTime(
   innerLevel = NULL,
   outerLabel = NULL,
   innerLabel = NULL,
-  digits = 3,
+  digits = 0,
   digits_rate = 2,
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
   fTimeColNm = "\\\\textbf{TotalFollowUpTime\\\\textsuperscript{b}}",

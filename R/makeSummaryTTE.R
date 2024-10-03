@@ -20,8 +20,8 @@
 #' @export
 #'
 #' @examples
-#' ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'), show_col_types = FALSE)
-#'
+#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 #' # create summary as a list
 #' makeSummaryTableTTE(ttedata,
 #'                     outerLevel   = "DOSEN",
