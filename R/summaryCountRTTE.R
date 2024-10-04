@@ -1,38 +1,107 @@
 #' Single data summary table for (R)TTE data
 #'
-#' @param df
-#' @param addFactors
-#' @param filterExpr
-#' @param myID
-#' @param myDV
-#' @param myEVCOUNT
-#' @param outerLevel
-#' @param innerLevel
-#' @param outerLabel
-#' @param innerLabel
-#' @param digits
-#' @param lumpCount
-#' @param dropCount0
-#' @param nIdColNm
-#' @param nObsColNm
-#' @param caption
-#' @param label
-#' @param footnote
-#' @param footnoteSize
-#' @param textSize
-#' @param here
-#' @param numeric.dollar
-#' @param asList
-#' @param saveTex
-#' @param fileName
-#' @param filePath
-#' @param myFun
-#' @param ...
+#' @param df is the data frame (e.g. anaDataF) or data object created using
+#'   \code{pmxdata::derived_data} (e.g. DATobject)
+#' @param addFactors if \strong{TRUE}, factors are added to the input data.
+#'   Default is \strong{FALSE}. This option is used iff \code{df} is a data
+#'   object
+#' @param filterExpr is an expression used to filter the data. Either a formula
+#'   using non standard evaluation (e.g. \code{quo(AMT==0 & TYPE==1)}) or a
+#'   character string with filter expression (e.g. "(AMT==0 & TYPE==1)") is
+#'   acceptable to this argument.
+#' @param myID is the name of the ID column, default is \strong{"ID"}
+#' @param myDV is the name of the DV column, default is \strong{"DV"}
+#' @param myEVCOUNT is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}
+#' @param outerLevel is the outler level (1st level) of stratification variable,
+#'   eg. "STUDYF"
+#' @param innerLevel is the inner level (2nd level) of stratification variable,
+#'   eg. "DOSEF"
+#' @param outerLabel is the label for the outler level (1st level) of
+#'   stratification variable, eg. "Study")
+#' @param innerLabel is the label for the inner level (2nd level) of
+#'   stratification variable, eg. "Dose"
+#' @param digits is the number of significant digits
+#' @param lumpCount is the maximum number of event to display, e.g. if `lumpcount=3`,
+#'   the category "3 or more" will be display. Only works for Latex code.
+#'   Default is \strong{Inf} (no lumping)
+#' @param dropCount0 is a logical, should categories with zero event be dropped.
+#'   Only works for Latex code. Default is \strong{FALSE} (don't drop)
+#' @param nIdColNm is the character string to be printed as the column name
+#'   with the number of subjects, default is
+#'   \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}
+#' @param nObsColNm is the character string to be printed as the column name
+#'   with the number of observations, default is
+#'   \strong{"\\\\textbf\{nObs\\\\textsuperscript\{b\}\}"}
+#' @param caption is the table caption. Assign \strong{NULL} to this argument
+#'   produce table without caption. Default is \strong{"PK analysis data set:
+#'   Number of subjects with observations and number of observations"}
+#' @param label is the label for the table used for cross-reference, default is
+#'   \strong{"tab:anaSummary"}
+#' @param footnote is the text for footnote, default is
+#'   \strong{"\\textsuperscript\{a\} Number of
+#'   subjects\\\\newline\\\\textsuperscript\{b\} Number of
+#'   observations\\\\newline\\\\textsuperscript\{c\} Average number of
+#'   observations per subject"}
+#' @param footnoteSize is the footnote text size, default is
+#'   \strong{"footnotesize"}
+#' @param textSize is the text size, default is \strong{"small"}
+#' @param here is the logical argument determining the placement of the LaTex
+#'   table. If set to \strong{TRUE} with optional argument \code{table.env=TRUE}
+#'   with \code{longtable=FALSE}, will cause the LaTeX table environment to be
+#'   set up with option H to guarantee that the table will appear exactly where
+#'   you think it will in the text. Default is \strong{TRUE}
+#' @param numeric.dollar is the logical argument determining if the numbers will
+#'   be placed within $ symbols, default is \strong{FALSE}
+#' @param asList if \strong{TRUE} the data summary is returned as a list where
+#'   different elements in the list contain summary of different stratification
+#'   levels. If \strong{FALSE} the data summary is returned as a latex table. If
+#'   no stratification variable is provided, this function always returns a list
+#'   of two items (Number of subjects, Number of observarions and Average number
+#'   of observarions per subject)
+#' @param saveTex is the logical argument determining if the LaTex code for the
+#'   table will be saved on disk. Default is \strong{FALSE}
+#' @param fileName is the name of the Tex file (without extension) with the
+#'   LaTex code for the table saved on disk, eg. if \code{fileName="mytable"} is
+#'   provided, a file called \code{"mytable.tex"} will be saved on disk. Default
+#'   is \strong{NULL}.
+#' @param filePath is the path to the directory where the Tex file is saved.
+#'   Default is \strong{"/"}.
+#' @param ... is the additional optional arguments compatible with
+#'   \code{\link{latex}}
+#' @param myFun internal function for the calculation of summarized data. If
+#'   NULL, the default, an internal function specific to R(TTE) data is used.
+#'   This should not be changed for a standard use.
 #'
-#' @return
+#' @return By default, the table at Latex format. Alternatively, if
+#'   `asList = TRUE`, a list of data.frame tables.
+#'
 #' @export
 #'
 #' @examples
+#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+#' # create summary as a list
+#' summaryCountRTTE(ttedata,
+#'                     outerLevel   = "DOSEN",
+#'                     outerLabel   = "Dose",
+#'                     innerLevel   = "STUDYIDN",
+#'                     innerLabel   = "Study",
+#'                     asList = TRUE)
+#'
+#'
+#' # output as latex table
+#' summaryCountRTTE(ttedata,
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose")
+#' summaryCountRTTE(ttedata,
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose",
+#'                     lumpCount    = 3
+#'                     )
 summaryCountRTTE <- function(
     df,
     addFactors = FALSE,
@@ -127,11 +196,12 @@ summaryCountRTTE <- function(
   if (!is.null(innerLevel) & !is.factor(innerLevel)) {
     df[, innerLevel] <- factor(df[, innerLevel])
   }
+  maxcountOverall <- max(ungroup(df)[[myEVCOUNT]])
   if (is.null(myFun)) {
     myFun <- function(x) {
       ans1 <- x %>%
-        mutate(EVCOUNT = factor_and_lump(!!rlang::sym(myEVCOUNT), lump = lumpCount)) %>%
-        count(EVCOUNT, .drop = dropCount0) %>%
+        mutate(EVCOUNT = factor(!!rlang::sym(myEVCOUNT), levels = seq(0,maxcountOverall))) %>%
+        count(EVCOUNT, .drop = FALSE) %>%
         filter(!all(n == 0)) %>%
         tidyr::pivot_wider(
           names_from = !!rlang::sym(myEVCOUNT),
@@ -166,11 +236,13 @@ summaryCountRTTE <- function(
   }
   else {
     res_tab <- res_tab %>% droplevels() %>% as.data.frame()
-    countnames <- names(res_tab)[grepl("^\\d+", names(res_tab))]
-    #countnames_ordered <- countnames[order(as.numeric(regmatches(countnames, m = regexpr("^\\d+", countnames))))]
     Ntable <- res_tab %>%
-      dplyr::select(all_of(c(countnames, "subjects"))) %>%
-      mutate(across(everything(), ~ ifelse(is.na(.x), 0, .x)))
+      dplyr::select(any_of("subjects"), matches("^\\d+$")) %>%
+      mutate(across(everything(), ~ ifelse(is.na(.x), 0, .x))) %>%
+      lump_drop_columns(
+        lump = lumpCount,
+        dropCount0 = dropCount0
+      )
     if (is.null(outerLabel)) {
       outerLabel <- outerLevel
     }
@@ -259,21 +331,26 @@ summaryCountRTTE <- function(
   }
 }
 
-factor_and_lump <- function(x, lump = Inf){
-  lastval  <- max(x)
-  lastname <- max(x)
+
+lump_drop_columns <- function(x, lump = Inf, dropCount0 = FALSE){
+
+  ans <- x
+
+  counts <- names(x)[grepl("^\\d+$", names(x))]
+
   if(lump <= 0){
     stop("Cannot lump counts <= 0")
   }
-  if(lastval > lump){
-    x[x>=lump] <- lump
-    lastval <- lump
-    lastname <- paste0(lump, " or more")
+  if(max(counts) > lump){
+    lumpname <- paste(lump, "or more")
+    ans[[lumpname]] <- rowSums(ans %>% select(any_of(as.character(lump:max(counts)))))
+    ans[as.character(lump:max(counts))] <- NULL
   }
-  factor(
-    x,
-    levels = c(seq(0, max(x)-1), lastval),
-    labels = c(seq(0, max(x)-1), lastname)
-  )
-}
 
+  if(dropCount0){
+    ans[sapply(ans, function(.x) all(.x == 0))] <- NULL
+  }
+
+  ans
+
+}

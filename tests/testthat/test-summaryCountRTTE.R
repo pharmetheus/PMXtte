@@ -40,38 +40,27 @@ test_that("inner/outer levels work", {
   expect_named(ans, c(as.character(0:6), "subjects", 'stratlvl'))
 })
 
-test_that("factor_and_lump() works", {
-  num <- sample(0:15, size = 100, replace = TRUE)
-  num[1:16] <- 0:15 # make sure all values are sampled...
-  num[num==1] <- 3 # ... except 1
+test_that("lump_drop_columns() works", {
 
-  ans0 <- num %>% factor_and_lump()
-  tab0 <- table(ans0)
+  df <- structure(list(subjects = c(200L, 150L, 200L, 150L, 350L, 200L, 150L, 350L, 200L, 1250L),
+                       `0` = c(92L, 80L, 114L, 82L, 196L, 126L, 94L, 220L, 125L, 713L),
+                       `1` = c(164L, 114L, 141L, 111L,  252L, 120L, 86L, 206L, 124L, 860L),
+                       `2` = c(85L, 43L, 51L, 39L, 90L, 44L, 41L, 85L, 43L, 346L),
+                       `3` = c(28L, 14L, 17L, 16L, 33L,  15L, 19L, 34L, 14L, 123L),
+                       `4` = c(14, 6, 7, 7, 14, 2, 5, 7, 0, 41),
+                       `5` = c(10, 3, 5, 1, 6, 0, 1, 1, 0, 20),
+                       `6` = c(4, 2,  2, 2, 4, 0, 2, 2, 0, 12)),
+                  row.names = c(NA, -10L), class = "data.frame")
 
-  expect_equal(levels(ans0), as.character(0:15))
 
-  ans <- factor_and_lump(num, 99)
-  expect_equal(ans, ans0)
+  ans <- lump_drop_columns(df)
+  expect_equal(ans, df)
 
-  ans <- factor_and_lump(num, 11)
-  expect_equal(levels(ans), c(0:10, "11 or more"))
-  tab <- table(ans)
+  ans <- lump_drop_columns(df, lump = 4)
+  expect_named(ans, c("subjects", "0", "1", "2", "3", "4 or more"))
+  expect_equal(ans[["4 or more"]], rowSums(df[c("4", "5", "6")]))
 
-  expect_equal(
-    sum(tab["11 or more"]),
-    sum(tab0[as.character(c(11:15))])
-  )
-
-  expect_error(factor_and_lump(num, 0), "Cannot lump counts")
-
-  ans <- summaryCountRTTE(ttedata, asList = TRUE, lumpCount = 3)
-  expect_named(ans, c("0", "1", "2", "3 or more", "subjects", "stratlvl"))
-
-  ttedata2 <- ttedata %>% mutate(EVCOUNT = ifelse(EVCOUNT==4|(EVCOUNT == 2 & STUDYIDN == 1), 3, EVCOUNT))
-  ans <- summaryCountRTTE(ttedata2, innerLevel = "DOSEN", outerLevel = "STUDYIDN", asList = TRUE)
-  expect_equal(ans[[2]][1,"2",drop=TRUE], 0)
-  expect_equal(ans[[2]][ ,"4",drop=TRUE], c(0,0))
-
-  ans <- summaryCountRTTE(ttedata2, innerLevel="STUDYIDN", asList = TRUE, dropCount0 = TRUE)
-  expect_null(ans[[2]][["4"]])
+  df[["1"]] <- 0
+  ans <- lump_drop_columns(df, dropCount0 = TRUE)
+  expect_null(ans[["1"]])
 })
