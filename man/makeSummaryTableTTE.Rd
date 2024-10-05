@@ -53,16 +53,16 @@ ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1
 ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 # create summary as a list
 makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
                     asList = TRUE)
 
 # output as latex table
 makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study")
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose")
 }

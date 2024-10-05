@@ -2,7 +2,7 @@
 % Please edit documentation in R/summaryCountRTTE.R
 \name{summaryCountRTTE}
 \alias{summaryCountRTTE}
-\title{Single data summary table for (R)TTE data}
+\title{Single data summary table for RTTE data}
 \usage{
 summaryCountRTTE(
   df,
@@ -19,9 +19,7 @@ summaryCountRTTE(
   lumpCount = Inf,
   dropCount0 = FALSE,
   nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
-  nObsColNm = NULL,
-  caption =
-    "PK analysis data set: Number of subjects with observations and number of events",
+  caption = "Number of repeated events",
   label = "tab:anaSummary",
   footnote = "\\\\textsuperscript{a}Number of subjects",
   footnoteSize = "footnotesize",
@@ -80,10 +78,6 @@ Only works for Latex code. Default is \strong{FALSE} (don't drop)}
 with the number of subjects, default is
 \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}}
 
-\item{nObsColNm}{is the character string to be printed as the column name
-with the number of observations, default is
-\strong{"\\\\textbf\{nObs\\\\textsuperscript\{b\}\}"}}
-
 \item{caption}{is the table caption. Assign \strong{NULL} to this argument
 produce table without caption. Default is \strong{"PK analysis data set:
 Number of subjects with observations and number of observations"}}
@@ -141,17 +135,20 @@ By default, the table at Latex format. Alternatively, if
 \code{asList = TRUE}, a list of data.frame tables.
 }
 \description{
-Single data summary table for (R)TTE data
+Derive a single data summary table with up to 2 levels of stratification, counting the number of events in each group.
+It is similar to \code{PhRame_makeSummaryTable()}, the same arguments should apply the same to both functions. There is a possibility to
+lump counts of event (e.g., if \code{lumpCount = 3}, a column "3 or more" will be shown). It is possible to remove
+counts if there are no events with \code{dropCount0 = TRUE}.
 }
 \examples{
 ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 # create summary as a list
 summaryCountRTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
                     asList = TRUE)
 
 

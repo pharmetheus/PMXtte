@@ -1,5 +1,9 @@
-#' Single data summary table for (R)TTE data
+#' Single data summary table for RTTE data
 #'
+#' @description Derive a single data summary table with up to 2 levels of stratification, counting the number of events in each group.
+#' It is similar to `PhRame_makeSummaryTable()`, the same arguments should apply the same to both functions. There is a possibility to
+#' lump counts of event (e.g., if `lumpCount = 3`, a column "3 or more" will be shown). It is possible to remove
+#' counts if there are no events with `dropCount0 = TRUE`.
 #' @param df is the data frame (e.g. anaDataF) or data object created using
 #'   \code{pmxdata::derived_data} (e.g. DATobject)
 #' @param addFactors if \strong{TRUE}, factors are added to the input data.
@@ -29,9 +33,6 @@
 #' @param nIdColNm is the character string to be printed as the column name
 #'   with the number of subjects, default is
 #'   \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}
-#' @param nObsColNm is the character string to be printed as the column name
-#'   with the number of observations, default is
-#'   \strong{"\\\\textbf\{nObs\\\\textsuperscript\{b\}\}"}
 #' @param caption is the table caption. Assign \strong{NULL} to this argument
 #'   produce table without caption. Default is \strong{"PK analysis data set:
 #'   Number of subjects with observations and number of observations"}
@@ -82,10 +83,10 @@
 #' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 #' # create summary as a list
 #' summaryCountRTTE(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study",
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose",
 #'                     asList = TRUE)
 #'
 #'
@@ -117,8 +118,7 @@ summaryCountRTTE <- function(
     lumpCount = Inf,
     dropCount0 = FALSE,
     nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
-    nObsColNm = NULL,
-    caption = "PK analysis data set: Number of subjects with observations and number of events",
+    caption = "Number of repeated events",
     label = "tab:anaSummary",
     footnote = "\\textsuperscript{a}Number of subjects",
     footnoteSize = "footnotesize",
@@ -263,9 +263,7 @@ summaryCountRTTE <- function(
     }
 
     coljust <- rep("S", ncol(Ntable))
-    if(is.null(nObsColNm)){
-      nObsColNm <- seq_len(ncol(Ntable)-1) # 0, 1, 2 etc..
-    }
+    nObsColNm <- seq_len(ncol(Ntable)-1) # 0, 1, 2 etc..
 
     if (!is.null(outerLevel) & !is.null(innerLevel)) {
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,

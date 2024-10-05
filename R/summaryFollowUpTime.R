@@ -1,41 +1,51 @@
-#' Title
+#' Single data summary table for follow-up times with (R)TTE data
 #'
-#' @param time Column used to calculate annual time
-#' @param count Column that contains count for events
-#' @param timeConversion factor to multiply the time column by to convert it to another format(e.g. annual)
-#' @param nEventColNm the charactrer string to be printed as the column name with the number of events
-#' @param fTimeColNm the charactrer string to be printed as the column name with follow up time
-#' @param EventRateColNm the charactrer string to be printed as the column name with Event rate
+#' @description Derive a single data summary table with up to 2 levels of stratification, in order to display the number
+#' of events, the total follow-up time and the annualized event rates. It is a wrapper around `PhRame_makeSummaryTable()`,
+#' which means that it is the same function but defaulted with arguments that use "event" instead of "observation".
+#' Any argument available in the documentation of `PhRame_makeSummaryTable()` can be used (except for `myFun`,
+#' see the details in `Arguments` below). New arguments include the possibility to handle the Time and Event Counts
+#' variables, and possibly conversion in the relevant units.
+#'
+#' @param myTIME Column used to calculate annual time, default is \strong{"TSFDH"}
+#' @param myEVCOUNT Column that contains count for events, default is \strong{"EVCOUNT"}
+#' @param timeConversion factor to multiply the time column by to convert it to another format (e.g. annual)
+#' @param nEventColNm the character string to be printed as the column name with the number of events
+#' @param fTimeColNm the character string to be printed as the column name with follow up time
+#' @param EventRateColNm the character string to be printed as the column name with Event rate
 #' @param digits_rate the number of significant digits for the Event rate column
 #' @param digits the number of significant digits for the follow up time column
-#' @return
+#'
+#' @return By default, the table at Latex format. Alternatively, if `asList = TRUE`, a list of data.frame tables
+#'
 #' @export
 #' @examples
-#' ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
+#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 #'
 #' #create summary as a list
 #' summaryFollowUpTime(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study",
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose",
 #'                     asList = TRUE,
 #'                     timeConversion = 1/24/365.25)
 #'
 #' #output as latex table
 #' summaryFollowUpTime(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study",
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose",
 #'                     timeConversion = 1/24/365.25)
 
 summaryFollowUpTime <- function (df,
                                  myID = "ID",
                                  myDV = "DV",
-                                 time = 'TSFDH',
+                                 myTIME = 'TSFDH',
                                  timeConversion = 1,
-                                 count = 'EVCOUNT',
+                                 myEVCOUNT = 'EVCOUNT',
                                  outerLevel = NULL,
                                  innerLevel = NULL,
                                  outerLabel = NULL,
@@ -45,16 +55,18 @@ summaryFollowUpTime <- function (df,
                                  nEventColNm = "\\textbf{nEvent\\textsuperscript{a}}",
                                  fTimeColNm = "\\textbf{TotalFollowUpTime\\textsuperscript{b}}",
                                  EventRateColNm = "\\textbf{AnnualizedEventRate/nID\\textsuperscript{c}}",
-                                 caption = "Annual Follow Up time",
-                                 label = "tab:anaSummary",
+                                 caption = "Annual Follow Up Time",
+                                 label = "tab:anaSummaryFollowupTime",
                                  footnote = "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Sum of individual follow-up times per group.\\newline\\textsuperscript{c}Annual event rate",
                                  asList = FALSE,
                                  ...) {
 
   sum_data <- df %>% group_by(!!rlang::sym(myID)) %>%
-    mutate(lastTSFDH = dplyr::last(!!rlang::sym(time)),             # Last time per subject
-           finalCount = dplyr::last(!!rlang::sym(count))          # How many events the subject had
-           )
+    mutate(
+      lastTSFDH = dplyr::last(!!rlang::sym(myTIME)),             # Last time per subject
+      finalCount = dplyr::last(!!rlang::sym(myEVCOUNT))          # How many events the subject had
+    ) %>%
+    slice(1)
 
 
   #Convert time to annual

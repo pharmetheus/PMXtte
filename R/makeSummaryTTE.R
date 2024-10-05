@@ -24,18 +24,18 @@
 #' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 #' # create summary as a list
 #' makeSummaryTableTTE(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study",
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose",
 #'                     asList = TRUE)
 #'
 #' # output as latex table
 #' makeSummaryTableTTE(ttedata,
-#'                     outerLevel   = "DOSEN",
-#'                     outerLabel   = "Dose",
-#'                     innerLevel   = "STUDYIDN",
-#'                     innerLabel   = "Study")
+#'                     outerLevel   ="STUDYIDN" ,
+#'                     outerLabel   = "Study",
+#'                     innerLevel   = "DOSEN",
+#'                     innerLabel   = "Dose")
 makeSummaryTableTTE <- function(df,
                                 myID = "ID",
                                 myDV = "DV",

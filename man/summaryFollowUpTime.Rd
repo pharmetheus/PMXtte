@@ -2,15 +2,15 @@
 % Please edit documentation in R/summaryFollowUpTime.R
 \name{summaryFollowUpTime}
 \alias{summaryFollowUpTime}
-\title{Title}
+\title{Single data summary table for follow-up times with (R)TTE data}
 \usage{
 summaryFollowUpTime(
   df,
   myID = "ID",
   myDV = "DV",
-  time = "TSFDH",
+  myTIME = "TSFDH",
   timeConversion = 1,
-  count = "EVCOUNT",
+  myEVCOUNT = "EVCOUNT",
   outerLevel = NULL,
   innerLevel = NULL,
   outerLabel = NULL,
@@ -20,8 +20,8 @@ summaryFollowUpTime(
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
   fTimeColNm = "\\\\textbf{TotalFollowUpTime\\\\textsuperscript{b}}",
   EventRateColNm = "\\\\textbf{AnnualizedEventRate/nID\\\\textsuperscript{c}}",
-  caption = "Annual Follow Up time",
-  label = "tab:anaSummary",
+  caption = "Annual Follow Up Time",
+  label = "tab:anaSummaryFollowupTime",
   footnote =
     "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Sum of individual follow-up times per group.\\\\newline\\\\textsuperscript{c}Annual event rate",
   asList = FALSE,
@@ -29,42 +29,51 @@ summaryFollowUpTime(
 )
 }
 \arguments{
-\item{time}{Column used to calculate annual time}
+\item{myTIME}{Column used to calculate annual time, default is \strong{"TSFDH"}}
 
-\item{timeConversion}{factor to multiply the time column by to convert it to another format(e.g. annual)}
+\item{timeConversion}{factor to multiply the time column by to convert it to another format (e.g. annual)}
 
-\item{count}{Column that contains count for events}
+\item{myEVCOUNT}{Column that contains count for events, default is \strong{"EVCOUNT"}}
 
 \item{digits}{the number of significant digits for the follow up time column}
 
 \item{digits_rate}{the number of significant digits for the Event rate column}
 
-\item{nEventColNm}{the charactrer string to be printed as the column name with the number of events}
+\item{nEventColNm}{the character string to be printed as the column name with the number of events}
 
-\item{fTimeColNm}{the charactrer string to be printed as the column name with follow up time}
+\item{fTimeColNm}{the character string to be printed as the column name with follow up time}
 
-\item{EventRateColNm}{the charactrer string to be printed as the column name with Event rate}
+\item{EventRateColNm}{the character string to be printed as the column name with Event rate}
+}
+\value{
+By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a list of data.frame tables
 }
 \description{
-Title
+Derive a single data summary table with up to 2 levels of stratification, in order to display the number
+of events, the total follow-up time and the annualized event rates. It is a wrapper around \code{PhRame_makeSummaryTable()},
+which means that it is the same function but defaulted with arguments that use "event" instead of "observation".
+Any argument available in the documentation of \code{PhRame_makeSummaryTable()} can be used (except for \code{myFun},
+see the details in \code{Arguments} below). New arguments include the possibility to handle the Time and Event Counts
+variables, and possibly conversion in the relevant units.
 }
 \examples{
-ttedata  <- readr::read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
+ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 
 #create summary as a list
 summaryFollowUpTime(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
                     asList = TRUE,
                     timeConversion = 1/24/365.25)
 
 #output as latex table
 summaryFollowUpTime(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
                     timeConversion = 1/24/365.25)
 }

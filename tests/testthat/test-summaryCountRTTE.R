@@ -55,6 +55,9 @@ test_that("lump_drop_columns() works", {
 
   ans <- lump_drop_columns(df)
   expect_equal(ans, df)
+  ans <- lump_drop_columns(df, lump = 99)
+  expect_equal(ans, df)
+  expect_error(lump_drop_columns(df, lump = 0), "Cannot lump counts")
 
   ans <- lump_drop_columns(df, lump = 4)
   expect_named(ans, c("subjects", "0", "1", "2", "3", "4 or more"))
