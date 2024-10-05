@@ -20,7 +20,9 @@ Imports:
     survminer,
     tidyr
 Suggests: 
+    devtools,
     knitr,
+    magrittr,
     PMXRenv,
     rmarkdown,
     testthat (>= 3.0.0),

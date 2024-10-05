@@ -127,8 +127,7 @@ Default is \strong{"/"}.}
 NULL, the default, an internal function specific to R(TTE) data is used.
 This should not be changed for a standard use.}
 
-\item{...}{is the additional optional arguments compatible with
-\code{\link{latex}}}
+\item{...}{is the additional optional arguments compatible with latex}
 }
 \value{
 By default, the table at Latex format. Alternatively, if

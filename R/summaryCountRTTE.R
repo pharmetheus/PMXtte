@@ -67,8 +67,7 @@
 #'   is \strong{NULL}.
 #' @param filePath is the path to the directory where the Tex file is saved.
 #'   Default is \strong{"/"}.
-#' @param ... is the additional optional arguments compatible with
-#'   \code{\link{latex}}
+#' @param ... is the additional optional arguments compatible with latex
 #' @param myFun internal function for the calculation of summarized data. If
 #'   NULL, the default, an internal function specific to R(TTE) data is used.
 #'   This should not be changed for a standard use.
