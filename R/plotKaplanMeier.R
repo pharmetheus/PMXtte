@@ -25,7 +25,7 @@
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
 #' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
 #' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
-#' @return Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
+#' @return A "ggsurvplot" object, see the documentation of `survminer::ggsurvplot` for more information. Basically it is a list that notably contains two "ggplot" objects, "x$plot" and "x$table", that renders into a single figure the Kaplan-Meier curves on top and the risk table on the bottom.
 #' @import rlang
 #' @import ggplot2
 #' @importFrom survival Surv
@@ -33,43 +33,46 @@
 #' @importFrom rlang set_names
 #'
 #' @examples
-#' #load example data
 #' library(magrittr)
-#' exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+#' #load example data
+#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 #'
 #' #generate time to first event dataframe
-#' RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
-#' RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+#' ttedata <- ttedata %>% dplyr::distinct(ID, .keep_all = TRUE)
+#'
+#' #transform back to "data.frame" not "tibble" do avoid bugs
+#' ttedata <- as.data.frame(ttedata)
 #'
 #' #default plot with one curve
-#'  plotKaplanMeier(RTTEdata)
+#' plotKaplanMeier(ttedata)
 #'
 #' # Kaplan Meier plot stratified by Dose and faceted by SEX
-#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+#' plotKaplanMeier(ttedata, cov_col = "DOSEN", facet.by = 'SEXN')
 #'
 #' # Change the panel labs of the facets
-#'  plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
+#' plotKaplanMeier(ttedata, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
 #'
 #' # Change the size of pval text
-#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+#' plotKaplanMeier(ttedata, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
 #'
 #' # Change the starting color in the palette
-#'  plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
+#' plotKaplanMeier(ttedata, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 #'
-#'  # Change the color for a single curve plot
-#'  plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+#' # Change the color for a single curve plot
+#' plotKaplanMeier(ttedata, palette = 'cadetblue')
 #'
-#'  # Create custom palette of colors
-#'  Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
-#'  plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
+#' # Create custom palette of colors
+#' Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3', 'darkred')
+#' plotKaplanMeier(ttedata, palette = Colors, cov_col = 'DOSEN')
 #'
-#'  #modify plot using ggplot syntax
-#'  p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
-#'  p$table <- p$table + ggplot2::ylab('Dose (mg)')
-#'  p
+#' #modify plot using ggplot syntax
+#' p <- plotKaplanMeier(ttedata, cov_col = "DOSEN")
+#' p$table <- p$table + ggplot2::ylab('Dose (mg)')
+#' p
 #'
 #' # remove median line from legend
-#' plotKaplanMeier(RTTEdata, cov_col = "DOSE", surv.median.line.legend = FALSE)
+#' plotKaplanMeier(ttedata, cov_col = "DOSEN", surv.median.line.legend = FALSE)
 #' @export
 
 
@@ -119,7 +122,7 @@ plotKaplanMeier <- function(data,
                             scales                  = "fixed",
                             legend.box              = 'horizontal',
                             legend.title.size       = 9,
-                            legend.margin           = 5,
+                            legend.spacing           = 5,
                             ...){
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
@@ -166,7 +169,6 @@ plotKaplanMeier <- function(data,
   if (add.ciWidth.to.legend){
     legend.title <- paste0(legend.title,' & ', ciWidth*100, '% CI')
   }
-
   if (!is.null(facet.by)){
     facetPlots <- survminer::ggsurvplot_facet(fit                    = fit,
                                               data                   = data,
@@ -243,7 +245,7 @@ plotKaplanMeier <- function(data,
       }}
         facetPlots <- facetPlots + theme(legend.box = legend.box,
                                          legend.title = element_text(size= legend.title.size),
-                                         legend.margin = unit(legend.margin, 'pt'))
+                                         legend.spacing = unit(legend.spacing, 'pt'))
     return(facetPlots)
   }
 
@@ -348,7 +350,7 @@ plotKaplanMeier <- function(data,
            linetype = guide_legend(order = 3)) +
     theme(legend.box = legend.box,
           legend.title = element_text(size= legend.title.size),
-          legend.margin = unit(legend.margin, 'pt'))
+          legend.spacing = unit(legend.spacing, 'pt'))
 
   # table specifications
 if(!is.null(kaplanPlot$table)) {
@@ -356,9 +358,12 @@ if(!is.null(kaplanPlot$table)) {
                       theme(panel.grid = element_blank()) +
                       ylab(label = risk.table.ylab)
   if(table.clip == 'off'){
-    kaplanPlot$table <- kaplanPlot$table +
-                         coord_cartesian(xlim = xlim, clip = 'off')
+    # unclear to me (FLL) but we need this "if" and we cannot
+    # use coord_cartesian(default = TRUE) to suppress the message
+    kaplanPlot$table <- suppressMessages(kaplanPlot$table +
+                         coord_cartesian(xlim = xlim, clip = 'off'))
   }
+
 }
   return(kaplanPlot)
 }
