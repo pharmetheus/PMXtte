@@ -14,7 +14,7 @@ plotKaplanMeier(
   short.panel.labs = TRUE,
   label.parsed = TRUE,
   xlab = "Time since first dose (week)",
-  ylab = "Fraction without events",
+  ylab = "Percentage without events",
   break.time.by = 4,
   xlim = NULL,
   ylim = c(0, 1),

@@ -51,7 +51,7 @@ test_that('similar plots', {
                 show.censor=T,
                 palette = PMXColors_pmx_palettes(),
                 scale.percent = TRUE,
-                ylab = 'Fraction without events (%)',
+                ylab = 'Percentage without events (%)',
                 xlab = 'Time (Weeks)',
                 legend.position = 'top',
                 xlim = c(0,5000),

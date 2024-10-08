@@ -43,11 +43,11 @@ ggKMvpc <- function(odata,
                     censor.size = 4,
                     palette = PMXtte:::PMXColors_pmx_palettes(),
                     scale.percent = TRUE,
-                    ylab = 'Fraction without events (%)',
+                    ylab = 'Percentage without events (%)',
                     xlab = 'Time (Weeks)',
                     legend.position = 'top',
                     xlim = NULL,
-                    ylim = NULL
+                    ylim = c(0,1)
                     ){
 
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
