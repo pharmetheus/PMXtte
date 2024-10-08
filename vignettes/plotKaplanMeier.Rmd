@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::load_all("/PMX/Projects/Pharmetheus/PMXtte/PMXtte/")
+devtools::load_all()
 #suppressPackageStartupMessages(library(PMXtte))
 #suppressPackageStartupMessages(library(dplyr))
 #suppressPackageStartupMessages(library(ggplot2))
@@ -66,7 +66,7 @@ You can also change the colors by modifying the palette using arguments in pmx_p
 plotKaplanMeier(RTTEdata,
                 time_col = 'TSFDW', #The default value
                 cov_col = "DOSE",
-                palette = PMXColors::pmx_palettes(firstColorNum = 3),
+                palette = PMXColors_pmx_palettes(firstColorNum = 3),
                 legend.title = 'Dose (mg)'
                 )
 ```
@@ -106,3 +106,10 @@ plotKaplanMeier(RTTEdata,
                 )
 ```
 
+To modify the plot we can also use ggplot syntax using $ sign to access either table or plot in case the plot includes a table or directly in the case it is only a plot like in the case of using facets
+```{r,fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
+p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+  p$table <- p$table + ylab('Dose (mg)')
+  p$
+  p
+```

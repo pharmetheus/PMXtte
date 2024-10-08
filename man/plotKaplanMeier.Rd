@@ -14,13 +14,13 @@ plotKaplanMeier(
   short.panel.labs = TRUE,
   label.parsed = TRUE,
   xlab = "Time since first dose (week)",
-  ylab = "Fraction without events",
+  ylab = "Percentage without events",
   break.time.by = 4,
   xlim = NULL,
   ylim = c(0, 1),
   surv.scale = "percent",
-  ggtheme = PMXColors::theme_pmx(),
-  palette = PMXColors::pmx_palettes(),
+  ggtheme = PMXColors_theme_pmx(),
+  palette = PMXColors_pmx_palettes(),
   conf.int = TRUE,
   ciWidth = 0.95,
   add.ciWidth.to.legend = TRUE,
@@ -49,7 +49,7 @@ plotKaplanMeier(
   scales = "fixed",
   legend.box = "horizontal",
   legend.title.size = 9,
-  legend.margin = 5,
+  legend.spacing = 5,
   ...
 )
 }
@@ -172,7 +172,7 @@ Alias of the \code{\link[survminer]{ggsurvplot_combine}()} function.}
   }}
 }
 \value{
-Kaplan-Meier (KM) curves for the provided data coloured by treatment/dose
+A "ggsurvplot" object, see the documentation of \code{survminer::ggsurvplot} for more information. Basically it is a list that notably contains two "ggplot" objects, "x$plot" and "x$table", that renders into a single figure the Kaplan-Meier curves on top and the risk table on the bottom.
 }
 \description{
 This function generates Kaplan Meier curves plot using ggsurvplot from a dataframe
@@ -182,32 +182,44 @@ The function takes a dataframe and fits the survival curves using surv_fit then 
 The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 }
 \examples{
+library(magrittr)
 #load example data
-exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
 
 #generate time to first event dataframe
-RTTEdata <- exampledata \%>\% dplyr::filter(EVID==0&TYPE==0)
-RTTEdata <- RTTEdata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
+ttedata <- ttedata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
+
+#transform back to "data.frame" not "tibble" do avoid bugs
+ttedata <- as.data.frame(ttedata)
 
 #default plot with one curve
- plotKaplanMeier(RTTEdata)
+plotKaplanMeier(ttedata)
 
 # Kaplan Meier plot stratified by Dose and faceted by SEX
- plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
+plotKaplanMeier(ttedata, cov_col = "DOSEN", facet.by = 'SEXN')
 
 # Change the panel labs of the facets
- plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
+plotKaplanMeier(ttedata, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
 
 # Change the size of pval text
- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+plotKaplanMeier(ttedata, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
 
 # Change the starting color in the palette
- plotKaplanMeier(RTTEdata, cov_col = "DOSE", palette = PMXColors::pmx_palettes(firstColorNum = 3))
+plotKaplanMeier(ttedata, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 
- # Change the color for a single curve plot
- plotKaplanMeier(RTTEdata, palette = 'cadetblue')
+# Change the color for a single curve plot
+plotKaplanMeier(ttedata, palette = 'cadetblue')
 
- # Create custom palette of colors
- Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
- plotKaplanMeier(RTTEdata, palette = Colors, cov_col = 'DOSE')
+# Create custom palette of colors
+Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3', 'darkred')
+plotKaplanMeier(ttedata, palette = Colors, cov_col = 'DOSEN')
+
+#modify plot using ggplot syntax
+p <- plotKaplanMeier(ttedata, cov_col = "DOSEN")
+p$table <- p$table + ggplot2::ylab('Dose (mg)')
+p
+
+# remove median line from legend
+plotKaplanMeier(ttedata, cov_col = "DOSEN", surv.median.line.legend = FALSE)
 }

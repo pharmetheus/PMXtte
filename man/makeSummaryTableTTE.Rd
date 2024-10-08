@@ -2,123 +2,67 @@
 % Please edit documentation in R/makeSummaryTTE.R
 \name{makeSummaryTableTTE}
 \alias{makeSummaryTableTTE}
-\title{Title}
+\title{Single data summary table for (R)TTE data}
 \usage{
 makeSummaryTableTTE(
   df,
   myID = "ID",
   myDV = "DV",
   digits = 3,
-  nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
-  nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
-  avnEventColNm = "\\\\textbf{pEvent/nID\\\\textsuperscript{c}}",
+  nObsColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
+  avnObsColNm = "\\\\textbf{pEvent/nID\\\\textsuperscript{c}}",
   caption = "Number of patients and number of events",
-  label = "tab:anaSummary",
   footnote =
     "\\\\textsuperscript{a}Number of patients\\\\newline\\\\textsuperscript{b}Number of events\\\\newline\\\\textsuperscript{c}Proportion of number of events",
+  myFun = NULL,
   ...
 )
 }
 \arguments{
-\item{df}{is the data frame (e.g. anaDataF) or data object created using
-\code{pmxdata::derived_data} (e.g. DATobject)}
+\item{df}{is the data frame}
 
-\item{myID}{is the name of the ID column, default is \strong{"ID"}}
+\item{myID}{is the name of the ID column, default is "ID"}
 
-\item{myDV}{is the name of the DV column, default is \strong{"DV"}}
+\item{myDV}{is the name of the DV column, default is "DV"}
 
 \item{digits}{is the number of significant digits}
 
-\item{nIdColNm}{is the character string to be printed as the column name
-with the number of subjects, default is
-\strong{"\\\\textbf{nID\\\\textsuperscript{a}}"}}
+\item{nObsColNm}{is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"}
 
-\item{nEventColNm}{the charactrer string to be printed as the column name with number of events}
+\item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"}
 
-\item{avnEventColNm}{the charactrer string to be printed as the column name with average number of events}
+\item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
 
-\item{caption}{is the table caption. Assign \strong{NULL} to this argument
-produce table without caption. Default is \strong{"PK analysis data set:
-Number of subjects with observations and number of observations"}}
+\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events"}
 
-\item{label}{is the label for the table used for cross-reference, default is
-\strong{"tab:anaSummary"}}
+\item{myFun}{internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.}
 
-\item{footnote}{is the text for footnote, default is
-\strong{"\\textsuperscript{a} Number of
-subjects\\\\newline\\\\textsuperscript{b} Number of
-observations\\\\newline\\\\textsuperscript{c} Average number of
-observations per subject"}}
-
-\item{...}{
-  Arguments passed on to \code{\link[PhRame:makeSummaryTable]{PhRame::makeSummaryTable}}
-  \describe{
-    \item{\code{addFactors}}{if \strong{TRUE}, factors are added to the input data.
-Default is \strong{FALSE}. This option is used iff \code{df} is a data
-object}
-    \item{\code{filterExpr}}{is an expression used to filter the data. Either a formula
-using non standard evaluation (e.g. \code{quo(AMT==0 & TYPE==1)}) or a
-character string with filter expression (e.g. "(AMT==0 & TYPE==1)") is
-acceptable to this argument.}
-    \item{\code{outerLevel}}{is the outler level (1st level) of stratification variable,
-eg. "STUDYF"}
-    \item{\code{innerLevel}}{is the inner level (2nd level) of stratification variable,
-eg. "DOSEF"}
-    \item{\code{outerLabel}}{is the label for the outler level (1st level) of
-stratification variable, eg. "Study")}
-    \item{\code{innerLabel}}{is the label for the inner level (2nd level) of
-stratification variable, eg. "Dose"}
-    \item{\code{nObsColNm}}{is the character string to be printed as the column name
-with the number of observations, default is
-\strong{"\\\\textbf{nObs\\\\textsuperscript{b}}"}}
-    \item{\code{avnObsColNm}}{is the character string to be printed as the column name
-with the average number of observations per subject in a given strata,
-default is
-\strong{"\\\\textbf{nObs/nID\\\\textsuperscript{c}}"}}
-    \item{\code{footnoteSize}}{is the footnote text size, default is
-\strong{"footnotesize"}}
-    \item{\code{textSize}}{is the text size, default is \strong{"small"}}
-    \item{\code{here}}{is the logical argument determining the placement of the LaTex
-table. If set to \strong{TRUE} with optional argument \code{table.env=TRUE}
-with \code{longtable=FALSE}, will cause the LaTeX table environment to be
-set up with option H to guarantee that the table will appear exactly where
-you think it will in the text. Default is \strong{TRUE}}
-    \item{\code{numeric.dollar}}{is the logical argument determining if the numbers will
-be placed within $ symbols, default is \strong{FALSE}}
-    \item{\code{asList}}{if \strong{TRUE} the data summary is returned as a list where
-different elements in the list contain summary of different stratification
-levels. If \strong{FALSE} the data summary is returned as a latex table. If
-no stratification variable is provided, this function always returns a list
-of two items (Number of subjects, Number of observarions and Average number
-of observarions per subject)}
-    \item{\code{saveTex}}{is the logical argument determining if the LaTex code for the
-table will be saved on disk. Default is \strong{FALSE}}
-    \item{\code{fileName}}{is the name of the Tex file (without extension) with the
-LaTex code for the table saved on disk, eg. if \code{fileName="mytable"} is
-provided, a file called \code{"mytable.tex"} will be saved on disk. Default
-is \strong{NULL}.}
-    \item{\code{filePath}}{is the path to the directory where the Tex file is saved.
-Default is \strong{"/"}.}
-  }}
+\item{...}{passed to \code{PhRame_makeSummaryTable()}, possibly for the additional optional arguments compatible with latex}
+}
+\value{
+By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a list of data.frame tables
 }
 \description{
-Title
+Derive a single data summary table with up to 2 levels of stratification, specifically tailored for (R)TTE data.
+It is a wrapper around \code{PhRame_makeSummaryTable()}, which means that it is the same function but defaulted with arguments
+that use "event" instead of "observation". Any argument available in the documentation of \code{PhRame_makeSummaryTable()} can
+be used (except for \code{myFun}, see the details in \code{Arguments} below).
 }
 \examples{
-ttedata  <- read_csv(system.file('extdata/anaDATAf.csv', package= 'PMXtte'))
-
-#create summary as a list
+ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+# create summary as a list
 makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study",
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
                     asList = TRUE)
 
-#output as latex table
+# output as latex table
 makeSummaryTableTTE(ttedata,
-                    outerLevel   = "DOSEN",
-                    outerLabel   = "Dose",
-                    innerLevel   = "STUDYIDN",
-                    innerLabel   = "Study")
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose")
 }

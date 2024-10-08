@@ -12,8 +12,15 @@
 #' @param obsCol color for the observed line
 #' @param posObs provide an explicit set of times to smoothen the CI for simulations
 #' @param show.censor logical to indicate whether the censoring times should be shown for the observed
-#' @param censor.shape
-#' @param censor.size
+#' @param censor.shape sympol for censored items to be passed to geom point
+#' @param censor.size size of the censor item
+#' @param palette palette of colors will override the simCol and obsCol arguments
+#' @param scale.percent logical to convert y axis to percent
+#' @param ylab Y-axis label
+#' @param xlab X-axis label
+#' @param legend.position the position of the legend, default 'top'
+#' @param xlim override the limits of x axis
+#' @param ylim override the limits of y axis
 #'
 #' @return
 #' @export
@@ -29,21 +36,25 @@ ggKMvpc <- function(odata,
                     cuminc=T,
                     simCol='blue',
                     obsCol='blue',
+                    obs.size = 0.8,
                     posObs=NULL,
                     show.censor=T,
                     censor.shape = '|',
                     censor.size = 4,
-                    palette = pmx_palettes(),
+                    palette = PMXtte:::PMXColors_pmx_palettes(),
                     scale.percent = TRUE,
-                    ylab = 'Fraction without events (%)',
-                    xlab = 'Time (Weeks)'
+                    ylab = 'Percentage without events (%)',
+                    xlab = 'Time (Weeks)',
+                    legend.position = 'top',
+                    xlim = NULL,
+                    ylim = c(0,1)
                     ){
 
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
 
   # group by stratifications if present
   if(!is.null(strat)) {
-    strat_gr <- map(seq_along(strat),function(i) as.name(strat[i]))
+    strat_gr <- purrr::map(seq_along(strat),function(i) as.name(strat[i]))
     odata <-  odata %>%
       group_by(!!!unlist(strat_gr))
     sdata <-  sdata %>%
@@ -74,10 +85,10 @@ ggKMvpc <- function(odata,
     # with stratification the standard is to sequence daily from 0 to the maximum observed time within each stratum (combination) to smooth out the simulations
     if(is.null(posObs)){
       # retrieve all combinations
-      all_levels = map(strat,function(i){paste(i,paste0('\'',levels(odata[[i]]),'\''),sep="==")})
-      mlength <- max(map_dbl(all_levels,length))
+      all_levels = purrr::map(strat,function(i){paste(i,paste0('\'',levels(odata[[i]]),'\''),sep="==")})
+      mlength <- max(purrr::map_dbl(all_levels,length))
       # get all levels for each factor
-      map(seq_along(all_levels),function(i){ # seq_along the lists in all_levels
+      purrr::map(seq_along(all_levels),function(i){ # seq_along the lists in all_levels
         var= all_levels[[i]]
         if(length(var)<mlength) var <- c(var,rep(NA,(mlength-length(var)) ))
         df_tmp = data.frame(var)
@@ -86,14 +97,14 @@ ggKMvpc <- function(odata,
       }) %>%
         as.data.frame() -> tmpdf # a list of e.g.CAVCYC1QF=='Q1 [0-194.7]'
       # complete to get all possible combinations
-      eval(parse(text=paste0('complete(tmpdf,',paste(paste0('strat',1:length(strat)),collapse = ","),")"))) %>%
+      eval(parse(text=paste0('tidyr::complete(tmpdf,',paste(paste0('strat',1:length(strat)),collapse = ","),")"))) %>%
         # remove the NA rows
         filter(!if_any(1:ncol(.), is.na)) %>%
         # turn into filter expression
         mutate(combi=eval(parse(text=paste0('paste(',paste(paste0('strat',1:length(strat)),collapse = ","),",sep=\'&\')")))) %>%
         pull(combi) -> filterExpr # filter of e.g.CAVCYC1QF=='Q1 [0-194.7]' & XXF=='...'
       # for each filter expression / covariate combination retrieve the time window
-      map(filterExpr,function(i){
+      purrr::map(filterExpr,function(i){
         expr <- rlang::parse_expr(i)
         odata %>%
           filter(!!expr) %>%
@@ -136,14 +147,14 @@ ggKMvpc <- function(odata,
            greenwood_se=KM * sqrt(cumevent / (nrisk1 * (nrisk1 - cumevent))), # RA: this gives the correct estimate at time <=16
            greenwood_se=ifelse(newevent==0,NA,greenwood_se),
            INC=1-KM) %>%
-    fill(greenwood_se)-> odata_km
+    tidyr::fill(greenwood_se)-> odata_km
 
   ### Simulated #####
   NREP = sdata %>% pull(!!enquo(iter)) %>% max
 
 
 
-  map_df(1:NREP,function(r){
+  purrr::map_df(1:NREP,function(r){
     # stime=Sys.time()
     sdata_r <- sdata %>%
       # filter(ITER==r)
@@ -184,13 +195,13 @@ ggKMvpc <- function(odata,
 
 
       # apply the smoother for each stratum combination
-      sdata_km_stepped <- map_df(seq_along(posObs),function(i){
+      sdata_km_stepped <- purrr::map_df(seq_along(posObs),function(i){
         # filter the data according to the expression (i.e. strata combination)
         expr <- rlang::parse_expr(names(posObs)[i]) #filter
         sdata_km_i <- sdata_km %>%
           filter(!!expr)
 
-        # derive the stepfun to smooth it
+      # derive the stepfun to smooth it
         survatt <- stepfun(sdata_km_i$time[-1], sdata_km_i$KM)
         # apply the stepfun
         tmp_df = data.frame(time=posObs[[i]],KM=survatt(posObs[[i]])) %>%
@@ -247,12 +258,12 @@ ggKMvpc <- function(odata,
     # ribbon for simulated CI
     geom_ribbon(data=sdata_km_sum,aes(x=time,ymin=lci,ymax=uci,fill=names(simCol)),alpha=0.5)+
     # step function for observed KM
-    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=1)+
-    geom_step(data=odata_km,aes(x=time,y=obs,color=names(obsCol)),size=1)+
+    geom_step(data=odata_km,aes(x=time,y=obs),color='black',size=obs.size)+
+    geom_step(data=odata_km,aes(x=time,y=obs,color=names(obsCol)),size=obs.size)+
     #
     scale_color_manual(values = obsCol)+
     scale_fill_manual(values = simCol)+
-    theme(legend.position = 'top',legend.title=element_blank())
+    theme(legend.position = legend.position,legend.title=element_blank())
 
 
   if(show.censor) {
@@ -277,6 +288,7 @@ ggKMvpc <- function(odata,
       strats=table(odata[[strat]])
       strats_n <- paste0(names(strats),"\n n = ",strats)
       names(strats_n) <- names(strats)
+
       p <- p+facet_wrap(reformulate(strat),labeller = as_labeller(strats_n))
     } else {
       p <- p+facet_wrap(reformulate(strat))
@@ -289,9 +301,15 @@ ggKMvpc <- function(odata,
   p <- ggpubr::ggpar(p, palette = palette)
   p <- p +
        xlab(xlab) +
-       ylab(ylab)
+       ylab(ylab) +
+       coord_cartesian(xlim = xlim, ylim = ylim)
   if(scale.percent){
     p <- p + scale_y_continuous(labels = scales::percent)
   }
   p
 }
+
+#prepare data for RTTE
+# Sdata <- Sdata %>% group_by(ID) %>% mutate(EVCOUNT = cumsum(DV))
+# Sdata <- Sdata %>% group_by(ID) %>% mutate(latestEventTime = lag(TIME)) %>% ungroup() %>% mutate(TimeSincelastEvent = TIME - latestEventTime)
+ #Sdata <- Sdata %>% mutate(TimeSincelastEvent2 = ifelse(is.na(TimeSincelastEvent), TIME, TimeSincelastEvent))

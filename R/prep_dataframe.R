@@ -5,7 +5,6 @@
 #' @return modified dataframe ready for plots
 #' @import dplyr
 #' @import rlang
-#' @export
 #'
 #' @examples
 prep_dataframe <- function(RTTEdata, plottype = "time_to_first_event",exposure_col = CMINSS){
