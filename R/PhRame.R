@@ -1,3 +1,74 @@
+#' @title Single data summary table including all strata
+#' @description Function to derive a single data summary table for all strata
+#'   (upto 2 levels of stratification) that can be used to format for latex
+#'   table
+#' @name PhRame_makeSummaryTable
+#' @param df is the data frame (e.g. anaDataF) or data object created using
+#'   \code{pmxdata::derived_data} (e.g. DATobject)
+#' @param addFactors if \strong{TRUE}, factors are added to the input data.
+#'   Default is \strong{FALSE}. This option is used iff \code{df} is a data
+#'   object
+#' @param filterExpr is an expression used to filter the data. Either a formula
+#'   using non standard evaluation (e.g. \code{quo(AMT==0 & TYPE==1)}) or a
+#'   character string with filter expression (e.g. "(AMT==0 & TYPE==1)") is
+#'   acceptable to this argument.
+#' @param myID is the name of the ID column, default is \strong{"ID"}
+#' @param myDV is the name of the DV column, default is \strong{"DV"}
+#' @param outerLevel is the outler level (1st level) of stratification variable,
+#'   eg. "STUDYF"
+#' @param innerLevel is the inner level (2nd level) of stratification variable,
+#'   eg. "DOSEF"
+#' @param outerLabel is the label for the outler level (1st level) of
+#'   stratification variable, eg. "Study")
+#' @param innerLabel is the label for the inner level (2nd level) of
+#'   stratification variable, eg. "Dose"
+#' @param digits is the number of significant digits
+#' @param nIdColNm is the character string to be printed as the column name
+#'   with the number of subjects, default is
+#'   \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}
+#' @param nObsColNm is the character string to be printed as the column name
+#'   with the number of observations, default is
+#'   \strong{"\\\\textbf\{nObs\\\\textsuperscript\{b\}\}"}
+#' @param avnObsColNm is the character string to be printed as the column name
+#'   with the average number of observations per subject in a given strata,
+#'   default is
+#'   \strong{"\\\\textbf\{nObs/nID\\\\textsuperscript\{c\}\}"}
+#' @param caption is the table caption. Assign \strong{NULL} to this argument
+#'   produce table without caption. Default is \strong{"PK analysis data set:
+#'   Number of subjects with observations and number of observations"}
+#' @param label is the label for the table used for cross-reference, default is
+#'   \strong{"tab:anaSummary"}
+#' @param footnote is the text for footnote, default is
+#'   \strong{"\\textsuperscript\{a\} Number of
+#'   subjects\\\\newline\\\\textsuperscript\{b\} Number of
+#'   observations\\\\newline\\\\textsuperscript\{c\} Average number of
+#'   observations per subject"}
+#' @param footnoteSize is the footnote text size, default is
+#'   \strong{"footnotesize"}
+#' @param textSize is the text size, default is \strong{"small"}
+#' @param here is the logical argument determining the placement of the LaTex
+#'   table. If set to \strong{TRUE} with optional argument \code{table.env=TRUE}
+#'   with \code{longtable=FALSE}, will cause the LaTeX table environment to be
+#'   set up with option H to guarantee that the table will appear exactly where
+#'   you think it will in the text. Default is \strong{TRUE}
+#' @param numeric.dollar is the logical argument determining if the numbers will
+#'   be placed within $ symbols, default is \strong{FALSE}
+#' @param asList if \strong{TRUE} the data summary is returned as a list where
+#'   different elements in the list contain summary of different stratification
+#'   levels. If \strong{FALSE} the data summary is returned as a latex table. If
+#'   no stratification variable is provided, this function always returns a list
+#'   of two items (Number of subjects, Number of observarions and Average number
+#'   of observarions per subject)
+#' @param saveTex is the logical argument determining if the LaTex code for the
+#'   table will be saved on disk. Default is \strong{FALSE}
+#' @param fileName is the name of the Tex file (without extension) with the
+#'   LaTex code for the table saved on disk, eg. if \code{fileName="mytable"} is
+#'   provided, a file called \code{"mytable.tex"} will be saved on disk. Default
+#'   is \strong{NULL}.
+#' @param filePath is the path to the directory where the Tex file is saved.
+#'   Default is \strong{"/"}.
+#' @param ... is the additional optional arguments compatible with
+#'   \code{\link{latex}}
 PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, myID = "ID",
                                      myDV = "DV", outerLevel = NULL, innerLevel = NULL, outerLabel = NULL,
                                      innerLabel = NULL, digits = 3, nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
@@ -227,7 +298,7 @@ PhRame_dataSummaryBy_all <- function (x, addFactors = FALSE, filterExpr = NULL, 
   tmp <- c()
   for (i in seq_along(grp_var)) {
     tmp <- c(tmp, grp_var[i])
-    tab_str <- x %>% droplevels() %>% group_by_at(vars(tmp)) %>%
+    tab_str <- x %>% droplevels() %>% group_by(across(all_of(tmp))) %>%
       fn() %>% ungroup() %>% mutate(stratlvl = i)
     left_arg <- grp_var[!grp_var %in% grp_var[1:i]]
     tab_str <- left_arg %>% purrr::map(~rep("All", nrow(tab_str))) %>%
@@ -295,7 +366,7 @@ PhRame_dataSummaryBy_comb <- function (x, addFactors = FALSE, filterExpr = NULL,
     else if (length(grp_var) == 2) {
       tab_comb <- tab_comb %>% dplyr::arrange(tab_comb[,
                                                        grp_var[1]], desc(stratlvl), tab_comb[, grp_var[2]]) %>%
-        group_by_at(grp_var[1]) %>% mutate(interactstrat = length(unique(interaction(.data[[grp_var[1]]],
+        group_by(across(all_of(grp_var[1]))) %>% mutate(interactstrat = length(unique(interaction(.data[[grp_var[1]]],
                                                                                      .data[[grp_var[2]]])))) %>% ungroup() %>% filter(c(stratlvl !=
                                                                                                                                           1 | interactstrat != 2)) %>% droplevels() %>%
         as.data.frame()

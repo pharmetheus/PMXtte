@@ -13,6 +13,7 @@ RoxygenNote: 7.2.1
 Imports: 
     dplyr,
     ggplot2,
+    ggpubr,
     purrr,
     readr,
     rlang,
@@ -22,6 +23,7 @@ Imports:
 Suggests: 
     devtools,
     knitr,
+    latex,
     magrittr,
     PMXRenv,
     rmarkdown,

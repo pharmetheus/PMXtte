@@ -1,4 +1,4 @@
-#' Single data summary table for follow-up times with (R)TTE data
+#' Single data summary table for follow-up times with RTTE data
 #'
 #' @description Derive a single data summary table with up to 2 levels of stratification, in order to display the number
 #' of events, the total follow-up time and the annualized event rates. It is a wrapper around `PhRame_makeSummaryTable()`,
@@ -15,16 +15,16 @@
 #' @param EventRateColNm the character string to be printed as the column name with Event rate
 #' @param digits_rate the number of significant digits for the Event rate column
 #' @param digits the number of significant digits for the follow up time column
-#'
+#' @inheritParams PhRame_makeSummaryTable
 #' @return By default, the table at Latex format. Alternatively, if `asList = TRUE`, a list of data.frame tables
 #'
 #' @export
 #' @examples
-#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+#' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 #'
 #' #create summary as a list
-#' summaryFollowUpTime(ttedata,
+#' summaryFollowUpTime(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
 #'                     innerLevel   = "DOSEN",
@@ -33,7 +33,7 @@
 #'                     timeConversion = 1/24/365.25)
 #'
 #' #output as latex table
-#' summaryFollowUpTime(ttedata,
+#' summaryFollowUpTime(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
 #'                     innerLevel   = "DOSEN",

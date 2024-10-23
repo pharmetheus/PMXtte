@@ -49,10 +49,10 @@ that use "event" instead of "observation". Any argument available in the documen
 be used (except for \code{myFun}, see the details in \code{Arguments} below).
 }
 \examples{
-ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 # create summary as a list
-makeSummaryTableTTE(ttedata,
+makeSummaryTableTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
                     innerLevel   = "DOSEN",
@@ -60,9 +60,19 @@ makeSummaryTableTTE(ttedata,
                     asList = TRUE)
 
 # output as latex table
-makeSummaryTableTTE(ttedata,
+makeSummaryTableTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
                     innerLevel   = "DOSEN",
                     innerLabel   = "Dose")
+
+# Time to first event only
+tte1data <- filter_xth_event(rttedata, event = 1)
+makeSummaryTableTTE(tte1data,
+                    outerLevel   ="STUDYIDN" ,
+                    outerLabel   = "Study",
+                    innerLevel   = "DOSEN",
+                    innerLabel   = "Dose",
+                    asList = TRUE)
+
 }

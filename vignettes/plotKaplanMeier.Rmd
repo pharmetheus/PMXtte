@@ -29,33 +29,35 @@ This vignette describes the use of the plotKaplanMeier function and its argument
 The following code prepares the example data to create a first time to event dataframe.
 
 ```{r}
-exampledata <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv', package= 'PMXtte'),na.strings=c(".","-99","NA"))
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+# Filter observations
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
-RTTEdata <- exampledata %>% dplyr::filter(EVID==0&TYPE==0)
-RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+# Filter time to First event
+tte1data <- rttedata %>% filter_xth_event(1)
 
 ```
 
 To create a basic plot with a single curve you can use the default settings 
 ```{r, fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW' #The default value
                 )
 ```
 
 Then we can create a kaplan-Meier plot stratified by Arm using the cov_col argument
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW', #The default value
-                cov_col = "DOSE"
+                cov_col = "DOSEN"
                 )
 ```
 
 Extra modification on the plot to remove the median line and p-value can be done by passing parameters to ggsurvplot.
 ```{r, fig.width=10,fig.height=6,out.width="100%"}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW', #The default value
-                cov_col = "DOSE",
+                cov_col = "DOSEN",
                 pval = FALSE,
                 surv.median.line = 'none'
                 )
@@ -63,9 +65,9 @@ plotKaplanMeier(RTTEdata,
 
 You can also change the colors by modifying the palette using arguments in pmx_palettes function 
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW', #The default value
-                cov_col = "DOSE",
+                cov_col = "DOSEN",
                 palette = PMXColors_pmx_palettes(firstColorNum = 3),
                 legend.title = 'Dose (mg)'
                 )
@@ -73,14 +75,14 @@ plotKaplanMeier(RTTEdata,
 
 You can also modify using custome colors in the argument palette
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
-plotKaplanMeier(RTTEdata, 
+plotKaplanMeier(tte1data, 
                 palette = 'cadetblue')
 ```
 
 You can create a custom palette to be used for multiple curves
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
 Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3')
-plotKaplanMeier(RTTEdata, 
+plotKaplanMeier(tte1data, 
                 palette = Colors)
 ```
 
@@ -88,9 +90,9 @@ plotKaplanMeier(RTTEdata,
 
 To change font size for the table and table height we can pass arguments to ggsurvplot. The arguments risk.table.fontsize and pval.size use points which will then be converted to be used as ggplot arguments. 
 ```{r,fig.width=10,fig.height=6,out.width="100%"}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW', #The default value
-                cov_col = "DOSE",
+                cov_col = "DOSEN",
                 risk.table.fontsize = 9,
                 table.height = 0.3
                 )
@@ -98,17 +100,17 @@ plotKaplanMeier(RTTEdata,
 
 To create facets by a covariate we can use the facet.by argument. currently the function does not support faceting tables, therfore only the plot will be faceted. the option panel.labs can be used to change the labels of the panels. 
 ```{r,fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
-plotKaplanMeier(RTTEdata,
+plotKaplanMeier(tte1data,
                 time_col = 'TSFDW', #The default value
-                cov_col = "DOSE",
-                facet.by = 'SEX',
-                panel.labs = list('SEX' = c('Male','Female'))
+                cov_col = "DOSEN",
+                facet.by = 'SEXN',
+                panel.labs = list('SEXN' = c('Male','Female'))
                 )
 ```
 
 To modify the plot we can also use ggplot syntax using $ sign to access either table or plot in case the plot includes a table or directly in the case it is only a plot like in the case of using facets
 ```{r,fig.width=10,fig.height=6,out.width="100%", warning=FALSE}
-p <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", pval.size = 12)
+p <- plotKaplanMeier(tte1data, cov_col = "DOSEN", pval.size = 12)
   p$table <- p$table + ylab('Dose (mg)')
   p$
   p
