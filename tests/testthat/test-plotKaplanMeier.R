@@ -1,26 +1,24 @@
 PMXRenv::library.unqualified("vdiffr")
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
 test_that("plotKaplanMeier work", {
   x <- c('x','y')
   expect_error(plotKaplanMeier(data = x),'Input is not a dataframe')
 
-  data_frame <- read.csv(system.file('extdata/DAT-TTE-1c-PMX-RTTE-LEARN-1.csv',
-                                     package= 'PMXtte'),na.strings=c(".","-99","NA"))
-  expect_error(plotKaplanMeier(data_frame, time_col = 'times'),
+  tte1data <- rttedata %>% filter_xth_event(1)
+  expect_error(plotKaplanMeier(tte1data, time_col = 'times'),
                'one or more specified columns do not exist in the dataframe')
-  expect_error(plotKaplanMeier(data_frame, cov_col = 'nocovariate'),
+  expect_error(plotKaplanMeier(tte1data, cov_col = 'nocovariate'),
                'covariate column does not exist in the dataframe')
-  RTTEdata <- data_frame %>% dplyr::filter(EVID==0&TYPE==0)
-  RTTEdata <- RTTEdata %>% dplyr::distinct(ID, .keep_all = TRUE)
+  tte1data <- as.data.frame(tte1data)
 
   svg()
-  p1 <-  plotKaplanMeier(RTTEdata)
-  p2 <- plotKaplanMeier(RTTEdata, cov_col = "DOSE")
-  p3 <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", facet.by = 'SEX')
-  p4 <- plotKaplanMeier(RTTEdata, cov_col = 'DOSE', facet.by = 'SEX', panel.labs = list('SEX' = c('male','female')))
-  p5 <- plotKaplanMeier(RTTEdata, cov_col = "DOSE", surv.median.line.legend = FALSE)
-
-  surv.median.line.legend = TRUE
+  p1 <-  suppressWarnings(plotKaplanMeier(tte1data))
+  p2 <- plotKaplanMeier(tte1data, cov_col = "DOSEN")
+  p3 <- plotKaplanMeier(tte1data, cov_col = "DOSEN", facet.by = 'SEXN')
+  p4 <- plotKaplanMeier(tte1data, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
+  p5 <- plotKaplanMeier(tte1data, cov_col = "DOSEN", surv.median.line.legend = FALSE)
   dev.off()
 
   vdiffr::expect_doppelganger("Kaplan Meier plot with default options", p1)
@@ -28,12 +26,6 @@ test_that("plotKaplanMeier work", {
   vdiffr::expect_doppelganger("Kaplan Meier plot by dose faceted by SEX", p3)
   vdiffr::expect_doppelganger("Change panel labs of facets", p4)
   vdiffr::expect_doppelganger("Median line not included in legend", p5)
-
-
-
-
-
-
 
 })
 

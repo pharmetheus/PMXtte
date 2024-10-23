@@ -78,10 +78,10 @@
 #' @export
 #'
 #' @examples
-#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+#' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 #' # create summary as a list
-#' summaryCountRTTE(ttedata,
+#' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
 #'                     innerLevel   = "DOSEN",
@@ -90,12 +90,12 @@
 #'
 #'
 #' # output as latex table
-#' summaryCountRTTE(ttedata,
+#' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
 #'                     innerLevel   = "DOSEN",
 #'                     innerLabel   = "Dose")
-#' summaryCountRTTE(ttedata,
+#' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
 #'                     innerLevel   = "DOSEN",

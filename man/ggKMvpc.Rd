@@ -12,17 +12,17 @@ ggKMvpc(
   iter = ITER,
   strat = NULL,
   ci = c(0.05, 0.95),
-  cuminc = T,
-  simCol = "blue",
-  obsCol = "blue",
+  cuminc = FALSE,
+  simCol = "black",
+  obsCol = "black",
   obs.size = 0.8,
   posObs = NULL,
-  show.censor = T,
+  show.censor = TRUE,
   censor.shape = "|",
   censor.size = 4,
   palette = PMXtte:::PMXColors_pmx_palettes(),
   scale.percent = TRUE,
-  ylab = "Percentage without events (\%)",
+  ylab = paste0("Percentage with", if (!cuminc) "out", " events (\%)"),
   xlab = "Time (Weeks)",
   legend.position = "top",
   xlim = NULL,
@@ -50,11 +50,13 @@ ggKMvpc(
 
 \item{obsCol}{color for the observed line}
 
+\item{obs.size}{size for the observed line}
+
 \item{posObs}{provide an explicit set of times to smoothen the CI for simulations}
 
 \item{show.censor}{logical to indicate whether the censoring times should be shown for the observed}
 
-\item{censor.shape}{sympol for censored items to be passed to geom point}
+\item{censor.shape}{symbol for censored items to be passed to geom point}
 
 \item{censor.size}{size of the censor item}
 
@@ -72,6 +74,69 @@ ggKMvpc(
 
 \item{ylim}{override the limits of y axis}
 }
+\value{
+a ggplot2 object
+}
 \description{
 Title
+}
+\examples{
+library(magrittr)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+
+# Load observed data
+odata <- rttedata \%>\%
+  dplyr::filter(STUDYIDN == 1) \%>\%
+  dplyr::mutate(TIME = TSFDW)
+
+# Load simulated data
+sdata <- readRDS(system.file('extdata/vpcdat.rds', package= 'PMXtte'))
+sdata <- sdata \%>\%
+  dplyr::mutate(TIME = TIME / (24*7)) \%>\% # Time in weeks
+  dplyr::group_by(ITER, ID) \%>\%
+  dplyr::mutate(EVCOUNT = cumsum(DV)) \%>\% # Compute EVCOUNT
+  dplyr::ungroup()
+
+# VPC for time to first event data
+odata1 <- odata \%>\% filter_xth_event(1)
+sdata1 <- sdata \%>\% filter_xth_event(1)
+
+ggKMvpc(
+  odata = odata1,
+  sdata = sdata1
+ )
+
+# Multiple options (stratifications, color, sizes...)
+ggKMvpc(
+  odata = odata1 \%>\% dplyr::rename(DOSE = DOSEN),
+  sdata = sdata1,
+  strat = "DOSE",
+  simCol = "pink", obsCol = "red",
+  palette = NULL #set NULL to palette
+ )
+
+# VPC for repeated TTE
+# First option: iterate over the different event numbers
+plotlist <- list()
+for(i in 1:4){
+plotlist[[i]] <- ggKMvpc(
+  odata = odata \%>\% filter_xth_event(i, time_since_last_event=NULL),
+  sdata = sdata \%>\% filter_xth_event(i, time_since_last_event=NULL)
+ )
+}
+ggpubr::ggarrange(plotlist = plotlist)
+
+# Second option (preferred): use RTTE as a stratification covariate
+odata <- odata \%>\%
+  dplyr::group_by(ID) \%>\%
+  dplyr::mutate(RTTE = seq_along(DV)) \%>\% #create RTTE in obs data
+  dplyr::ungroup()
+
+ggKMvpc(
+  odata = odata \%>\% dplyr::filter(RTTE <= 4), #keep a reasonable number of ID
+  sdata = sdata \%>\% dplyr::filter(RTTE <= 4),
+  strat = "RTTE"
+ )
+
 }

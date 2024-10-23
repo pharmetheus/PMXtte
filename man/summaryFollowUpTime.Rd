@@ -2,7 +2,7 @@
 % Please edit documentation in R/summaryFollowUpTime.R
 \name{summaryFollowUpTime}
 \alias{summaryFollowUpTime}
-\title{Single data summary table for follow-up times with (R)TTE data}
+\title{Single data summary table for follow-up times with RTTE data}
 \usage{
 summaryFollowUpTime(
   df,
@@ -29,11 +29,30 @@ summaryFollowUpTime(
 )
 }
 \arguments{
+\item{df}{is the data frame (e.g. anaDataF) or data object created using
+\code{pmxdata::derived_data} (e.g. DATobject)}
+
+\item{myID}{is the name of the ID column, default is \strong{"ID"}}
+
+\item{myDV}{is the name of the DV column, default is \strong{"DV"}}
+
 \item{myTIME}{Column used to calculate annual time, default is \strong{"TSFDH"}}
 
 \item{timeConversion}{factor to multiply the time column by to convert it to another format (e.g. annual)}
 
 \item{myEVCOUNT}{Column that contains count for events, default is \strong{"EVCOUNT"}}
+
+\item{outerLevel}{is the outler level (1st level) of stratification variable,
+eg. "STUDYF"}
+
+\item{innerLevel}{is the inner level (2nd level) of stratification variable,
+eg. "DOSEF"}
+
+\item{outerLabel}{is the label for the outler level (1st level) of
+stratification variable, eg. "Study")}
+
+\item{innerLabel}{is the label for the inner level (2nd level) of
+stratification variable, eg. "Dose"}
 
 \item{digits}{the number of significant digits for the follow up time column}
 
@@ -44,6 +63,29 @@ summaryFollowUpTime(
 \item{fTimeColNm}{the character string to be printed as the column name with follow up time}
 
 \item{EventRateColNm}{the character string to be printed as the column name with Event rate}
+
+\item{caption}{is the table caption. Assign \strong{NULL} to this argument
+produce table without caption. Default is \strong{"PK analysis data set:
+Number of subjects with observations and number of observations"}}
+
+\item{label}{is the label for the table used for cross-reference, default is
+\strong{"tab:anaSummary"}}
+
+\item{footnote}{is the text for footnote, default is
+\strong{"\\textsuperscript\{a\} Number of
+subjects\\\\newline\\\\textsuperscript\{b\} Number of
+observations\\\\newline\\\\textsuperscript\{c\} Average number of
+observations per subject"}}
+
+\item{asList}{if \strong{TRUE} the data summary is returned as a list where
+different elements in the list contain summary of different stratification
+levels. If \strong{FALSE} the data summary is returned as a latex table. If
+no stratification variable is provided, this function always returns a list
+of two items (Number of subjects, Number of observarions and Average number
+of observarions per subject)}
+
+\item{...}{is the additional optional arguments compatible with
+\code{\link{latex}}}
 }
 \value{
 By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a list of data.frame tables
@@ -57,11 +99,11 @@ see the details in \code{Arguments} below). New arguments include the possibilit
 variables, and possibly conversion in the relevant units.
 }
 \examples{
-ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
 #create summary as a list
-summaryFollowUpTime(ttedata,
+summaryFollowUpTime(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
                     innerLevel   = "DOSEN",
@@ -70,7 +112,7 @@ summaryFollowUpTime(ttedata,
                     timeConversion = 1/24/365.25)
 
 #output as latex table
-summaryFollowUpTime(ttedata,
+summaryFollowUpTime(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
                     innerLevel   = "DOSEN",

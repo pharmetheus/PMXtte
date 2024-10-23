@@ -1,8 +1,8 @@
-ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
 test_that("summaryFollowUpTime()", {
-  ans <- summaryFollowUpTime(ttedata,
+  ans <- summaryFollowUpTime(rttedata,
                              outerLevel   ="STUDYIDN" ,
                              outerLabel   = "Study",
                              innerLevel   = "DOSEN",

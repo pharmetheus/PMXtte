@@ -184,42 +184,53 @@ The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot 
 \examples{
 library(magrittr)
 #load example data
-ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
-#generate time to first event dataframe
-ttedata <- ttedata \%>\% dplyr::distinct(ID, .keep_all = TRUE)
+#generate time to first event data
+tte1data <- rttedata \%>\% filter_xth_event(1)
 
 #transform back to "data.frame" not "tibble" do avoid bugs
-ttedata <- as.data.frame(ttedata)
+tte1data <- as.data.frame(tte1data)
 
 #default plot with one curve
-plotKaplanMeier(ttedata)
+plotKaplanMeier(tte1data)
 
 # Kaplan Meier plot stratified by Dose and faceted by SEX
-plotKaplanMeier(ttedata, cov_col = "DOSEN", facet.by = 'SEXN')
+plotKaplanMeier(tte1data, cov_col = "DOSEN", facet.by = 'SEXN')
 
 # Change the panel labs of the facets
-plotKaplanMeier(ttedata, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
+plotKaplanMeier(tte1data, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
 
 # Change the size of pval text
-plotKaplanMeier(ttedata, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
+plotKaplanMeier(tte1data, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
 
 # Change the starting color in the palette
-plotKaplanMeier(ttedata, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
+plotKaplanMeier(tte1data, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 
 # Change the color for a single curve plot
-plotKaplanMeier(ttedata, palette = 'cadetblue')
+plotKaplanMeier(tte1data, palette = 'cadetblue')
 
 # Create custom palette of colors
 Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3', 'darkred')
-plotKaplanMeier(ttedata, palette = Colors, cov_col = 'DOSEN')
+plotKaplanMeier(tte1data, palette = Colors, cov_col = 'DOSEN')
 
 #modify plot using ggplot syntax
-p <- plotKaplanMeier(ttedata, cov_col = "DOSEN")
+p <- plotKaplanMeier(tte1data, cov_col = "DOSEN")
 p$table <- p$table + ggplot2::ylab('Dose (mg)')
 p
 
 # remove median line from legend
-plotKaplanMeier(ttedata, cov_col = "DOSEN", surv.median.line.legend = FALSE)
+plotKaplanMeier(tte1data, cov_col = "DOSEN", surv.median.line.legend = FALSE)
+
+# Time to second event data
+# !! NOT ADVISED since the subjects at risk are not at random across groups!!
+rttedata \%>\%
+  filter_xth_event(2) \%>\%
+  plotKaplanMeier( # KPM plot of time to second event data
+    cov_col = "DOSEN",
+    time_col = "TSLE", #x-axis: time since Last event (not first dose),
+    xlab = "Time since last event (week)" #in week because `time_col="TSFDW"`
+  )
+
 }

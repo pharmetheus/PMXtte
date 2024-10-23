@@ -26,53 +26,60 @@
 #' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
 #' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 #' @return A "ggsurvplot" object, see the documentation of `survminer::ggsurvplot` for more information. Basically it is a list that notably contains two "ggplot" objects, "x$plot" and "x$table", that renders into a single figure the Kaplan-Meier curves on top and the risk table on the bottom.
-#' @import rlang
-#' @import ggplot2
-#' @importFrom survival Surv
-#' @importFrom survminer ggsurvplot surv_fit ggsurvplot_facet
-#' @importFrom rlang set_names
+
 #'
 #' @examples
 #' library(magrittr)
 #' #load example data
-#' ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-#' ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+#' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+#' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 #'
-#' #generate time to first event dataframe
-#' ttedata <- ttedata %>% dplyr::distinct(ID, .keep_all = TRUE)
+#' #generate time to first event data
+#' tte1data <- rttedata %>% filter_xth_event(1)
 #'
 #' #transform back to "data.frame" not "tibble" do avoid bugs
-#' ttedata <- as.data.frame(ttedata)
+#' tte1data <- as.data.frame(tte1data)
 #'
 #' #default plot with one curve
-#' plotKaplanMeier(ttedata)
+#' plotKaplanMeier(tte1data)
 #'
 #' # Kaplan Meier plot stratified by Dose and faceted by SEX
-#' plotKaplanMeier(ttedata, cov_col = "DOSEN", facet.by = 'SEXN')
+#' plotKaplanMeier(tte1data, cov_col = "DOSEN", facet.by = 'SEXN')
 #'
 #' # Change the panel labs of the facets
-#' plotKaplanMeier(ttedata, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
+#' plotKaplanMeier(tte1data, cov_col = 'DOSEN', facet.by = 'SEXN', panel.labs = list('SEXN' = c('male','female')))
 #'
 #' # Change the size of pval text
-#' plotKaplanMeier(ttedata, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
+#' plotKaplanMeier(tte1data, cov_col = "DOSEN", pval = TRUE, pval.size = 12)
 #'
 #' # Change the starting color in the palette
-#' plotKaplanMeier(ttedata, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
+#' plotKaplanMeier(tte1data, cov_col = "DOSEN", palette = PMXtte:::PMXColors_pmx_palettes(firstColorNum = 3))
 #'
 #' # Change the color for a single curve plot
-#' plotKaplanMeier(ttedata, palette = 'cadetblue')
+#' plotKaplanMeier(tte1data, palette = 'cadetblue')
 #'
 #' # Create custom palette of colors
 #' Colors <- c('cadetblue', 'coral1', 'darkorchid', 'deepskyblue3', 'darkred')
-#' plotKaplanMeier(ttedata, palette = Colors, cov_col = 'DOSEN')
+#' plotKaplanMeier(tte1data, palette = Colors, cov_col = 'DOSEN')
 #'
 #' #modify plot using ggplot syntax
-#' p <- plotKaplanMeier(ttedata, cov_col = "DOSEN")
+#' p <- plotKaplanMeier(tte1data, cov_col = "DOSEN")
 #' p$table <- p$table + ggplot2::ylab('Dose (mg)')
 #' p
 #'
 #' # remove median line from legend
-#' plotKaplanMeier(ttedata, cov_col = "DOSEN", surv.median.line.legend = FALSE)
+#' plotKaplanMeier(tte1data, cov_col = "DOSEN", surv.median.line.legend = FALSE)
+#'
+#' # Time to second event data
+#' # !! NOT ADVISED since the subjects at risk are not at random across groups!!
+#' rttedata %>%
+#'   filter_xth_event(2) %>%
+#'   plotKaplanMeier( # KPM plot of time to second event data
+#'     cov_col = "DOSEN",
+#'     time_col = "TSLE", #x-axis: time since Last event (not first dose),
+#'     xlab = "Time since last event (week)" #in week because `time_col="TSFDW"`
+#'   )
+#'
 #' @export
 
 
@@ -128,6 +135,11 @@ plotKaplanMeier <- function(data,
   if (!is.data.frame(data)){
     stop('Input is not a dataframe')
   }
+
+  if(inherits(data, "tbl")){
+    data <- as.data.frame(data)
+  }
+
   # convert time_col, event_col to strings if they are not already
   time_col  <- as.character(substitute(time_col))
   event_col <- as.character(substitute(event_col))
