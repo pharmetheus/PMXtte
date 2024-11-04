@@ -23,7 +23,7 @@ Imports:
 Suggests: 
     devtools,
     knitr,
-    latex,
+    Hmisc,
     magrittr,
     PMXRenv,
     rmarkdown,
