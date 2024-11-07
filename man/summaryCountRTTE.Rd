@@ -19,9 +19,11 @@ summaryCountRTTE(
   lumpCount = Inf,
   dropCount0 = FALSE,
   nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
+  nEventColNm = NULL,
   caption = "Number of repeated events",
   label = "tab:anaSummary",
-  footnote = "\\\\textsuperscript{a}Number of subjects",
+  footnote =
+    "\\\\textsuperscript{a}Initial number of subjects\\\\newline\\\\textsuperscript{b}Number of subjects with this number of events",
   footnoteSize = "footnotesize",
   textSize = "small",
   here = TRUE,
@@ -53,7 +55,7 @@ acceptable to this argument.}
 
 \item{myEVCOUNT}{is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}}
 
-\item{outerLevel}{is the outler level (1st level) of stratification variable,
+\item{outerLevel}{is the outer level (1st level) of stratification variable,
 eg. "STUDYF"}
 
 \item{innerLevel}{is the inner level (2nd level) of stratification variable,
@@ -78,6 +80,10 @@ Only works for Latex code. Default is \strong{FALSE} (don't drop)}
 with the number of subjects, default is
 \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}}
 
+\item{nEventColNm}{is the character string to be printed as the column names
+with the number of subjects with this number of events. Default is \code{NULL},
+because this is dynamically generated depending on the data.}
+
 \item{caption}{is the table caption. Assign \strong{NULL} to this argument
 produce table without caption. Default is \strong{"PK analysis data set:
 Number of subjects with observations and number of observations"}}
@@ -86,10 +92,9 @@ Number of subjects with observations and number of observations"}}
 \strong{"tab:anaSummary"}}
 
 \item{footnote}{is the text for footnote, default is
-\strong{"\\textsuperscript\{a\} Number of
-subjects\\\\newline\\\\textsuperscript\{b\} Number of
-observations\\\\newline\\\\textsuperscript\{c\} Average number of
-observations per subject"}}
+\strong{"\\textsuperscript\{a\} Initial number of
+subjects\\\\newline\\\\textsuperscript\{b\} Number of subjects with this
+number of events"}}
 
 \item{footnoteSize}{is the footnote text size, default is
 \strong{"footnotesize"}}

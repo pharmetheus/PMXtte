@@ -21,10 +21,12 @@
 #' @param facet.by a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.
 #' @inheritParams survminer::ggsurvplot
 #' @inheritParams survminer::ggsurvplot_facet
+#' @inheritParams survminer::ggsurvtable
+#' @inheritParams ggpubr::ggpar
 #' @inheritDotParams survminer::ggsurvplot
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
-#' @details The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
-#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
+#' @details The function takes a dataframe (tibble will be coerced to data.frame) and fits the survival curves using surv_fit then plots them using ggsurvplot.
+#' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. For other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 #' @return A "ggsurvplot" object, see the documentation of `survminer::ggsurvplot` for more information. Basically it is a list that notably contains two "ggplot" objects, "x$plot" and "x$table", that renders into a single figure the Kaplan-Meier curves on top and the risk table on the bottom.
 
 #'
@@ -175,7 +177,7 @@ plotKaplanMeier <- function(data,
 
   #fit survival curves
   formula_text        <- paste("survival::Surv(",time_col,",",event_col,")~",cov_col)
-  fit <- survminer::surv_fit(as.formula(formula_text) , data = data , conf.int = ciWidth)
+  fit <- survminer::surv_fit(stats::as.formula(formula_text) , data = data , conf.int = ciWidth)
 
   # title for confidence interval legend
   if (add.ciWidth.to.legend){
@@ -220,7 +222,7 @@ plotKaplanMeier <- function(data,
                        y1 = rep(0, length(surv_median)),
                        y2 = rep(0.5, length(surv_median))
       )
-      df <- na.omit(df)
+      df <- stats::na.omit(df)
       if (nrow(df)>0 & surv.median.line.legend){
       facetPlots <- facetPlots +
         geom_line(aes(x = 0 , y= 0,linetype = 'Median'), show.legend = TRUE) +
@@ -244,7 +246,7 @@ plotKaplanMeier <- function(data,
 
     if (label.parsed == TRUE) {
       if(length(facet.by) == 1){
-        facet_formula <- paste0("~", facet.by) %>% as.formula()
+        facet_formula <- paste0("~", facet.by) %>% stats::as.formula()
         facetPlots <- facetPlots + facet_wrap(facet_formula,
                                               scales = scales,
                                               nrow = nrow,
@@ -252,7 +254,7 @@ plotKaplanMeier <- function(data,
                                               labeller = label_parsed)
       }
       else if(length(facet.by) == 2){
-        facet_formula <- paste(facet.by, collapse = " ~ ") %>% as.formula()
+        facet_formula <- paste(facet.by, collapse = " ~ ") %>% stats::as.formula()
         facetPlots <- facetPlots + facet_grid(facet_formula, scales = scales, labeller = label_parsed)
       }}
         facetPlots <- facetPlots + theme(legend.box = legend.box,
@@ -338,7 +340,7 @@ plotKaplanMeier <- function(data,
                      y1 = rep(0, length(surv_median)),
                      y2 = rep(0.5, length(surv_median))
                      )
-    df <- na.omit(df)
+    df <- stats::na.omit(df)
     if (nrow(df)>0 & surv.median.line.legend){
 
     kaplanPlot$plot <- kaplanPlot$plot +

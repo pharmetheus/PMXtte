@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggKMvpc.R
 \name{ggKMvpc}
 \alias{ggKMvpc}
-\title{Title}
+\title{Visual predictive checks Kaplan-Meier}
 \usage{
 ggKMvpc(
   odata,
@@ -78,7 +78,7 @@ ggKMvpc(
 a ggplot2 object
 }
 \description{
-Title
+Returns visual predictive checks from observed and simulated time to event data, in the form of a Kaplan-Meier curve, generally to evaluate model performance.
 }
 \examples{
 library(magrittr)

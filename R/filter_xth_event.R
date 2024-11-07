@@ -1,5 +1,5 @@
 #' Filter time to Xth event data
-#' @description Filter a repeated time to event dataset into a time to 1st event, time to 2nd event (etc...) dataset. Particularly useful for summary statistics, Kaplan-Meier plots or Visual Predictive checks of time to second (and more) event data.
+#' @description Filter a repeated time to event dataset into a time to 1st event, time to 2nd event (etc...) dataset. Particularly useful for summary statistics, Kaplan-Meier plots or Visual Predictive checks of time to second (and more) event data. This function preserves the data.frame/tibble attributes and potential grouping.
 #'
 #' @param x a dataset, with only observations regarding time to event data. It often means data filtered with `EVID==0` and with a unique "TYPE" value.
 #' @param event a integer of length 1, informs if the time to 1st, 2nd, 3rd event (etc...) should be returned. Default is 1 (time to first event data).

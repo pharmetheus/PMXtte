@@ -7,9 +7,9 @@
 #' see the details in `Arguments` below). New arguments include the possibility to handle the Time and Event Counts
 #' variables, and possibly conversion in the relevant units.
 #'
-#' @param myTIME Column used to calculate annual time, default is \strong{"TSFDH"}
-#' @param myEVCOUNT Column that contains count for events, default is \strong{"EVCOUNT"}
-#' @param timeConversion factor to multiply the time column by to convert it to another format (e.g. annual)
+#' @param myTIME Column used to calculate annual time, default is `"TSFDH"`
+#' @param myEVCOUNT Column that contains count for events, default is `"EVCOUNT"`
+#' @param timeConversion factor to multiply the time column by to convert it to another format (e.g. annual). Default is `1/(24*365.25)` because default myTIME is `"TSFDH"`
 #' @param nEventColNm the character string to be printed as the column name with the number of events
 #' @param fTimeColNm the character string to be printed as the column name with follow up time
 #' @param EventRateColNm the character string to be printed as the column name with Event rate
@@ -44,7 +44,7 @@ summaryFollowUpTime <- function (df,
                                  myID = "ID",
                                  myDV = "DV",
                                  myTIME = 'TSFDH',
-                                 timeConversion = 1,
+                                 timeConversion = 1/(24*365.25),
                                  myEVCOUNT = 'EVCOUNT',
                                  outerLevel = NULL,
                                  innerLevel = NULL,
@@ -71,21 +71,21 @@ summaryFollowUpTime <- function (df,
 
   #Convert time to annual
 
-   sum_data <- sum_data %>% mutate(annualT = lastTSFDH*timeConversion)
+  sum_data <- sum_data %>% mutate(annualT = lastTSFDH*timeConversion)
   followUpFun <- function(df){
     df %>%
       summarise(nEvent=sum(finalCount),
                 TotalFollowUpTime=sum(annualT[!duplicated(!!rlang::sym(myID))]),
-                AnnualizedEventRate=PhRame_out.digits(nEvent/TotalFollowUpTime, dig = digits, numeric = TRUE))
+                AnnualizedEventRate=PhRame_out.digits(nEvent/TotalFollowUpTime, dig = digits_rate, numeric = TRUE))
   }
   if(asList & (!is.null(outerLevel) | !is.null(innerLevel))){
-      res_tab <- PhRame_dataSummaryBy_all(sum_data, fn = followUpFun, grp_var = c(outerLevel, innerLevel))
-    }
+    res_tab <- PhRame_dataSummaryBy_all(sum_data, fn = followUpFun, grp_var = c(outerLevel, innerLevel))
+  }
   if(is.null(outerLevel) & is.null(innerLevel)){
-      tab_comb <- PhRame_dataSummaryBy_comb(sum_data, fn = followUpFun)
-      res_tab <- list(nEvent    = as.numeric(tab_comb$nEvent),
-                      TotalFollowUpTime   = as.numeric(tab_comb$TotalFollowUpTime),
-                      AnnualizedEventRate = as.numeric(tab_comb$AnnualizedEventRate))
+    tab_comb <- PhRame_dataSummaryBy_comb(sum_data, fn = followUpFun)
+    res_tab <- list(nEvent    = as.numeric(tab_comb$nEvent),
+                    TotalFollowUpTime   = as.numeric(tab_comb$TotalFollowUpTime),
+                    AnnualizedEventRate = as.numeric(tab_comb$AnnualizedEventRate))
   }
   if(asList | (is.null(outerLevel) & is.null(innerLevel))) {
     return(res_tab)
@@ -96,23 +96,23 @@ summaryFollowUpTime <- function (df,
                   nObs=round(sum(annualT[!duplicated(!!rlang::sym(myID))]), digits = digits),
                   avnObs=PhRame_out.digits(subjects/nObs, dig = digits_rate))
     }
-  PhRame_makeSummaryTable(df = sum_data,
-                           myID = myID,
-                           myDV = myDV,
-                           outerLevel = outerLevel,
-                           innerLevel = innerLevel,
-                           outerLabel = outerLabel,
-                           innerLabel = innerLabel,
-                           digits = digits,
-                           nIdColNm = nEventColNm,
-                           nObsColNm = fTimeColNm,
-                           avnObsColNm = EventRateColNm,
-                           caption = caption,
-                           label = label,
-                           footnote = footnote,
-                           myFun = followUpFunTable,
-                           ...
-  )
+    PhRame_makeSummaryTable(df = sum_data,
+                            myID = myID,
+                            myDV = myDV,
+                            outerLevel = outerLevel,
+                            innerLevel = innerLevel,
+                            outerLabel = outerLabel,
+                            innerLabel = innerLabel,
+                            digits = digits,
+                            nIdColNm = nEventColNm,
+                            nObsColNm = fTimeColNm,
+                            avnObsColNm = EventRateColNm,
+                            caption = caption,
+                            label = label,
+                            footnote = footnote,
+                            myFun = followUpFunTable,
+                            ...
+    )
 
   }
 }

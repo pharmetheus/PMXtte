@@ -124,8 +124,12 @@ is \strong{NULL}.}
 \item{filePath}{is the path to the directory where the Tex file is saved.
 Default is \strong{"/"}.}
 
+\item{myFun}{internal function for the calculation of summarized data. If
+NULL, the default, an internal function is used. This should not be changed
+for a standard use.}
+
 \item{...}{is the additional optional arguments compatible with
-\code{\link{latex}}}
+\link[Hmisc:latex]{Hmisc::latex}}
 }
 \description{
 Function to derive a single data summary table for all strata

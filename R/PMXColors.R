@@ -46,7 +46,13 @@ PMXColors_pmx_palettes <- function (n, name = c("default", "strong", "light", "e
     }
     else {
       orgPalette <- palette
-      palette <- PMXColors_startColor(PMXColors_sortColors(palette, scale = "H"),
+      if(!requireNamespace("PMXColors", quietly = TRUE)) {
+        stop(
+          "Package \"PMXColors\" must be installed for this type of palette",
+          call. = FALSE
+        )
+      }
+      palette <- PMXColors_startColor(PMXColors::sortColors(palette, scale = "H"),
                             name = names(orgPalette)[1])
       palette <- PMXColors_startColor(palette, name = firstColorName,
                             n = firstColorNum)
@@ -139,17 +145,8 @@ PMXColors_startColor <- function (x, name = names(x), n = 1)
     out <- x
   }
   else {
-    out <- c(tail(x, -n), head(x, n))
+    out <- c(utils::tail(x, -n), utils::head(x, n))
   }
   return(out)
 }
 
-
-PMXColors_sortColors <- function (cols, scale = c("L", "H", "S"))
-{
-  cols_HSL <- col2hsl(cols)
-  scale <- match.arg(scale)
-  sortedCols <- hsl2col(cols_HSL[, order(cols_HSL[scale, ])])
-  names(sortedCols) <- names(cols)[match(sortedCols, cols)]
-  return(sortedCols)
-}

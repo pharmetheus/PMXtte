@@ -76,6 +76,15 @@ labelled only by variable grouping levels.}
 
 \item{label.parsed}{if TRUE (default), facet labels can include superscipts and greek letters}
 
+\item{xlab}{main title and axis labels}
+
+\item{ylab}{main title and axis labels}
+
+\item{break.time.by}{numeric value controlling time axis breaks. Default value
+is NULL.}
+
+\item{xlim}{x and y axis limits e.g. xlim = c(0, 1000), ylim = c(0, 1).}
+
 \item{ggtheme}{function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.}
 
 \item{palette}{the color palette to be used. Allowed values include "hue" for
@@ -114,6 +123,13 @@ line at median survival. Allowed values include one of c("none", "hv", "h",
 "v"). v: vertical, h:horizontal.}
 
 \item{surv.median.line.legend}{Text to be used for median survival line in the legend}
+
+\item{legend}{character specifying legend position. Allowed values are one of
+c("top", "bottom", "left", "right", "none"). Default is "top" side position.
+to remove the legend use legend = "none". Legend position can be also
+specified using a numeric vector c(x, y); see details section.}
+
+\item{legend.title}{legend title.}
 
 \item{legend.labs}{character vector specifying legend labels. Used to replace
 the names of the strata from the fit. Should be given in the same order as
@@ -178,8 +194,8 @@ A "ggsurvplot" object, see the documentation of \code{survminer::ggsurvplot} for
 This function generates Kaplan Meier curves plot using ggsurvplot from a dataframe
 }
 \details{
-The function takes a dataframe and fits the survival curves using surv_fit then plots them using ggsurvplot.
-The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. for other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
+The function takes a dataframe (tibble will be coerced to data.frame) and fits the survival curves using surv_fit then plots them using ggsurvplot.
+The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. For other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 }
 \examples{
 library(magrittr)

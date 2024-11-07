@@ -9,7 +9,7 @@ summaryFollowUpTime(
   myID = "ID",
   myDV = "DV",
   myTIME = "TSFDH",
-  timeConversion = 1,
+  timeConversion = 1/(24 * 365.25),
   myEVCOUNT = "EVCOUNT",
   outerLevel = NULL,
   innerLevel = NULL,
@@ -36,11 +36,11 @@ summaryFollowUpTime(
 
 \item{myDV}{is the name of the DV column, default is \strong{"DV"}}
 
-\item{myTIME}{Column used to calculate annual time, default is \strong{"TSFDH"}}
+\item{myTIME}{Column used to calculate annual time, default is \code{"TSFDH"}}
 
-\item{timeConversion}{factor to multiply the time column by to convert it to another format (e.g. annual)}
+\item{timeConversion}{factor to multiply the time column by to convert it to another format (e.g. annual). Default is \code{1/(24*365.25)} because default myTIME is \code{"TSFDH"}}
 
-\item{myEVCOUNT}{Column that contains count for events, default is \strong{"EVCOUNT"}}
+\item{myEVCOUNT}{Column that contains count for events, default is \code{"EVCOUNT"}}
 
 \item{outerLevel}{is the outler level (1st level) of stratification variable,
 eg. "STUDYF"}
@@ -85,7 +85,7 @@ of two items (Number of subjects, Number of observarions and Average number
 of observarions per subject)}
 
 \item{...}{is the additional optional arguments compatible with
-\code{\link{latex}}}
+\link[Hmisc:latex]{Hmisc::latex}}
 }
 \value{
 By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a list of data.frame tables

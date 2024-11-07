@@ -16,7 +16,7 @@
 #' @param myID is the name of the ID column, default is \strong{"ID"}
 #' @param myDV is the name of the DV column, default is \strong{"DV"}
 #' @param myEVCOUNT is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}
-#' @param outerLevel is the outler level (1st level) of stratification variable,
+#' @param outerLevel is the outer level (1st level) of stratification variable,
 #'   eg. "STUDYF"
 #' @param innerLevel is the inner level (2nd level) of stratification variable,
 #'   eg. "DOSEF"
@@ -33,16 +33,18 @@
 #' @param nIdColNm is the character string to be printed as the column name
 #'   with the number of subjects, default is
 #'   \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}
+#' @param nEventColNm is the character string to be printed as the column names
+#'   with the number of subjects with this number of events. Default is `NULL`,
+#'   because this is dynamically generated depending on the data.
 #' @param caption is the table caption. Assign \strong{NULL} to this argument
 #'   produce table without caption. Default is \strong{"PK analysis data set:
 #'   Number of subjects with observations and number of observations"}
 #' @param label is the label for the table used for cross-reference, default is
 #'   \strong{"tab:anaSummary"}
 #' @param footnote is the text for footnote, default is
-#'   \strong{"\\textsuperscript\{a\} Number of
-#'   subjects\\\\newline\\\\textsuperscript\{b\} Number of
-#'   observations\\\\newline\\\\textsuperscript\{c\} Average number of
-#'   observations per subject"}
+#'   \strong{"\\textsuperscript\{a\} Initial number of
+#'   subjects\\\\newline\\\\textsuperscript\{b\} Number of subjects with this
+#'   number of events"}
 #' @param footnoteSize is the footnote text size, default is
 #'   \strong{"footnotesize"}
 #' @param textSize is the text size, default is \strong{"small"}
@@ -117,9 +119,10 @@ summaryCountRTTE <- function(
     lumpCount = Inf,
     dropCount0 = FALSE,
     nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
+    nEventColNm = NULL,
     caption = "Number of repeated events",
     label = "tab:anaSummary",
-    footnote = "\\textsuperscript{a}Number of subjects",
+    footnote = "\\textsuperscript{a}Initial number of subjects\\newline\\textsuperscript{b}Number of subjects with this number of events",
     footnoteSize = "footnotesize",
     textSize = "small",
     here = TRUE,
@@ -143,6 +146,12 @@ summaryCountRTTE <- function(
     df <- as.data.frame(df) %>% droplevels()
   }
   else if (all(class(df) == c("data_file", "derived_data"))) {
+    if(!requireNamespace("pmxdata", quietly = TRUE)) {
+      stop(
+        "Package \"pmxdata\" must be installed to use derived_data ",
+        call. = FALSE
+      )
+    }
     df <- pmxdata::analysis_data(deriveddatafile = df, addFactors = addFactors)
     if (!is.null(filterExpr)) {
       if (is_formula(filterExpr)) {
@@ -200,6 +209,9 @@ summaryCountRTTE <- function(
     myFun <- function(x) {
       ans1 <- x %>%
         mutate(EVCOUNT = factor(!!rlang::sym(myEVCOUNT), levels = seq(0,maxcountOverall))) %>%
+        group_by(!!rlang::sym(myID), .add = TRUE) %>%
+        slice_tail(n = 1) %>%
+        ungroup(!!rlang::sym(myID)) %>%
         count(EVCOUNT, .drop = FALSE) %>%
         filter(!all(n == 0)) %>%
         tidyr::pivot_wider(
@@ -261,8 +273,17 @@ summaryCountRTTE <- function(
       footnote <- paste0("\\", footnoteSize, " ", footnote)
     }
 
+    if(is.null(nEventColNm)){
+      nEventColNm <- seq_len(ncol(Ntable)-1)-1 # 0, 1, 2 etc..
+      nEventColNm <- paste0("\\textbf{", nEventColNm, "\\textsuperscript{b}}")
+
+      #nEventColNm[1] <- paste0("\\textbf{nEvent\\textsuperscript{b}:}\\newline", nEventColNm[1])
+      #nEventColNm <- c("\\textbf{nEvent\\textsuperscript{b}:}", nEventColNm)
+      # Ntable <- Ntable %>%
+      #   mutate(nevent = "", .after = subjects)
+    }
+
     coljust <- rep("S", ncol(Ntable))
-    nObsColNm <- seq_len(ncol(Ntable)-1) # 0, 1, 2 etc..
 
     if (!is.null(outerLevel) & !is.null(innerLevel)) {
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
@@ -270,7 +291,7 @@ summaryCountRTTE <- function(
                    rowname = as.character(res_tab[, innerLevel]),
                    rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                    outerLevel]), (res_tab[, outerLevel]), length),
-                   colheads = c(nIdColNm, nObsColNm),
+                   colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
@@ -281,7 +302,7 @@ summaryCountRTTE <- function(
                             rowname = as.character(res_tab[, innerLevel]),
                             rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                             outerLevel]), (res_tab[, outerLevel]), length),
-                            colheads = c(nIdColNm, nObsColNm),
+                            colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)
@@ -291,7 +312,7 @@ summaryCountRTTE <- function(
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                   colheads = c(nIdColNm, nObsColNm),
+                   colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
@@ -300,7 +321,7 @@ summaryCountRTTE <- function(
                                                   fileName, ".tex"), first.hline.double = FALSE,
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                            colheads = c(nIdColNm, nObsColNm),
+                            colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)
@@ -310,7 +331,7 @@ summaryCountRTTE <- function(
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                   colheads = c(nIdColNm, nObsColNm),
+                   colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
@@ -319,7 +340,7 @@ summaryCountRTTE <- function(
                                                   fileName, ".tex"), first.hline.double = FALSE,
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                            colheads = c(nIdColNm, nObsColNm),
+                            colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)

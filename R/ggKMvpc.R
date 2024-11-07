@@ -1,4 +1,5 @@
-#' Title
+#' Visual predictive checks Kaplan-Meier
+#' @description Returns visual predictive checks from observed and simulated time to event data, in the form of a Kaplan-Meier curve, generally to evaluate model performance.
 #'
 #' @param odata the observed data with one row per subject with a time and event indicator (1==event, 0==censored)
 #' @param sdata the simulated data with one row per subject and replicate with a time and event indicator (1==event, 0==censored)
@@ -142,7 +143,7 @@ ggKMvpc <- function(odata,
       }
     }
     # to supply error message if the posObs is not understood correctly, but is supplied
-    if(!is.null(posObs)&(class(posObs)!="list"|is.null(names(posObs)))){
+    if(!is.null(posObs)&(inherits(posObs, "list")|is.null(names(posObs)))){
       stop("Must provide list named with all combinations of covariate levels for posObs when using stratified VPCs")
     }
     if(!all(grepl("==",names(posObs)))){
@@ -271,7 +272,7 @@ ggKMvpc <- function(odata,
 
     if(is.null(strat)){
       # smoothen using stats::stepfun (code from Jocke) #### find alternative for smoother function
-      survatt <- stepfun(sdata_km$time[-1], sdata_km$KM)
+      survatt <- stats::stepfun(sdata_km$time[-1], sdata_km$KM)
       # Apply the function to the KM raw results to smoothen according to posObs
       sdata_km_stepped <- data.frame(time=posObs,KM=survatt(posObs)) %>%
         mutate(INC=1-KM)
@@ -286,7 +287,7 @@ ggKMvpc <- function(odata,
             filter(!!expr)
 
           # derive the stepfun to smooth it
-          survatt <- stepfun(sdata_km_i$time[-1], sdata_km_i$KM)
+          survatt <- stats::stepfun(sdata_km_i$time[-1], sdata_km_i$KM)
           # apply the stepfun
           tmp_df = data.frame(time=posObs[[i]],KM=survatt(posObs[[i]])) %>%
             mutate(INC=1-KM)
@@ -321,9 +322,9 @@ ggKMvpc <- function(odata,
     summarise_at(
       .vars = vars(KM,INC),
       .funs = list(
-        'med'=median,
-        'lci'=function(x) quantile(x,ci[1]),
-        'uci'=function(x) quantile(x,ci[2]))
+        'med'=stats::median,
+        'lci'=function(x) stats::quantile(x,ci[1]),
+        'uci'=function(x) stats::quantile(x,ci[2]))
     )
 
   # this is where we choose the incidence or the survival
@@ -375,14 +376,14 @@ ggKMvpc <- function(odata,
         data = odata_km,
         aes(
           x = time,
-          y = obs*exp(qnorm(ci[1])*greenwood_se/obs),
+          y = obs*exp(stats::qnorm(ci[1])*greenwood_se/obs),
           linetype = paste0(100*diff(ci),"% CI of observed")
         ),
         color = 'black', size = 0.75) +
       geom_line(
         data = odata_km,
         aes(x = time,
-            y = obs*exp(qnorm(ci[2])*greenwood_se/obs),
+            y = obs*exp(stats::qnorm(ci[2])*greenwood_se/obs),
             linetype = paste0(100*diff(ci),"% CI of observed")
             ),
         color = 'black', size = 1) +
@@ -396,9 +397,9 @@ ggKMvpc <- function(odata,
       strats_n <- paste0(names(strats),"\n n = ",strats)
       names(strats_n) <- names(strats)
 
-      p <- p + facet_wrap(reformulate(strat), labeller = as_labeller(strats_n))
+      p <- p + facet_wrap(stats::reformulate(strat), labeller = as_labeller(strats_n))
     } else {
-      p <- p + facet_wrap(reformulate(strat))
+      p <- p + facet_wrap(stats::reformulate(strat))
     }
   } else {
     # also for unstratified we show the N

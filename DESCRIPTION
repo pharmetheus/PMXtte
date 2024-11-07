@@ -1,12 +1,10 @@
 Package: PMXtte
-Title: R package to support TTE and RTTE reporting
-Version: 0.0.0.9000
+Title: Support (Repeated) Time-To-Event data analysis
+Version: 0.9.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Niclas", "Jonsson", email = "niclas.jonsson@pharmetheus.com", role = c("aut", "cre"))
+Description: Support functions for (Repeated) Time-To-Event data analysis. Generate summary tables and Kaplan-Meier plot for the exploratory analyses, and visual predictive checks for model evaluation. 
+License: Propriety
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
@@ -15,18 +13,22 @@ Imports:
     ggplot2,
     ggpubr,
     purrr,
-    readr,
     rlang,
+    stringr,
     survival,
     survminer,
     tidyr
 Suggests: 
     devtools,
     knitr,
-    latex,
+    Hmisc,
     magrittr,
+    PMXColors,
+    pmxdata,
     PMXRenv,
+    readr,
     rmarkdown,
+    scales,
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3

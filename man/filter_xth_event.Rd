@@ -30,7 +30,7 @@ filter_xth_event(
 a dataset, filtered for the analysis of a particular event number (time to 1st event, time to 2nd event, etc...). If the event number (\code{event}) is greater than 1, a new column that informs the time since the last event is created (default is \code{TSLE}, based on \code{TSFDW}).
 }
 \description{
-Filter a repeated time to event dataset into a time to 1st event, time to 2nd event (etc...) dataset. Particularly useful for summary statistics, Kaplan-Meier plots or Visual Predictive checks of time to second (and more) event data.
+Filter a repeated time to event dataset into a time to 1st event, time to 2nd event (etc...) dataset. Particularly useful for summary statistics, Kaplan-Meier plots or Visual Predictive checks of time to second (and more) event data. This function preserves the data.frame/tibble attributes and potential grouping.
 }
 \examples{
 library(magrittr)
