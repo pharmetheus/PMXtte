@@ -32,3 +32,20 @@ test_that("filter_xth_event() works", {
     filter(rttedata, INCLFIRST==1)
   )
 })
+
+test_that("preserve tibble/data.frame class", {
+  input <- as_tibble(rttedata)
+  ans <- filter_xth_event(input)
+  expect_s3_class(ans, "tbl_df")
+
+  input <- as.data.frame(rttedata)
+  ans <- filter_xth_event(input)
+  expect_false(inherits(ans ,"tbl_df"))
+})
+
+test_that("preserves groups", {
+  input <- rttedata %>% group_by(DOSEN, SEXN)
+  ans <- filter_xth_event(input)
+  expect_equal(group_vars(input), group_vars(ans))
+})
+

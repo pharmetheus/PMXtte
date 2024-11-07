@@ -11,6 +11,12 @@ test_that("summaryCountRTTE() works", {
   expect_type(ans, "list")
   expect_length(ans, 3)
   expect_named(ans[[1]], c(as.character(0:6), "subjects", 'stratlvl',"DOSEN", "STUDYIDN"))
+
+  expect_equal(
+    rowSums(ans[[3]][as.character(0:6)]),
+    ans[[3]]$subjects
+  )
+
 })
 
 test_that("inner/outer levels work", {

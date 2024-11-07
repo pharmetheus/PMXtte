@@ -67,8 +67,11 @@
 #'   is \strong{NULL}.
 #' @param filePath is the path to the directory where the Tex file is saved.
 #'   Default is \strong{"/"}.
+#' @param myFun internal function for the calculation of summarized data. If
+#'   NULL, the default, an internal function is used. This should not be changed
+#'   for a standard use.
 #' @param ... is the additional optional arguments compatible with
-#'   \code{\link{latex}}
+#'   [Hmisc::latex]
 PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, myID = "ID",
                                      myDV = "DV", outerLevel = NULL, innerLevel = NULL, outerLabel = NULL,
                                      innerLabel = NULL, digits = 3, nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
@@ -91,6 +94,12 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
     df <- as.data.frame(df) %>% droplevels()
   }
   else if (all(class(df) == c("data_file", "derived_data"))) {
+    if(!requireNamespace("pmxdata", quietly = TRUE)) {
+      stop(
+        "Package \"pmxdata\" must be installed to use derived_data ",
+        call. = FALSE
+      )
+    }
     df <- pmxdata::analysis_data(deriveddatafile = df, addFactors = addFactors)
     if (!is.null(filterExpr)) {
       if (is_formula(filterExpr)) {
@@ -270,6 +279,12 @@ PhRame_dataSummaryBy_all <- function (x, addFactors = FALSE, filterExpr = NULL, 
     x <- as.data.frame(x) %>% droplevels()
   }
   else if (all(class(x) == c("data_file", "derived_data"))) {
+    if(!requireNamespace("pmxdata", quietly = TRUE)) {
+      stop(
+        "Package \"pmxdata\" must be installed to use derived_data ",
+        call. = FALSE
+      )
+    }
     x <- pmxdata::analysis_data(deriveddatafile = x, addFactors = addFactors)
     if (!is.null(filterExpr)) {
       if (is_formula(filterExpr)) {
@@ -323,6 +338,12 @@ PhRame_dataSummaryBy_comb <- function (x, addFactors = FALSE, filterExpr = NULL,
     x <- as.data.frame(x) %>% droplevels()
   }
   else if (all(class(x) == c("data_file", "derived_data"))) {
+    if(!requireNamespace("pmxdata", quietly = TRUE)) {
+      stop(
+        "Package \"pmxdata\" must be installed to use derived_data ",
+        call. = FALSE
+      )
+    }
     x <- pmxdata::analysis_data(deriveddatafile = x, addFactors = addFactors)
     if (!is.null(filterExpr)) {
       if (is_formula(filterExpr)) {

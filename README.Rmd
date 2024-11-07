@@ -1,0 +1,33 @@
+---
+output: github_document
+---
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+devtools::load_all()
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+
+```
+# PMXtte
+Support functions for (Repeated) Time-To-Event data analysis. Generate summary tables and Kaplan-Meier plot for the exploratory analyses, and visual predictive checks for model evaluation. 
+
+## Installation
+You can install the development version of PMXtte from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("pharmetheus/PMXtte")
+```
+To get the latest stable release (including vignettes), please click the appropriate link on the right side of the page. Download the file with a name that starts with PMXtte. Install PMXtte with the `install.packages` command, e.g.:
+
+```{r,eval=FALSE}
+install.packages("path_to_release.tar.gz")
+```
+
+
