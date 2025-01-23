@@ -54,10 +54,11 @@ ggKMMC <- function(odata,
                    ylab="Mean of covariate",
                    obsCol = "black",
                    fill = PMXtte:::PMXColors_pmx_palettes(name="light"),
+                   ci = 90,
                    ...){
 
   osum <- kmmc_obs(odata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,...)
-  simsum <- kmmc_sim(sdata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,...)
+  simsum <- kmmc_sim(sdata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,ci=ci,...)
 
   p <- ggplot()+
     geom_rect(data=simsum,aes(xmin=TIMES,xmax=TIMEF,ymin=lci,ymax=uci,fill=TP))+
@@ -83,11 +84,25 @@ kmmc_obs <- function(odata,COV,TIME,bins,...){
              TIMEF=bins[i+1],
              TIMEM=(bins[i]+bins[i+1])/2)
   }) %>%
-    mutate(TP="Observed")
+    mutate(TP="Observed mean")
 }
 
 
-kmmc_sim <- function(sdata,COV,TIME,bins,...){
+getCI <- function(ci=90) {
+
+  stopifnot(ci>0 && ci<100)
+  CI <- ci/100
+
+  lo <- (1-CI)/2
+  up <- 1-lo
+  return(c(lo=lo,up=up))
+
+}
+
+kmmc_sim <- function(sdata,COV,TIME,bins,ci=90,...){
+
+  ciProbs <- getCI(ci=ci)
+
   map_df(seq_along(bins[-length(bins)]),function(i){
     sdata %>%
       filter(TIME>=bins[i]) %>%
@@ -95,14 +110,13 @@ kmmc_sim <- function(sdata,COV,TIME,bins,...){
       summarise(MN=mean(!!enquo(COV)),
                 TIME=median(TIME)) %>%
       group_by(...) %>%
-      summarise_at(vars(MN),.funs = list("med"=function(x) quantile(x,0.5),
-                                         "lci"=function(x) quantile(x,0.05),
-                                         "uci"=function(x) quantile(x,0.95)))%>%
+      summarise_at(vars(MN),.funs = list("lci"=function(x) quantile(x,ciProbs[1]),
+                                         "uci"=function(x) quantile(x,ciProbs[2])))%>%
       ungroup() %>%
       mutate(TIMES=bins[i],
              TIMEF=bins[i+1],
              TIMEM=(bins[i]+bins[i+1])/2)
   }) %>%
-    mutate(TP="Simulated")
+    mutate(TP=paste0("Simulated ",ci,"% CI"))
 }
 
