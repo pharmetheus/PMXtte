@@ -35,6 +35,14 @@ p1 <- ggKMMC(odata1,
   theme(legend.position="top") +
   theme(legend.title = element_blank())
 
+p1a <- ggKMMC(odata1,
+             sdata1,
+             cov = DOSEN,
+             CI = 95,
+             bins=seq(from=0,to=52,by=1)) +
+  theme(legend.position="top") +
+  theme(legend.title = element_blank())
+
 p2 <- ggKMMC(odata1,
              sdata1,
              cov = DOSEN,
@@ -73,6 +81,16 @@ p5 <- ggKMMC(odata1,
   theme(legend.position="top") +
   theme(legend.title = element_blank())
 
+p6 <- ggKMMC(odata1,
+             sdata1,
+             ci = c(0.02,0.98),
+             cov = DOSEN,
+             xlab = "Time (weeks)",
+             ylab = "Mean of dose (mg)",
+             bins=seq(from=0,to=52,by=1)) +
+  theme(legend.position="top") +
+  theme(legend.title = element_blank())
+
 dev.off()
 
 vdiffr::expect_doppelganger('basic plot', p1)
@@ -80,4 +98,6 @@ vdiffr::expect_doppelganger('basic plot with xlab and ylab', p2)
 vdiffr::expect_doppelganger('using different time variable', p3)
 vdiffr::expect_doppelganger('using fill color via palette', p4)
 vdiffr::expect_doppelganger('using col to specify line color', p5)
+vdiffr::expect_doppelganger('Changing CI', p1a)
+vdiffr::expect_doppelganger('Setting the CI with ci', p6)
 })
