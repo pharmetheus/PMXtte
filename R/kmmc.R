@@ -54,10 +54,12 @@ ggKMMC <- function(odata,
                    ylab="Mean of covariate",
                    obsCol = "black",
                    fill = PMXtte:::PMXColors_pmx_palettes(name="light"),
+                   CI = 90,
+                   ci = NULL,
                    ...){
 
   osum <- kmmc_obs(odata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,...)
-  simsum <- kmmc_sim(sdata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,...)
+  simsum <- kmmc_sim(sdata,COV=!!enquo(cov),TIME=!!enquo(timevar),bins,CI=CI,ci=ci,...)
 
   p <- ggplot()+
     geom_rect(data=simsum,aes(xmin=TIMES,xmax=TIMEF,ymin=lci,ymax=uci,fill=TP))+
@@ -83,11 +85,31 @@ kmmc_obs <- function(odata,COV,TIME,bins,...){
              TIMEF=bins[i+1],
              TIMEM=(bins[i]+bins[i+1])/2)
   }) %>%
-    mutate(TP="Observed")
+    mutate(TP="Observed mean")
 }
 
 
-kmmc_sim <- function(sdata,COV,TIME,bins,...){
+getCI <- function(CI=90) {
+
+  stopifnot(CI>0 && CI<100)
+  ci <- CI/100
+
+  lo <- (1-ci)/2
+  up <- 1-lo
+  return(c(lo=lo,up=up))
+
+}
+
+kmmc_sim <- function(sdata,COV,TIME,bins,CI=90,ci,...){
+
+  if(is.null(ci)) {
+    ci <- getCI(CI=CI)
+  } else {
+      ci <- c(lo=ci[1],up=ci[2])
+      CI <- 100*diff(ci)
+  }
+
+
   map_df(seq_along(bins[-length(bins)]),function(i){
     sdata %>%
       filter(TIME>=bins[i]) %>%
@@ -95,14 +117,13 @@ kmmc_sim <- function(sdata,COV,TIME,bins,...){
       summarise(MN=mean(!!enquo(COV)),
                 TIME=median(TIME)) %>%
       group_by(...) %>%
-      summarise_at(vars(MN),.funs = list("med"=function(x) quantile(x,0.5),
-                                         "lci"=function(x) quantile(x,0.05),
-                                         "uci"=function(x) quantile(x,0.95)))%>%
+      summarise_at(vars(MN),.funs = list("lci"=function(x) quantile(x,ci[1]),
+                                         "uci"=function(x) quantile(x,ci[2])))%>%
       ungroup() %>%
       mutate(TIMES=bins[i],
              TIMEF=bins[i+1],
              TIMEM=(bins[i]+bins[i+1])/2)
   }) %>%
-    mutate(TP="Simulated")
+    mutate(TP=paste0("Simulated ",CI,"% CI"))
 }
 

@@ -1,4 +1,5 @@
 PMXRenv::library.unqualified("vdiffr")
+PMXRenv::library.unqualified("diffviewer")
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 

@@ -342,7 +342,7 @@ ggKMvpc <- function(odata,
   }
 
   # this is for the coloring and legend
-  names(simCol) = paste0(100*diff(ci),"% CI of simulated")
+  names(simCol) = paste0("Simulated ",100*diff(ci),"% CI")
   names(obsCol) = "Observed"
 
   # make the plot
