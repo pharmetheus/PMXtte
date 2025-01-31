@@ -9,11 +9,15 @@ makeSummaryTableTTE(
   myID = "ID",
   myDV = "DV",
   digits = 3,
+  showAvnObs = !isRTTE(df, myID = myID),
   nObsColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
-  avnObsColNm = "\\\\textbf{pEvent/nID\\\\textsuperscript{c}}",
+  avnObsColNm = "\\\\textbf{pEvent\\\\textsuperscript{c}}",
   caption = "Number of patients and number of events",
-  footnote =
-    "\\\\textsuperscript{a}Number of patients\\\\newline\\\\textsuperscript{b}Number of events\\\\newline\\\\textsuperscript{c}Proportion of number of events",
+  footnote = paste0("\\\\textsuperscript{a}Number of patients\\\\newline",
+    "\\\\textsuperscript{b}Number of events\\\\newline", if (showAvnObs) {
+    
+    "\\\\textsuperscript{c}Proportion of number of events"
+ }),
   myFun = NULL,
   ...
 )
@@ -27,13 +31,15 @@ makeSummaryTableTTE(
 
 \item{digits}{is the number of significant digits}
 
+\item{showAvnObs}{a logical, show a column with the average number of events? Default will be \code{FALSE} if the data is recognized as RTTE data, \code{TRUE} if not.}
+
 \item{nObsColNm}{is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"}
 
 \item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"}
 
 \item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
 
-\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events"}
+\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.}
 
 \item{myFun}{internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.}
 
@@ -46,7 +52,8 @@ By default, the table at Latex format. Alternatively, if \code{asList = TRUE}, a
 Derive a single data summary table with up to 2 levels of stratification, specifically tailored for (R)TTE data.
 It is a wrapper around \code{PhRame_makeSummaryTable()}, which means that it is the same function but defaulted with arguments
 that use "event" instead of "observation". Any argument available in the documentation of \code{PhRame_makeSummaryTable()} can
-be used (except for \code{myFun}, see the details in \code{Arguments} below).
+be used (except for \code{myFun}, see the details in \code{Arguments} below). By default, the average number of event will be displayed
+only for single event data, not for RTTE data.
 }
 \examples{
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
@@ -74,5 +81,4 @@ makeSummaryTableTTE(tte1data,
                     innerLevel   = "DOSEN",
                     innerLabel   = "Dose",
                     asList = TRUE)
-
 }
