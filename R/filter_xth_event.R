@@ -76,3 +76,9 @@ filter_xth_event <- function(
   }
   ans
 }
+
+isRTTE <- function(x, myID = "ID"){
+  any(duplicated(x[x$EVID==0,][[myID]]))
+}
+
+

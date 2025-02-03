@@ -3,16 +3,18 @@
 #' @description Derive a single data summary table with up to 2 levels of stratification, specifically tailored for (R)TTE data.
 #' It is a wrapper around `PhRame_makeSummaryTable()`, which means that it is the same function but defaulted with arguments
 #' that use "event" instead of "observation". Any argument available in the documentation of `PhRame_makeSummaryTable()` can
-#' be used (except for `myFun`, see the details in `Arguments` below).
+#' be used (except for `myFun`, see the details in `Arguments` below). By default, the average number of event will be displayed
+#' only for single event data, not for RTTE data.
 #'
 #' @param df is the data frame
 #' @param myID is the name of the ID column, default is "ID"
 #' @param myDV is the name of the DV column, default is "DV"
 #' @param digits is the number of significant digits
+#' @param showAvnObs a logical, show a column with the average number of events? Default will be `FALSE` if the data is recognized as RTTE data, `TRUE` if not.
 #' @param nObsColNm is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"
 #' @param avnObsColNm is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"
 #' @param caption is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"
-#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events"
+#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.
 #' @param myFun internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.
 #' @param ...  passed to `PhRame_makeSummaryTable()`, possibly for the additional optional arguments compatible with latex
 #'
@@ -45,20 +47,26 @@
 #'                     innerLevel   = "DOSEN",
 #'                     innerLabel   = "Dose",
 #'                     asList = TRUE)
-#'
+
 makeSummaryTableTTE <- function(df,
                                 myID = "ID",
                                 myDV = "DV",
                                 digits = 3,
+                                showAvnObs = !isRTTE(df, myID = myID),
                                 nObsColNm = "\\textbf{nEvent\\textsuperscript{b}}",
-                                avnObsColNm = "\\textbf{pEvent/nID\\textsuperscript{c}}",
+                                avnObsColNm = "\\textbf{pEvent\\textsuperscript{c}}",
                                 caption = "Number of patients and number of events",
-                                footnote = "\\textsuperscript{a}Number of patients\\newline\\textsuperscript{b}Number of events\\newline\\textsuperscript{c}Proportion of number of events",
+                                footnote = paste0(
+                                  "\\textsuperscript{a}Number of patients\\newline",
+                                  "\\textsuperscript{b}Number of events\\newline",
+                                  if(showAvnObs){"\\textsuperscript{c}Proportion of number of events"}
+                                  ),
                                 myFun = NULL,
                                 ...){
+
   if(is.null(myFun)){
     myFun <- function(df){
-      df %>%
+      ans <- df %>%
         summarise(
           subjects = length(unique(!!rlang::sym(myID))),
           nObs     = length(c(!!rlang::sym(myDV))[!!rlang::sym(myDV)==1]),
@@ -67,8 +75,14 @@ makeSummaryTableTTE <- function(df,
             dig = digits,
             numeric = F)
         )
+      if(!showAvnObs){
+        ans$avnObs <- ""
+      }
+      ans
     }
   }
+
+  if(!showAvnObs) avnObsColNm <- ""
 
   PhRame_makeSummaryTable(
     df = df,

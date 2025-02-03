@@ -49,3 +49,8 @@ test_that("preserves groups", {
   expect_equal(group_vars(input), group_vars(ans))
 })
 
+test_that("isRTTE is working", {
+  expect_true(isRTTE(rttedata))
+  expect_false(isRTTE(rttedata %>% filter_xth_event(1)))
+  expect_false(isRTTE(rttedata %>% filter_xth_event(2)))
+})
