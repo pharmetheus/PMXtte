@@ -315,7 +315,7 @@ plotKaplanMeier <- function(data,
                                            #font.legend   = 20,
                                            #cumevents = TRUE,
                                            #cumcensor=TRUE,
-                                           #linetype = "DOSEF",
+                                           #linetype = "DOSENF",
                                            #tables.height = 0.15,
                                            #short.panel.labs=TRUE,
                                            #axes.offset   = TRUE, #default is TRUE

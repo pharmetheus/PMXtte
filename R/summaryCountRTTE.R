@@ -17,10 +17,10 @@
 #' @param myDV is the name of the DV column, default is \strong{"DV"}
 #' @param myEVCOUNT is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}
 #' @param outerLevel is the outer level (1st level) of stratification variable,
-#'   eg. "STUDYF"
+#'   eg. "DOSENF"
 #' @param innerLevel is the inner level (2nd level) of stratification variable,
-#'   eg. "DOSEF"
-#' @param outerLabel is the label for the outler level (1st level) of
+#'   eg. "DOSENF"
+#' @param outerLabel is the label for the outer level (1st level) of
 #'   stratification variable, eg. "Study")
 #' @param innerLabel is the label for the inner level (2nd level) of
 #'   stratification variable, eg. "Dose"
