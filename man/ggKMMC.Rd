@@ -14,6 +14,8 @@ ggKMMC(
   ylab = "Mean of covariate",
   obsCol = "black",
   fill = PMXtte:::PMXColors_pmx_palettes(name = "light"),
+  CI = 90,
+  ci = NULL,
   ...
 )
 }
@@ -33,6 +35,8 @@ ggKMMC(
 \item{obsCol}{color for the observed line}
 
 \item{fill}{The fill color for the simulation interval.}
+
+\item{ci}{what level of confidence to we want for the simulated Kaplan-Meier}
 
 \item{...}{}
 }
