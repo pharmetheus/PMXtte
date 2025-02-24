@@ -9,6 +9,7 @@
 #' @param iter_col a character, the simulation replicate identifier column. The default is `"ITER"`.  Must be present in`sdata`.
 #' @param grouping_col a character, the grouping variables, useful to facet the plot. The default is `character(0)`, overall data. Must be present in `odata`, and `sdata`.
 #' @param bins a numeric, vector of numeric values when the covariate mean should be calculated. Default is set to have 50 values whatever the input data.
+#' @param fun a character, name of the function to summarize the covariate. Default is `"mean"`.
 #' @param ylab a character, label of the y-axis.
 #' @param nocb a logical, should covariate value be interpolated with the "next observation carried backward" rule (the default)? Otherwise "last observation carried forward" will be used
 #' @param output_data a logical, should the function return the data that build the plot? If not, the default, a figure is returned
@@ -82,7 +83,8 @@ ggKMMC <- function(
     iter_col = "ITER",
     grouping_col = character(0),
     bins = seq(0, max(odata[[time_col]]), length.out = 50),
-    ylab = paste("Mean of", cov_col),
+    fun = "mean",
+    ylab = paste(stringr::str_to_title(fun), "of", cov_col),
     nocb = TRUE,
     output_data = FALSE,
     obsCol = "black",
@@ -122,7 +124,7 @@ ggKMMC <- function(
   ggKMMCdata <- merged_data %>%
     dplyr::group_by(across(all_of(c('DATASET', grouping_col, time_col, iter_col)))) %>%
     dplyr::summarise(
-      MEAN = mean(.data[[cov_col]]), # Calculate the covariate mean at each time
+      MEAN = do.call(what = fun, args = list(.data[[cov_col]])), # Calculate the covariate mean at each time
       .groups = "drop_last"
     ) %>% # Data now grouped by DATASET (obs/sim), GROUPING columns and TIME
     dplyr::summarise(

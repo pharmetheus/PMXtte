@@ -116,4 +116,16 @@ test_that("ggKMMC works", {
   expect_equal(
     filter(ans, DATASET == "SDATA")$n, c(3, 3, 3, 1)
   )
+
+  # Calculate median
+
+  odat$COV <- c(100, 100, 900)
+  sdat$COV <- rep(c(100, 100, 900), 3)
+
+  ans <- ggKMMC(odata = odat, sdata = sdat, cov_col = "COV",
+                output_data = TRUE, bins = c(0,24,48,96),
+                ci = c(0,1), fun = "median")
+  expect_equal(
+    ans$med[ans$DATASET=='ODATA'], c(100, 100, 500, 900)
+  )
 })

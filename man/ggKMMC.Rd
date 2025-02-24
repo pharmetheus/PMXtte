@@ -14,7 +14,8 @@ ggKMMC(
   iter_col = "ITER",
   grouping_col = character(0),
   bins = seq(0, max(odata[[time_col]]), length.out = 50),
-  ylab = paste("Mean of", cov_col),
+  fun = "mean",
+  ylab = paste(stringr::str_to_title(fun), "of", cov_col),
   nocb = TRUE,
   output_data = FALSE,
   obsCol = "black",
@@ -40,6 +41,8 @@ ggKMMC(
 \item{grouping_col}{a character, the grouping variables, useful to facet the plot. The default is \code{character(0)}, overall data. Must be present in \code{odata}, and \code{sdata}.}
 
 \item{bins}{a numeric, vector of numeric values when the covariate mean should be calculated. Default is set to have 50 values whatever the input data.}
+
+\item{fun}{a character, name of the function to summarize the covariate. Default is \code{"mean"}.}
 
 \item{ylab}{a character, label of the y-axis.}
 
