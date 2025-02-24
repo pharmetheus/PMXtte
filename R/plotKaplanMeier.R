@@ -143,8 +143,8 @@ plotKaplanMeier <- function(data,
   }
 
   # convert time_col, event_col to strings if they are not already
-  time_col  <- as.character(substitute(time_col))
-  event_col <- as.character(substitute(event_col))
+  time_col  <- as.character(time_col)
+  event_col <- as.character(event_col)
 
   # Check if the columns exist in the dataframe
   if (!all(c(time_col, event_col) %in% names(data))) {
@@ -153,7 +153,7 @@ plotKaplanMeier <- function(data,
 
 
   if (!is.null(cov_col)) {
-    cov_col <- as.character(substitute(cov_col))
+    cov_col <- as.character(cov_col)
     if (!cov_col %in% names(data)){
       stop('covariate column does not exist in the dataframe')
     }
