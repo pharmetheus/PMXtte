@@ -8,7 +8,7 @@ filter_xth_event(
   x,
   event = 1,
   event_col = "DV",
-  evcount_col = "EVCOUNT",
+  evcount_col = NULL,
   time_since_last_event = "TSLE",
   time_col = "TSFDW"
 )
@@ -20,7 +20,7 @@ filter_xth_event(
 
 \item{event_col}{a character, the event column in the data.}
 
-\item{evcount_col}{a character, the event count column in the data. Expected as the cumulative sum of the event column (i.e. starts at 0, not incremented of +1 in case of censoring event).}
+\item{evcount_col}{a character, the event count column in the data. Default is \code{NULL}, will create or use the column \code{EVCOUNT}, expected as the cumulative sum of the event column (i.e. starts at 0, not incremented of +1 in case of censoring event).}
 
 \item{time_since_last_event}{a character, the name of the column to create that will inform the time since the last event. If \code{NULL}, no column will be created. Ignored if \code{event=1}.}
 
