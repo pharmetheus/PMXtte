@@ -33,6 +33,13 @@ test_that("filter_xth_event() works", {
   )
 })
 
+test_that("deal with missing EVCOUNT", {
+  expect_equal(
+    filter_xth_event(rttedata %>% select(-EVCOUNT)) %>% relocate("EVCOUNT"),
+    filter_xth_event(rttedata) %>% relocate("EVCOUNT")
+  )
+})
+
 test_that("preserve tibble/data.frame class", {
   input <- as_tibble(rttedata)
   ans <- filter_xth_event(input)

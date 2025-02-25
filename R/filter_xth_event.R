@@ -4,7 +4,7 @@
 #' @param x a dataset, with only observations regarding time to event data. It often means data filtered with `EVID==0` and with a unique "TYPE" value.
 #' @param event a integer of length 1, informs if the time to 1st, 2nd, 3rd event (etc...) should be returned. Default is 1 (time to first event data).
 #' @param event_col a character, the event column in the data.
-#' @param evcount_col  a character, the event count column in the data. Expected as the cumulative sum of the event column (i.e. starts at 0, not incremented of +1 in case of censoring event).
+#' @param evcount_col  a character, the event count column in the data. Default is `NULL`, will create or use the column `EVCOUNT`, expected as the cumulative sum of the event column (i.e. starts at 0, not incremented of +1 in case of censoring event).
 #' @param time_since_last_event a character, the name of the column to create that will inform the time since the last event. If `NULL`, no column will be created. Ignored if `event=1`.
 #' @param time_col a character, the name of the time column used to calculate the time since last event. Ignored if `time_since_last_event=NULL` or if `event=1`.
 #'
@@ -33,25 +33,35 @@ filter_xth_event <- function(
     x,
     event = 1,
     event_col = "DV",
-    evcount_col = "EVCOUNT",
+    evcount_col = NULL,
     time_since_last_event = "TSLE",
     time_col = "TSFDW"
 ){
+  ans <- x
+
   if(length(event)!=1){
     stop("`event` is not of length 1. Only a single value can be passed at a time.")
   }
   if(is.null(x[[event_col]])){
     stop("`event_col = \"", event_col, "\"`, but column ", event_col, " not found in data.")
   }
-  if(is.null(x[[evcount_col]])){
+  if(is.null(evcount_col)){
+    evcount_col <- "EVCOUNT"
+    if(is.null(x[[evcount_col]])){
+      ans <- ans %>%
+        dplyr::group_by(dplyr::across(dplyr::all_of("ID")), .add = TRUE) %>%
+        dplyr::mutate(EVCOUNT = cumsum(.data[[event_col]])) %>%
+        dplyr::ungroup("ID")
+    }
+  }
+  if(is.null(ans[[evcount_col]])){
     stop("`evcount_col = \"", evcount_col, "\"`, but column ", evcount_col, " not found in data.")
   }
-  ans <- x
   if(event > 1){
-        ans <- x %>%
-      dplyr::group_by(!!quo(ID), .add = TRUE) %>%
+    ans <- ans %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of("ID")), .add = TRUE) %>%
       filter(any(.data[[event_col]]==1 & .data[[evcount_col]]==(event-1))) %>%
-      dplyr::ungroup(!!quo(ID))
+      dplyr::ungroup("ID")
     if(!is.null(time_since_last_event)){
       if(!is.null(x[[time_since_last_event]])){
         stop("`time_since_last_event = \"", time_since_last_event, "\"`, but ", time_since_last_event, " already exists in the data.")
@@ -60,12 +70,12 @@ filter_xth_event <- function(
         stop("`time_col = \"", time_col, "\"`, but column ", time_col, " not found in data.")
       }
       ans <- ans %>%
-        dplyr::group_by(!!quo(ID), .add = TRUE) %>%
+        dplyr::group_by(dplyr::across(dplyr::all_of("ID")), .add = TRUE) %>%
         mutate(
           tmpTSLE = (.data[[time_col]])-.data[[time_col]][.data[[event_col]]==1&.data[[evcount_col]]==(event-1)],
           .after = all_of(time_col)
         ) %>%
-        dplyr::ungroup(!!quo(ID))
+        dplyr::ungroup("ID")
       names(ans)[names(ans)=="tmpTSLE"] <- time_since_last_event
     }
   }
