@@ -417,7 +417,3 @@ ggKMvpc <- function(odata,
   p
 }
 
-#prepare data for RTTE
-# Sdata <- Sdata %>% group_by(ID) %>% mutate(EVCOUNT = cumsum(DV))
-# Sdata <- Sdata %>% group_by(ID) %>% mutate(latestEventTime = lag(TIME)) %>% ungroup() %>% mutate(TimeSincelastEvent = TIME - latestEventTime)
- #Sdata <- Sdata %>% mutate(TimeSincelastEvent2 = ifelse(is.na(TimeSincelastEvent), TIME, TimeSincelastEvent))
