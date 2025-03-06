@@ -56,12 +56,12 @@ acceptable to this argument.}
 \item{myEVCOUNT}{is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}}
 
 \item{outerLevel}{is the outer level (1st level) of stratification variable,
-eg. "STUDYF"}
+eg. "DOSENF"}
 
 \item{innerLevel}{is the inner level (2nd level) of stratification variable,
-eg. "DOSEF"}
+eg. "DOSENF"}
 
-\item{outerLabel}{is the label for the outler level (1st level) of
+\item{outerLabel}{is the label for the outer level (1st level) of
 stratification variable, eg. "Study")}
 
 \item{innerLabel}{is the label for the inner level (2nd level) of

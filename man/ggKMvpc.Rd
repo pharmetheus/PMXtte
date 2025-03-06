@@ -22,8 +22,8 @@ ggKMvpc(
   censor.size = 4,
   palette = PMXtte:::PMXColors_pmx_palettes(),
   scale.percent = TRUE,
-  ylab = paste0("Percentage with", if (!cuminc) "out", " events (\%)"),
-  xlab = "Time (Weeks)",
+  ylab = paste0("Subjects with", if (!cuminc) "out", " events (\%)"),
+  xlab = "Time since first dose (weeks)",
   legend.position = "top",
   xlim = NULL,
   ylim = c(0, 1)
