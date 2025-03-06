@@ -1,4 +1,4 @@
-# PMXtte (development version)
+# PMXtte 0.12.0
 
 * Changes to `makeSummaryTable` so that a column is not printed for RTTE.
 * Change default for `avnObsColNm` to `\\textbf{pEvent\\textsuperscript{c}}`
