@@ -18,12 +18,13 @@ summaryFollowUpTime(
   digits = 0,
   digits_rate = 2,
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
-  fTimeColNm = "\\\\textbf{TotalFollowUpTime\\\\textsuperscript{b}}",
-  EventRateColNm = "\\\\textbf{AnnualizedEventRate/nID\\\\textsuperscript{c}}",
-  caption = "Annual Follow Up Time",
+  fTimeColNm = "\\\\textbf{Observation period (year)\\\\textsuperscript{b}}",
+  EventRateColNm = "\\\\textbf{ Event rate (1/year)\\\\textsuperscript{c}}",
+  caption =
+    "Summary of observation periods and annual event rates in the analysis data set.",
   label = "tab:anaSummaryFollowupTime",
   footnote =
-    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Sum of individual follow-up times per group.\\\\newline\\\\textsuperscript{c}Annual event rate",
+    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per group.\\n                                 \\\\newline\\\\textsuperscript{c}Mean annual event rate calculated as number of events per\\n                                 group divided by total observation period per group.",
   asList = FALSE,
   ...
 )
@@ -42,13 +43,13 @@ summaryFollowUpTime(
 
 \item{myEVCOUNT}{Column that contains count for events, default is \code{"EVCOUNT"}}
 
-\item{outerLevel}{is the outler level (1st level) of stratification variable,
-eg. "STUDYF"}
+\item{outerLevel}{is the outer level (1st level) of stratification variable,
+eg. "STUDYNF"}
 
 \item{innerLevel}{is the inner level (2nd level) of stratification variable,
-eg. "DOSEF"}
+eg. "DOSENF"}
 
-\item{outerLabel}{is the label for the outler level (1st level) of
+\item{outerLabel}{is the label for the outer level (1st level) of
 stratification variable, eg. "Study")}
 
 \item{innerLabel}{is the label for the inner level (2nd level) of

@@ -1,5 +1,15 @@
 #' Create NONMEM control stream for TTE simulations based on a model file
 #'
+#' This function generates a NONMEM control stream file for simulating
+#' time-to-event (TTE) or repeated time-to-event (RTTE) data using the MTIME
+#' technique and is based on an existing NONMEM model file. The function
+#' modifies (adding and revising) the model file to enable simulations and
+#' output simulated event times and covariates. Default is to change to
+#' subroutine ADVAN6 in the simulations since other subroutines have been
+#' shown not to work adequately for this purpose. Note also that the created
+#' model file may need some further manual editing, eg, in the $ERROR section
+#' (removing Y expressions).
+#'
 #' @description This function generates a NONMEM control stream file for
 #'   simulating time-to-event (TTE) or repeated time-to-event (RTTE) data
 #'   based on an existing NONMEM model file. It modifies the model file to
