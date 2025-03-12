@@ -1,6 +1,7 @@
 # PMXtte 0.12.0.9000 Development version
 
 * `summaryFollowUpTime()` arguments that inherited their documentation from `makeSummaryTable()` despite having different default values are now properly documented.
+* Add `PMXFrem` as a suggested package, it is required to run `createTTESim()`.
 
 # PMXtte 0.12.0
 
