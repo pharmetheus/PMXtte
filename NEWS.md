@@ -1,3 +1,7 @@
+# PMXtte 0.12.0.9000 Development version
+
+* `summaryFollowUpTime()` arguments that inherited their documentation from `makeSummaryTable()` despite having different default values are now properly documented.
+
 # PMXtte 0.12.0
 
 * Changes to `makeSummaryTable` so that a column is not printed for RTTE.

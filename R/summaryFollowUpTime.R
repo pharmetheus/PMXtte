@@ -15,6 +15,14 @@
 #' @param EventRateColNm the character string to be printed as the column name with Event rate
 #' @param digits_rate the number of significant digits for the Event rate column
 #' @param digits the number of significant digits for the follow up time column
+#' @param caption is the table caption. Assign NULL to this argument produce table without caption.
+#' @param footnote is the text for footnote.
+#' @param label is the label for the table used for cross-reference.
+#' @param asList if \strong{TRUE} the data summary is returned as a list where
+#'   different elements in the list contain summary of different stratification
+#'   levels. If \strong{FALSE} the data summary is returned as a latex table. If
+#'   no stratification variable is provided, this function always returns a list
+#'   of two items (Number of event, Observation period, Event rate)
 #' @inheritParams PhRame_makeSummaryTable
 #' @return By default, the table at Latex format. Alternatively, if `asList = TRUE`, a list of data.frame tables
 #'
@@ -54,13 +62,13 @@ summaryFollowUpTime <- function (df,
                                  digits_rate = 2,
                                  nEventColNm = "\\textbf{nEvent\\textsuperscript{a}}",
                                  fTimeColNm = "\\textbf{Observation period (year)\\textsuperscript{b}}",
-                                 EventRateColNm = "\\textbf{ Event rate (1/year)\\textsuperscript{c}}",
+                                 EventRateColNm = "\\textbf{Event rate (1/year)\\textsuperscript{c}}",
                                  caption = "Summary of observation periods and annual event rates in the analysis data set.",
                                  label = "tab:anaSummaryFollowupTime",
                                  footnote = "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Total
-                                 observation period calculated as sum of individual observation period per group.
+                                 observation period calculated as sum of individual observation period per group
                                  \\newline\\textsuperscript{c}Mean annual event rate calculated as number of events per
-                                 group divided by total observation period per group.",
+                                 group divided by total observation period per group",
                                  asList = FALSE,
                                  ...) {
 
