@@ -70,7 +70,11 @@ test_that("createTTESim replaces SUBROUTINE to ADVAN6 when replaceSUB=TRUE", {
   sub_line <- model_code_replace_sub[grepl("\\$SUBROUTINE", model_code_replace_sub)]
   expect_match(sub_line, "\\$SUBROUTINE.*?ADVAN=6") # Check if ADVAN=6 is present
 
-  model_code_no_replace_sub <- createTTESim(modFile = mod_file_path, outFile = NULL, replaceSUB = FALSE)
+  expect_warning(
+    createTTESim(modFile = mod_file_path, outFile = NULL, replaceSUB = FALSE),
+    "Note that other ADVAN\'s than ADVAN6 might not work properly with MTIME simulations"
+  )
+  model_code_no_replace_sub <- suppressWarnings(createTTESim(modFile = mod_file_path, outFile = NULL, replaceSUB = FALSE))
   sub_line_no_replace <- model_code_no_replace_sub[grepl("\\$SUBROUTINE", model_code_no_replace_sub)]
   original_sub_line <- readLines(mod_file_path)[grepl("\\$SUBROUTINE", readLines(mod_file_path))] # Get original $SUB from mod file
   expect_equal(sub_line_no_replace, original_sub_line) # Check if $SUB is original

@@ -25,6 +25,7 @@ Suggests:
     magrittr,
     PMXColors,
     pmxdata,
+    PMXFrem,
     PMXRenv,
     readr,
     rmarkdown,

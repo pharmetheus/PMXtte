@@ -99,10 +99,13 @@
 #'
 #' @examples
 #' # Example usage: RTTE with time-varying DOSEN covariate in output, not updating initial estimates
-#' createTTESim(modFile = "rtte_mod.mod", rtte = TRUE, timeVaryingCovs = "DOSEN", updateInits = FALSE)
+#' # File path to a ".mod" object (embedded in the package as an example)
+#' mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
+#' createTTESim(modFile = mypath, rtte = TRUE, timeVaryingCovs = "DOSEN", updateInits = FALSE)
 #'
 #' # Example usage: TTE with no covariates in output
-#' createTTESim(modFile = "tte_weibull.mod")
+#' mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
+#' createTTESim(modFile = mypath)
 createTTESim <- function(modFile,
                          outFile = paste0(tools::file_path_sans_ext(modFile), "vpc.mod"),
                          simTabFile = paste0("vpctab", tools::file_path_sans_ext(modFile)),
@@ -135,6 +138,13 @@ createTTESim <- function(modFile,
                          includeThetaComments = TRUE,
                          includeTABLE = FALSE,
                          replaceSUB = TRUE) {
+
+  if(!requireNamespace("PMXFrem", quietly = TRUE)) {
+    stop(
+      "Package \"PMXFrem\" must be installed to use \"PMXtte::createTTESim()\" ",
+      call. = FALSE
+    )
+  }
 
   if (!file.exists(modFile)) {
     stop(paste0("Cannot find model file: ", modFile))
