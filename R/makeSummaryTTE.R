@@ -59,7 +59,7 @@ makeSummaryTableTTE <- function(df,
                                 footnote = paste0(
                                   "\\textsuperscript{a}Number of patients\\newline",
                                   "\\textsuperscript{b}Number of events\\newline",
-                                  if(showAvnObs){"\\textsuperscript{c}Proportion of number of events"}
+                                  if(showAvnObs){"\\textsuperscript{c}Proportion of events"}
                                   ),
                                 myFun = NULL,
                                 ...){
