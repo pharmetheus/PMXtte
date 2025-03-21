@@ -1,3 +1,21 @@
+# PMXtte (development version)
+
+* makeSummaryTableTTE()
+  Changed the "c" footnote:
+  From:"\\textsuperscript{c}Proportion of number of event"
+  To: "\\textsuperscript{c}Proportion of events"
+
+* summaryFollowUpTime()
+  Changed the footnote to
+  To: \textsuperscript{a}Number of events\newline\textsuperscript{b}Total observation period
+  calculated as sum of individual observation period per
+  row.\newline\textsuperscript{c}Annual event rate calculated, for each row, as the number
+  of events divided by total the total observation period.
+  
+  Changed:
+  From: fTimeColNm = "\\textbf{Observation period (year)\\textsuperscript{b}}",
+  To: fTimeColNm = "\\textbf{Observation period (years)\\textsuperscript{b}}",
+
 # PMXtte 0.12.0
 
 * Changes to `makeSummaryTable` so that a column is not printed for RTTE.
