@@ -1,4 +1,4 @@
-# PMXtte (development version)
+# PMXtte 0.13.0
 
 * makeSummaryTableTTE()
   Changed the "c" footnote:
