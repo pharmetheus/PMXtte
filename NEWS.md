@@ -15,6 +15,13 @@
   Changed:
   From: fTimeColNm = "\\textbf{Observation period (year)\\textsuperscript{b}}",
   To: fTimeColNm = "\\textbf{Observation period (years)\\textsuperscript{b}}",
+  
+  Changes to plotKaplanMeier
+* Changes in legend: Survival curves -> Observed
+* Changes in legend: Added Censored (default |)
+* Changes in legend: Removed censor sympol from confidence intervals
+* Added arguments censor.shape, censor.size and risk.table.title
+* Set the default value for risk.table.title to "Number of subjects at risk"
 
 # PMXtte 0.12.0
 
