@@ -119,10 +119,11 @@ plotKaplanMeier <- function(data,
                             surv.median.line.legend = TRUE,
                             surv.median.line.title  = 'Median Survival',
                             legend                  = "top",
-                            legend.title            = 'Survival curves',
+                            legend.title            = 'Observed',
                             legend.nrow             = NULL,
                             legend.ncol             = NULL,
                             risk.table.ylab         = cov_col,
+                            risk.table.title        ="Number of subjects at risk",
                             legend.labs             = sub(pattern=paste(cov_col,'=', sep = ''),
                                                           replacement="",
                                                           x=names(fit$strata)),
@@ -132,6 +133,8 @@ plotKaplanMeier <- function(data,
                             legend.box              = 'horizontal',
                             legend.title.size       = 9,
                             legend.spacing           = 5,
+                            censor.shape = '|',
+                            censor.size = 4,
                             ...){
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
@@ -170,9 +173,9 @@ plotKaplanMeier <- function(data,
     # if (conf.int.legend == 'Confidence intervals'){
     #   conf.int.legend <- 'Confidence interval'
     # }
-    if (legend.title == 'Survival curves'){
-      legend.title <- 'Survival curve'
-    }
+    # if (legend.title == 'Survival curves'){
+    #   legend.title <- 'Survival curve'
+    # }
   }
 
   #fit survival curves
@@ -181,7 +184,7 @@ plotKaplanMeier <- function(data,
 
   # title for confidence interval legend
   if (add.ciWidth.to.legend){
-    legend.title <- paste0(legend.title,' & ', ciWidth*100, '% CI')
+    legend.title <- paste0(legend.title,' and ', ciWidth*100, '% CI')
   }
   if (!is.null(facet.by)){
     facetPlots <- survminer::ggsurvplot_facet(fit                    = fit,
@@ -206,6 +209,7 @@ plotKaplanMeier <- function(data,
                                               ylim                   = ylim,
                                               palette                = palette,
                                               pval.size              = pval.size * 0.36,
+                                              censor.shape = censor.shape,
                                               ...
     )
     if (surv.median.line %in% c('hv', 'v', 'h')){
@@ -232,16 +236,30 @@ plotKaplanMeier <- function(data,
         )
       }}
 
-        facetPlots <- facetPlots +
-          guides(color= guide_legend(order=1,
-                                     nrow = legend.nrow,
-                                     ncol = legend.ncol
-                                     ),
-                 fill = guide_legend(order=1,
-                                     nrow = legend.nrow,
-                                     ncol = legend.ncol
-                                     ) ,
-                 linetype = guide_legend(order = 3))
+    # Add a blank geom_point to trigger the Censored entry
+    facetPlots <- facetPlots +
+      geom_point(x=NA,y=NA,aes(shape= factor(1))) +
+      scale_shape_manual(name = '',
+                         values = censor.shape,
+                         label = "Censored"
+      )
+
+
+    facetPlots <- facetPlots +
+      guides(color= guide_legend(order=1,
+                                 nrow = legend.nrow,
+                                 ncol = legend.ncol
+      ),
+      fill = guide_legend(order=1,
+                          nrow = legend.nrow,
+                          ncol = legend.ncol,
+                          override.aes=list(shape=NA)
+      ) ,
+      linetype = guide_legend(order = 3),
+      shape = guide_legend(order=3,
+                           override.aes=list(shape=censor.shape,
+                                             linetype=NA,
+                                             size=censor.size)))
 
 
     if (label.parsed == TRUE) {
@@ -308,6 +326,8 @@ plotKaplanMeier <- function(data,
                                            palette               = palette,
                                            pval.size             = pval.size * 0.36,
                                           conf.int.fill          = conf.int.fill,
+                                      censor.shape = censor.shape,
+                                      risk.table.title = risk.table.title,
                                            ...
                                            #font.x               = 25,
                                            #font.y        = 25,
@@ -351,7 +371,16 @@ plotKaplanMeier <- function(data,
       )
     }
 
+    # Add a blank geom_point to trigger the Censored entry
+    kaplanPlot$plot <- kaplanPlot$plot +
+      geom_point(x=NA,y=NA,aes(shape= factor(1))) +
+      scale_shape_manual(name = '',
+                         values = censor.shape,
+                         label = "Censored"
+      )
+
   }
+
   kaplanPlot$plot <- kaplanPlot$plot +
     guides(color= guide_legend(order=1,
                                nrow = legend.nrow,
@@ -359,9 +388,13 @@ plotKaplanMeier <- function(data,
                       ),
              fill = guide_legend(order=1,
                                  nrow = legend.nrow,
-                                 ncol = legend.ncol
+                                 ncol = legend.ncol,
+                                 override.aes = list(shape=NA)
                                ) ,
-           linetype = guide_legend(order = 3)) +
+           linetype = guide_legend(order = 3),
+           shape = guide_legend(order=3,override.aes=list(shape=censor.shape,
+                                                          linetype=NA,
+                                                          size=censor.size))) +
     theme(legend.box = legend.box,
           legend.title = element_text(size= legend.title.size),
           legend.spacing = unit(legend.spacing, 'pt'))
