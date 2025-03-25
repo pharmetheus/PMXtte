@@ -1,5 +1,7 @@
 # PMXtte 0.13.1
 
+* Minor udpates to funciton documentation
+
 # PMXtte 0.13.0
 
 * makeSummaryTableTTE()
