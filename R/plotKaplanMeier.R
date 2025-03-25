@@ -25,6 +25,8 @@
 #' @inheritParams ggpubr::ggpar
 #' @inheritDotParams survminer::ggsurvplot
 #' @param surv.median.line.legend Text to be used for median survival line in the legend
+#' @param legend.nrow The number if rows in the legend for the stratification variable
+#' @param legend.ncol The number if columns in the legend for the stratification variable
 #' @details The function takes a dataframe (tibble will be coerced to data.frame) and fits the survival curves using surv_fit then plots them using ggsurvplot.
 #' The arguments risk.table.fontsize and pval.size convert regular sizes to ggplot sizes. For other font size arguments passed to ggsurvplot you can multiply regular point sizes by 0.36 to convert to ggplot sizes. To change the color of the curves use the argument palette instead of color.
 #' @return A "ggsurvplot" object, see the documentation of `survminer::ggsurvplot` for more information. Basically it is a list that notably contains two "ggplot" objects, "x$plot" and "x$table", that renders into a single figure the Kaplan-Meier curves on top and the risk table on the bottom.

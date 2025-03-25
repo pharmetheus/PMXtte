@@ -18,13 +18,13 @@ summaryFollowUpTime(
   digits = 0,
   digits_rate = 2,
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
-  fTimeColNm = "\\\\textbf{Observation period (year)\\\\textsuperscript{b}}",
+  fTimeColNm = "\\\\textbf{Observation period (years)\\\\textsuperscript{b}}",
   EventRateColNm = "\\\\textbf{ Event rate (1/year)\\\\textsuperscript{c}}",
   caption =
     "Summary of observation periods and annual event rates in the analysis data set.",
   label = "tab:anaSummaryFollowupTime",
   footnote =
-    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per group.\\n                                 \\\\newline\\\\textsuperscript{c}Mean annual event rate calculated as number of events per\\n                                 group divided by total observation period per group.",
+    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per row.\\n                                 \\\\newline\\\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per\\n                                 group divided by total observation period per group.",
   asList = FALSE,
   ...
 )
@@ -72,11 +72,10 @@ Number of subjects with observations and number of observations"}}
 \item{label}{is the label for the table used for cross-reference, default is
 \strong{"tab:anaSummary"}}
 
-\item{footnote}{is the text for footnote, default is
-\strong{"\\textsuperscript\{a\} Number of
-subjects\\\\newline\\\\textsuperscript\{b\} Number of
-observations\\\\newline\\\\textsuperscript\{c\} Average number of
-observations per subject"}}
+\item{footnote}{is the text for footnote, default is "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Total
+observation period calculated as sum of individual observation period per row.
+\\newline\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per
+group divided by total observation period per group."}
 
 \item{asList}{if \strong{TRUE} the data summary is returned as a list where
 different elements in the list contain summary of different stratification
