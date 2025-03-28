@@ -13,10 +13,10 @@ makeSummaryTableTTE(
   nObsColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
   avnObsColNm = "\\\\textbf{pEvent\\\\textsuperscript{c}}",
   caption = "Number of patients and number of events",
-  footnote = paste0("\\\\textsuperscript{a}Number of patients\\\\newline",
+  footnote = paste0("\\\\textsuperscript{a}Number of subjects\\\\newline",
     "\\\\textsuperscript{b}Number of events\\\\newline", if (showAvnObs) {
     
-    "\\\\textsuperscript{c}Proportion of number of events"
+    "\\\\textsuperscript{c}Proportion of events"
  }),
   myFun = NULL,
   ...
@@ -35,11 +35,11 @@ makeSummaryTableTTE(
 
 \item{nObsColNm}{is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"}
 
-\item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"}
+\item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\\\\textsuperscript\{c\}\}"}
 
 \item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
 
-\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.}
+\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.}
 
 \item{myFun}{internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.}
 

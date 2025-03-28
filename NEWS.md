@@ -1,7 +1,36 @@
-# PMXtte 0.12.0.9000 Development version
+# PMXtte 0.13.1.9000 Development version
 
 * `summaryFollowUpTime()` arguments that inherited their documentation from `makeSummaryTable()` despite having different default values are now properly documented.
 * Add `PMXFrem` as a suggested package, it is required to run `createTTESim()`.
+
+# PMXtte 0.13.1
+
+* Minor udpates to funciton documentation
+
+# PMXtte 0.13.0
+
+* makeSummaryTableTTE()
+  Changed the "c" footnote:
+  From:"\\textsuperscript{c}Proportion of number of event"
+  To: "\\textsuperscript{c}Proportion of events"
+
+* summaryFollowUpTime()
+  Changed the footnote to
+  To: \textsuperscript{a}Number of events\newline\textsuperscript{b}Total observation period
+  calculated as sum of individual observation period per
+  row.\newline\textsuperscript{c}Annual event rate calculated, for each row, as the number
+  of events divided by total the total observation period.
+  
+  Changed:
+  From: fTimeColNm = "\\textbf{Observation period (year)\\textsuperscript{b}}",
+  To: fTimeColNm = "\\textbf{Observation period (years)\\textsuperscript{b}}",
+  
+  Changes to plotKaplanMeier
+* Changes in legend: Survival curves -> Observed
+* Changes in legend: Added Censored (default |)
+* Changes in legend: Removed censor sympol from confidence intervals
+* Added arguments censor.shape, censor.size and risk.table.title
+* Set the default value for risk.table.title to "Number of subjects at risk"
 
 # PMXtte 0.12.0
 

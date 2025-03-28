@@ -12,9 +12,9 @@
 #' @param digits is the number of significant digits
 #' @param showAvnObs a logical, show a column with the average number of events? Default will be `FALSE` if the data is recognized as RTTE data, `TRUE` if not.
 #' @param nObsColNm is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"
-#' @param avnObsColNm is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\/nID\\\\textsuperscript\{c\}\}"
+#' @param avnObsColNm is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\\\\textsuperscript\{c\}\}"
 #' @param caption is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"
-#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of patients\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.
+#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.
 #' @param myFun internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.
 #' @param ...  passed to `PhRame_makeSummaryTable()`, possibly for the additional optional arguments compatible with latex
 #'
@@ -57,9 +57,9 @@ makeSummaryTableTTE <- function(df,
                                 avnObsColNm = "\\textbf{pEvent\\textsuperscript{c}}",
                                 caption = "Number of patients and number of events",
                                 footnote = paste0(
-                                  "\\textsuperscript{a}Number of patients\\newline",
+                                  "\\textsuperscript{a}Number of subjects\\newline",
                                   "\\textsuperscript{b}Number of events\\newline",
-                                  if(showAvnObs){"\\textsuperscript{c}Proportion of number of events"}
+                                  if(showAvnObs){"\\textsuperscript{c}Proportion of events"}
                                   ),
                                 myFun = NULL,
                                 ...){

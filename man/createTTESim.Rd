@@ -142,11 +142,11 @@ If \code{TRUE}, tries to get the corresponding theta comments (text following
 first ";") from the \code{modFile} and add to the new updated simulation
 parameters. Default \code{TRUE}.}
 
+\item{includeTABLE}{Logical, indicating whether \verb{$TABLE} should be included
+or not. Default \code{FALSE}.}
+
 \item{replaceSUB}{Logical, indicating whether to replace \verb{$SUBROUTINE} to
 make sure it is using \code{ADVAN6}. Default \code{TRUE}.}
-
-\item{includeTable}{Logical, indicating whether \verb{$TABLE} should be included
-or not. Default \code{FALSE}.}
 }
 \value{
 If \code{outFile} is specified, the function writes the NONMEM control

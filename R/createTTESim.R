@@ -87,7 +87,7 @@
 #'   If `TRUE`, tries to get the corresponding theta comments (text following
 #'   first ";") from the `modFile` and add to the new updated simulation
 #'   parameters. Default `TRUE`.
-#' @param includeTable Logical, indicating whether `$TABLE` should be included
+#' @param includeTABLE Logical, indicating whether `$TABLE` should be included
 #'   or not. Default `FALSE`.
 #' @param replaceSUB Logical, indicating whether to replace `$SUBROUTINE` to
 #'   make sure it is using `ADVAN6`. Default `TRUE`.

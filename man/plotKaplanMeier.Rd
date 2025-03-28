@@ -38,10 +38,11 @@ plotKaplanMeier(
   surv.median.line.legend = TRUE,
   surv.median.line.title = "Median Survival",
   legend = "top",
-  legend.title = "Survival curves",
+  legend.title = "Observed",
   legend.nrow = NULL,
   legend.ncol = NULL,
   risk.table.ylab = cov_col,
+  risk.table.title = "Number of subjects at risk",
   legend.labs = sub(pattern = paste(cov_col, "=", sep = ""), replacement = "", x =
     names(fit$strata)),
   nrow = NULL,
@@ -50,6 +51,8 @@ plotKaplanMeier(
   legend.box = "horizontal",
   legend.title.size = 9,
   legend.spacing = 5,
+  censor.shape = "|",
+  censor.size = 4,
   ...
 )
 }
@@ -130,6 +133,12 @@ to remove the legend use legend = "none". Legend position can be also
 specified using a numeric vector c(x, y); see details section.}
 
 \item{legend.title}{legend title.}
+
+\item{legend.nrow}{The number if rows in the legend for the stratification variable}
+
+\item{legend.ncol}{The number if columns in the legend for the stratification variable}
+
+\item{risk.table.title}{The title to be used for the risk table.}
 
 \item{legend.labs}{character vector specifying legend labels. Used to replace
 the names of the strata from the fit. Should be given in the same order as

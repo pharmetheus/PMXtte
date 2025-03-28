@@ -24,7 +24,7 @@ summaryFollowUpTime(
     "Summary of observation periods and annual event rates in the analysis data set.",
   label = "tab:anaSummaryFollowupTime",
   footnote =
-    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per group\\n                                 \\\\newline\\\\textsuperscript{c}Mean annual event rate calculated as number of events per\\n                                 group divided by total observation period per group",
+    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per row.\\n                                 \\\\newline\\\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per\\n                                 group divided by total observation period per group.",
   asList = FALSE,
   ...
 )
@@ -67,9 +67,13 @@ stratification variable, eg. "Dose"}
 
 \item{caption}{is the table caption. Assign NULL to this argument produce table without caption.}
 
-\item{label}{is the label for the table used for cross-reference.}
+\item{label}{is the label for the table used for cross-reference, default is
+\strong{"tab:anaSummary"}}
 
-\item{footnote}{is the text for footnote.}
+\item{footnote}{is the text for footnote, default is "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Total
+observation period calculated as sum of individual observation period per row.
+\\newline\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per
+group divided by total observation period per group."#' @param label is the label for the table used for cross-reference.}
 
 \item{asList}{if \strong{TRUE} the data summary is returned as a list where
 different elements in the list contain summary of different stratification
