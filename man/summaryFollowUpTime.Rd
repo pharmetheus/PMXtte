@@ -18,8 +18,8 @@ summaryFollowUpTime(
   digits = 0,
   digits_rate = 2,
   nEventColNm = "\\\\textbf{nEvent\\\\textsuperscript{a}}",
-  fTimeColNm = "\\\\textbf{Observation period (years)\\\\textsuperscript{b}}",
-  EventRateColNm = "\\\\textbf{ Event rate (1/year)\\\\textsuperscript{c}}",
+  fTimeColNm = "\\\\textbf{Observation period (year)\\\\textsuperscript{b}}",
+  EventRateColNm = "\\\\textbf{Event rate (1/year)\\\\textsuperscript{c}}",
   caption =
     "Summary of observation periods and annual event rates in the analysis data set.",
   label = "tab:anaSummaryFollowupTime",
@@ -65,9 +65,7 @@ stratification variable, eg. "Dose"}
 
 \item{EventRateColNm}{the character string to be printed as the column name with Event rate}
 
-\item{caption}{is the table caption. Assign \strong{NULL} to this argument
-produce table without caption. Default is \strong{"PK analysis data set:
-Number of subjects with observations and number of observations"}}
+\item{caption}{is the table caption. Assign NULL to this argument produce table without caption.}
 
 \item{label}{is the label for the table used for cross-reference, default is
 \strong{"tab:anaSummary"}}
@@ -75,14 +73,13 @@ Number of subjects with observations and number of observations"}}
 \item{footnote}{is the text for footnote, default is "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Total
 observation period calculated as sum of individual observation period per row.
 \\newline\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per
-group divided by total observation period per group."}
+group divided by total observation period per group."#' @param label is the label for the table used for cross-reference.}
 
 \item{asList}{if \strong{TRUE} the data summary is returned as a list where
 different elements in the list contain summary of different stratification
 levels. If \strong{FALSE} the data summary is returned as a latex table. If
 no stratification variable is provided, this function always returns a list
-of two items (Number of subjects, Number of observarions and Average number
-of observarions per subject)}
+of two items (Number of event, Observation period, Event rate)}
 
 \item{...}{is the additional optional arguments compatible with
 \link[Hmisc:latex]{Hmisc::latex}}

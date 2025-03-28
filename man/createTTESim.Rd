@@ -142,11 +142,11 @@ If \code{TRUE}, tries to get the corresponding theta comments (text following
 first ";") from the \code{modFile} and add to the new updated simulation
 parameters. Default \code{TRUE}.}
 
+\item{includeTABLE}{Logical, indicating whether \verb{$TABLE} should be included
+or not. Default \code{FALSE}.}
+
 \item{replaceSUB}{Logical, indicating whether to replace \verb{$SUBROUTINE} to
 make sure it is using \code{ADVAN6}. Default \code{TRUE}.}
-
-\item{includeTable}{Logical, indicating whether \verb{$TABLE} should be included
-or not. Default \code{FALSE}.}
 }
 \value{
 If \code{outFile} is specified, the function writes the NONMEM control
@@ -172,8 +172,11 @@ model file may need some further manual editing, eg, in the $ERROR section
 }
 \examples{
 # Example usage: RTTE with time-varying DOSEN covariate in output, not updating initial estimates
-createTTESim(modFile = "rtte_mod.mod", rtte = TRUE, timeVaryingCovs = "DOSEN", updateInits = FALSE)
+# File path to a ".mod" object (embedded in the package as an example)
+mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
+createTTESim(modFile = mypath, rtte = TRUE, timeVaryingCovs = "DOSEN", updateInits = FALSE)
 
 # Example usage: TTE with no covariates in output
-createTTESim(modFile = "tte_weibull.mod")
+mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
+createTTESim(modFile = mypath)
 }

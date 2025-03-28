@@ -9,7 +9,7 @@ $PK
 IF (NEWIND.EQ.0) THEN      ; Only for the first record
   COM(5) = (IREP-1)*NINDR+1 ; Reset simulation ID counter
 "  ! Initialize sim output file
-"  OPEN (99, FILE = 'vpctab/Users/niclasj/PMX/Projects/Pharmetheus/PMXtte/PMXtte/inst/extdata/tte_weibull', POSITION='APPEND')
+"  OPEN (99, FILE = 'vpctabC:/PMX/Projects/Pharmetheus/PMXtte/inst/extdata/tte_weibull', POSITION='APPEND')
 "  IF (IREP.EQ.1) THEN !Write header for 1st subproblem
 "    WRITE (99,'(A,7(1XA))') 'ID','DV','TIME','RTTE','SUR','ICOUNT','ITER','RAND'
 "  ENDIF
