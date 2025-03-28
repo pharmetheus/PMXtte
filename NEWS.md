@@ -1,3 +1,7 @@
+# PMXtte 0.13.2
+
+* Editorial changes to the documentaiton
+
 # PMXtte 0.13.1.9000 Development version
 
 * `summaryFollowUpTime()` arguments that inherited their documentation from `makeSummaryTable()` despite having different default values are now properly documented.
