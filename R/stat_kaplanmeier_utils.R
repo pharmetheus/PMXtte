@@ -52,32 +52,41 @@ kpm_ci <- function(x, width = .95){
 
 
 
-kpm_stepfun <- function(time, dv){
+kpm_stepfun <- function(time, dv, cuminc = FALSE){
   dv   <- dv[order(time)]
   time <- time[order(time)]
   surv <- kpm(dv)
+  yval <- c(1, surv) # before the first time of event, the survival = 1
+  if(cuminc){
+    yval <- 1 - yval # reverse the survival to obtain cumulative incidence
+  }
 
   stats::stepfun(
     x = time,
-    y = c(1, surv),
+    y = yval,
     f = 0 #carrying forward
   )
 }
 
-kpm_ci_stepfun <- function(time, dv, width = .95){
+kpm_ci_stepfun <- function(time, dv, cuminc = FALSE, width = .95){
   dv   <- dv[order(time)]
   time <- time[order(time)]
   survs <- kpm_ci(dv, width = width)
+  yvals <- rbind(c(1,1), survs) # before the first time of event, the survival = 1
+
+  if(cuminc){
+    yvals <- 1 - yvals # reverse the survival to obtain cumulative incidence
+  }
 
   upfun <- stats::stepfun(
     x = time,
-    y = c(1, survs[,1]),
+    y = yvals[,1],
     f = 0 #carrying forward
   )
 
   lofun <- stats::stepfun(
     x = time,
-    y = c(1, survs[,2]),
+    y = yvals[,1],
     f = 0 #carrying forward
   )
 
@@ -103,14 +112,12 @@ medsurvtime <- function(time, surv){
   surv <- surv[order(time)]
   time <- time[order(time)]
   ans <- time[surv<=.5][1]
-  ans
 }
 
 pretty_pval <- function(x, digits = 3, cutoff = 0.001){
-  ans <- round(x, digits)
   ifelse(
-    ans < cutoff,
-    paste0("p<", cutoff),
-    paste0("p=", ans)
+    x < cutoff,
+    paste0("p<", format(cutoff, scientific = FALSE, trim = TRUE)),
+    paste0("p=", format(round(x, digits = digits), scientific = FALSE, trim = TRUE, drop0trailing=TRUE))
   )
 }

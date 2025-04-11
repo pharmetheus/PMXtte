@@ -32,3 +32,34 @@ testthat::test_that("kpm works", {
   expect_equal(CI[,2][timesubset], sufit$upper)
 
 })
+
+testthat::test_that("pretty_pval works", {
+
+  p <-  c(10, 1, 0.3, 0.123456789, 0.0000001)
+
+  expect_equal(
+    pretty_pval(p),
+    c("p=10", "p=1", "p=0.3", "p=0.123", "p<0.001")
+  )
+  # same as default
+  expect_equal(
+    pretty_pval(p, digits = 3, cutoff = 0.001),
+    c("p=10", "p=1", "p=0.3", "p=0.123", "p<0.001")
+  )
+  # more digits
+  expect_equal(
+    pretty_pval(p, digits = 4),
+    c("p=10", "p=1", "p=0.3", "p=0.1235", "p<0.001")
+  )
+
+  # less digits
+  expect_equal(
+    pretty_pval(p, digits = 2),
+    c("p=10", "p=1", "p=0.3", "p=0.12", "p<0.001")
+  )
+  # deeper cutoff
+  expect_equal(
+    pretty_pval(p, cutoff = 0.0001),
+    c("p=10", "p=1", "p=0.3", "p=0.123", "p<0.0001")
+  )
+})
