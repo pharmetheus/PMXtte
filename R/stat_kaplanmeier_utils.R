@@ -24,12 +24,6 @@ kpm_se <- function(x){
 }
 
 
-width2z <- function(width = .95){
-  if(length(width)!=1 || width >= 1 || width <=0) stop("invalid width. should be within ]0;1[")
-  z <- qnorm(1-(1-width)/2)
-  z
-}
-
 kpm_ci <- function(x, width = .95){
   # In the literature, the Greenwood estimator is often reported as
   # VAR = SURV^2 * SUM (di / (ni * (ni-di)))
@@ -121,3 +115,23 @@ pretty_pval <- function(x, digits = 3, cutoff = 0.001){
     paste0("p=", format(round(x, digits = digits), scientific = FALSE, trim = TRUE, drop0trailing=TRUE))
   )
 }
+
+
+width2z <- function(width = .95){
+  if(length(width)!=1 || width >= 1 || width <=0) stop("invalid width. should be within ]0;1[")
+  z <- qnorm(1-(1-width)/2)
+  z
+}
+# width2z(.95)
+# width2z(.90)
+
+
+width2bounds <- function(width){
+  if(length(width)!=1 || width >= 1 || width <=0) stop("invalid width. should be within ]0;1[")
+  c(
+    (1-width)/2,
+    1-(1-width)/2
+  )
+}
+# width2bounds(.95)
+# width2bounds(.90)

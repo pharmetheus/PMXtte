@@ -61,6 +61,9 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
+
+\item{xpos, ypos}{numeric values, the coordinates of the text. By default (NULL),
+coordinates that corresponds toon the bottom left corner will be computed.}
 }
 \description{
 P-value of the likelihood ratio test between several Kaplan-Meier functions
@@ -69,7 +72,7 @@ P-value of the likelihood ratio test between several Kaplan-Meier functions
 library(ggplot2)
 dat <- PMXtte::simplettedata
 
-# Requires a `strata` argument
+# Requires a `strata` aesthetic argument
 ggplot(dat) +
   stat_kaplanmeier_pval(aes(x = TIME, y = DV, strata = SEXF))
 
@@ -81,11 +84,19 @@ ggplot(dat, aes(x = TIME, y = DV)) +
   stat_kaplanmeier(aes(group = AUCQF)) +
   stat_kaplanmeier_pval(aes(strata = AUCQF))
 
-# Supported variables defined in `aes()` and facetting
+# Supported facetting
 # P-value calculated for each panel
 ggplot(dat, aes(x = TIME, y = DV)) +
   stat_kaplanmeier(aes(group = AUCQF)) +
-  stat_kaplanmeier_pval(aes(strata = AUCQF, colour = SEXF)) +
+  stat_kaplanmeier_pval(aes(strata = AUCQF)) +
+  facet_grid(~SEXF)
+
+# May not support coloring or any variable-related aesthetic mapping
+# Despite that, the guide (legend) will carry some text attributes
+# P-value calculated for each panel
+ggplot(dat, aes(x = TIME, y = DV)) +
+  stat_kaplanmeier(aes(group = AUCQF, col = SEXF)) +
+  stat_kaplanmeier_pval(aes(strata = AUCQF, col = SEXF)) + # not colored
   facet_grid(~SEXF)
 
 # No argument needed if the cumulative incidence is plotted.
