@@ -205,6 +205,7 @@ medsurvtime <- function(time, surv){
   surv <- surv[order(time)]
   time <- time[order(time)]
   ans <- time[surv<=.5][1]
+  ans
 }
 
 

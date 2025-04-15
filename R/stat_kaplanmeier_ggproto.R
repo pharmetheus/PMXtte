@@ -292,8 +292,8 @@ StatKaplanMeierSE <- ggplot2::ggproto(
     times <- c(0, data$x)
     dat <- data.frame(
       x = times,
-      ymin = sf(times)[,2],
-      ymax = sf(times)[,1]
+      ymin = sf(times)[,1],
+      ymax = sf(times)[,2]
     )
     # explicitely define two records per time point
     dat <- explicit_step(
@@ -534,8 +534,8 @@ StatKaplanMeierSim <- ggplot2::ggproto(
       dplyr::ungroup(iter) %>%
       dplyr::group_by(OUTTIME, .add = TRUE) %>%
       dplyr::summarise(
-        lci = stats::quantile(SURV, width2bounds(level)[1]),
-        uci = stats::quantile(SURV, width2bounds(level)[2]),
+        lci = stats::quantile(SURV, width2bounds(level)[1], names = FALSE),
+        uci = stats::quantile(SURV, width2bounds(level)[2], names = FALSE),
         .groups = "drop"
       )
 

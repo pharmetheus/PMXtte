@@ -106,6 +106,12 @@ testthat::test_that("medsurvtime works", {
 
   #lengths are checked
   expect_error(medsurvtime(time = c(0,1, 2), surv = c(0.25,.05)), "time and surv must be of the same length")
+
+  #Results are in-line with survfit
+  expect_equal(
+    medsurvtime(time = da$time, surv = kpm(da$x)),
+    unname(sufit$table["median"])
+  )
 })
 
 
