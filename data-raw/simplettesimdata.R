@@ -1,4 +1,4 @@
-## code to prepare `simplesimttedata` dataset goes here
+## code to prepare `simplettesimdata` dataset goes here
 set.seed(123)
 simplettesimdata <- tidyr::expand_grid(
   ITER = 1:100,
