@@ -1,46 +1,46 @@
 #' Visualize Survival Data
 #'
-#' @param data
-#' @param sdata
-#' @param time_var
-#' @param dv_var
-#' @param iter_var
-#' @param col_var
-#' @param facet_var
-#' @param show_kpm
-#' @param show_censor
-#' @param show_risktable
-#' @param show_se
-#' @param show_pval
-#' @param show_median
-#' @param show_sim
-#' @param ci_level
-#' @param cuminc
-#' @param ci_alpha
-#' @param censor_shape
-#' @param censor_size
-#' @param median_linetype
-#' @param scale_x_break_by
-#' @param scale_y_labels
-#' @param label_x
-#' @param label_y_fig
-#' @param label_col
-#' @param label_y_risktab
-#' @param legend_label_kpm
-#' @param legend_label_censor
-#' @param legend_label_se
-#' @param legend_label_median
-#' @param legend_label_sim
-#' @param scale_color_labels
-#' @param scale_color_values
-#' @param facetting_args
-#' @param xlim
-#' @param ylim
-#' @param title_risktable
-#' @param arrange
-#' @param rel_heights
+#' @param data a data.frame, observed data, assuming one time-to-event record per individual.
+#' @param sdata a data.frame, simulated data, assuming one time-to-event record per individual and iteration.
+#' @param time_var a character, the name of the time column in `data` and `sdata`. The variable should be numeric, ideally > 0.
+#' @param dv_var a character, the name of the dependent variable column in `data` and `sdata`. The variable should be numeric, either 0 or 1.
+#' @param iter_var a character, the name of the iteration column in `sdata`. The variable should be numeric, ideally a sequence of integers.
+#' @param col_var a character, the name of the column in `data` and `sdata` used to stratify by color. The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.
+#' @param facet_var a character, the name of the column in `data` and `sdata` used to facet the plot (Kaplan-Meier figure and risk tables) . The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.
+#' @param show_kpm a logical, should the Kaplan-Meier curve (and associated legend) appear on the plot? Default is `TRUE` if `data` is provided.
+#' @param show_censor a logical, should the censored events (and associated legend) appear on the plot? Default is `TRUE` if `data` is provided.
+#' @param show_risktable a logical, should the table with number of patient at risk appear on the plot? Default is `TRUE` if `data` is provided.
+#' @param show_se a logical, should a parametric confidence interval (and associated legend) around the Kaplan-Meier curve (computed from observed data) appear on the plot? Default is `TRUE` if `data` alone is provided, `FALSE` if `sdata` is also provided.
+#' @param show_pval a logical, should the p-value of a log-rank test appear on the plot? Default is `TRUE` if `data` alone is provided, and there are several Kaplan-Meier curves in each panel of the plot.
+#' @param show_median a logical, should the median survival (and associated legend) appear on the plot? Default is `TRUE` if `data` alone is provided, `FALSE` if `sdata` is also provided.
+#' @param show_sim a logical, should a confidence interval (and associated legend) computed from simulated data (`sdata`) appear on the plot? Default is `TRUE` if `sdata` is provided.
+#' @param ci_level a numeric, between 0 and 1, indicating the level of the confidence interval. Default is `.95` (95%) if the confidence interval is calculated from observed data (`data`), `.90` (90%) if calculated from simulations (`sdata`).
+#' @param cuminc a logical, should the plot represent the cumulative incidence? If `FALSE`, the default, the survival is represented.
+#' @param ci_alpha a numeric, between 0 and 1, indicating the opacity of the confidence interval.
+#' @param censor_shape shape of the censoring event.
+#' @param censor_size a numeric, the size of the censoring event.
+#' @param median_linetype type of the median survival line.
+#' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
+#' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
+#' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
+#' @param label_y_fig a character, the name of the y-axis (i.e. survival) of the Kaplan-Meier figure.
+#' @param label_col a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (`expression()`) if special character or super/subscripts should be shown.
+#' @param label_y_risktab a character, the name of the y-axis of the risk table. Default is the same as the name of the legend for colors `label_col`.
+#' @param legend_label_kpm a character, the label of the legend that describes the line type of the Kaplan-Meier curve.
+#' @param legend_label_censor a character, the label of the legend that describes the shape of the censoring events.
+#' @param legend_label_se a character, the label of the legend that describes the ribbon of parametric confidence interval. Default is computed as function of `ci_level`.
+#' @param legend_label_median a character, the label of the legend that describes the line type of the median survival.
+#' @param legend_label_sim a character, the label of the legend that describes the ribbon of simulation-based confidence interval. Default is computed as function of `ci_level`.
+#' @param scale_color_labels passed to `ggplot2::scale_color_manual(labels = )` for the Kaplan-Meier figure, and `ggplot2::scale_y_discrete(labels = )` for the risk table. The default is `waiver()` (calls the default setup of ggplot2), but can accept `scales::label_parsed` if the coloring variable is an expression (`expression()`) and special character or super/subscripts should be shown.
+#' @param scale_color_values passed to `ggplot2::scale_color_manual(values = )` for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome.
+#' @param facetting_args a list, arguments that will overwrite the default arguments of `facet_wrap()`. Note that it will not overwrite `vars`, the latter being informed by `facet_var`. Use `list(labeller = ggplot2::label_parsed)` if the facetting variable is an expression (`expression()`) and special character or super/subscripts should be shown.
+#' @param xlim a vector of 2 numeric values, limits of the x-axes. Default will use the default ggplot setup.
+#' @param ylim a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1.
+#' @param title_risktable a character, the title above the risk table.
+#' @param arrange a logical, should the elements of the plot be arranged in a single plot with `cowplot::grid.arrange()` (default is `TRUE`). If `FALSE`, a list with separated elements will be returned (useful for advanced customization.)
+#' @param rel_heights a list specifying the relative heights (1) between the legends (default is 1 and 1, same height), (2) between the Kaplan-Meier figure and the risk table (default is 2 and 1, i.e. figure twice higher than table) and (3) overall (default is 1 and 8, combined legends takes 1/9 of heights, combined figure and tables takes 8/9 of heights)
 #'
-#' @return
+#' @return by default, a single "ggplot" object arranged with `cowplot::plot.grid()`. If `arrange = FALSE`, a list of ggplot objects.
 #' @export
 #'
 #' @examples
@@ -48,7 +48,7 @@
 #' dat <- PMXtte::simplettedata
 #' simdat <- PMXtte::simplettesimdata
 #'
-#' ggKAP(dat)
+#' a <- ggKAP(dat)
 #' ggKAP(dat, show_kpm = FALSE)
 #' ggKAP(dat, show_censor = FALSE)
 #' ggKAP(dat, show_se = FALSE)
@@ -125,7 +125,7 @@ ggKAP <- function(data,
                   arrange = TRUE,
                   rel_heights = list(
                     legends = c(1,1),
-                    figtable = c(8,4),
+                    figtable = c(2,1),
                     overall = c(1,8)
                   )
 ){
@@ -374,10 +374,6 @@ ggKAP <- function(data,
       ncol = 1,
       rel_heights = rel_heights[["overall"]]
     )
-  } else {
-    if(length(ans)==1){ #simplify
-      ans <- ans[[1]]
-    }
   }
 
   ans
