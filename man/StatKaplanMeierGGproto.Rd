@@ -14,9 +14,9 @@
 \format{
 An object of class \code{StatKaplanMeier} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{StatKaplanMeierCensor} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatKaplanMeierCensor} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{StatKaplanMeierMedian} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatKaplanMeierMedian} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{StatKaplanMeierSE} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
@@ -24,7 +24,7 @@ An object of class \code{StatKaplanMeierPval} (inherits from \code{Stat}, \code{
 
 An object of class \code{StatKaplanMeierSim} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{StatKaplanMeierRiskTable} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+An object of class \code{StatKaplanMeierRiskTable} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 }
 \usage{
 StatKaplanMeier

@@ -12,8 +12,7 @@ stat_kaplanmeier_median(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
-  ...,
-  linetype = 2
+  ...
 )
 }
 \arguments{

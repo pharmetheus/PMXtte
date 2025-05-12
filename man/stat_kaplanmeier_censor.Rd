@@ -13,7 +13,6 @@ stat_kaplanmeier_censor(
   show.legend = NA,
   inherit.aes = TRUE,
   ...,
-  shape = "|",
   cuminc = FALSE
 )
 }

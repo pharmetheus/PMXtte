@@ -62,7 +62,7 @@ often aesthetics, used to set an aesthetic to a fixed value, like
 to the paired geom/stat.}
 
 \item{times}{time values when the number at risk is computed. The default (NULL)
-will render 5 times between 0 and the maximum value of \code{x} in data.}
+uses an internal algorithm that should match the breaks and limits of the x-axis.}
 }
 \description{
 Number of subjects at risk
@@ -84,6 +84,11 @@ ggplot(dat) +
   stat_kaplanmeier_risktable(
   aes(x = TIME, y = 1),
   times = seq(0, 100, 10))
+
+# `times` should match the breaks of the x-axis
+ggplot(dat) +
+  stat_kaplanmeier_risktable(aes(x = TIME, y = 1)) +
+  scale_x_continuous(breaks = c(0, 15, 50, 99))
 
 # Default geom is "text", any compatible option can be used
 ggplot(dat, aes(x = TIME, y = 1)) +

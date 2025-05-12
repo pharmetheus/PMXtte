@@ -123,11 +123,11 @@ StatKaplanMeier <- ggplot2::ggproto(
 #'   stat_kaplanmeier_censor(geom = "line", color = "red")
 stat_kaplanmeier_censor <- function(mapping = NULL, data = NULL, geom = "point",
                                     position = "identity", na.rm = FALSE, show.legend = NA,
-                                    inherit.aes = TRUE, ..., shape = "|", cuminc = FALSE) {
+                                    inherit.aes = TRUE, ..., cuminc = FALSE) {
   layer(
     stat = StatKaplanMeierCensor, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ..., shape = shape, cuminc = cuminc)
+    params = list(na.rm = na.rm, ..., cuminc = cuminc)
   )
 }
 
@@ -135,6 +135,7 @@ stat_kaplanmeier_censor <- function(mapping = NULL, data = NULL, geom = "point",
 #' @export
 StatKaplanMeierCensor <- ggplot2::ggproto(
   "StatKaplanMeierCensor", Stat,
+  default_aes = aes(shape = "|"),
   compute_group = function(data, scales, cuminc) {
     sf <- kpm_stepfun(time = data$x, dv = data$y, cuminc = cuminc)
     times <- data$x[data$y==0]
@@ -194,11 +195,11 @@ StatKaplanMeierCensor <- ggplot2::ggproto(
 #'   stat_kaplanmeier_median(geom = "point", color = "red")
 stat_kaplanmeier_median <- function(mapping = NULL, data = NULL, geom = "line",
                                     position = "identity", na.rm = FALSE, show.legend = NA,
-                                    inherit.aes = TRUE, ..., linetype = 2){
+                                    inherit.aes = TRUE, ...){
   layer(
     stat = StatKaplanMeierMedian, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ..., linetype = linetype)
+    params = list(na.rm = na.rm, ...)
   )
 }
 
@@ -206,6 +207,7 @@ stat_kaplanmeier_median <- function(mapping = NULL, data = NULL, geom = "line",
 #' @export
 StatKaplanMeierMedian <- ggplot2::ggproto(
   "StatKaplanMeierMedian", Stat,
+  default_aes = aes(linetype = 2),
   compute_group = function(data, scales) {
     sf <- kpm_stepfun(time = data$x, dv = data$y)
     medtime <- medsurvtime(
@@ -570,7 +572,7 @@ StatKaplanMeierSim <- ggplot2::ggproto(
 #' @inheritParams ggplot2::layer
 #' @inheritParams ggplot2::geom_text
 #' @param times time values when the number at risk is computed. The default (NULL)
-#' will render 5 times between 0 and the maximum value of `x` in data.
+#' uses an internal algorithm that should match the breaks and limits of the x-axis.
 #'
 #' @export
 #' @examples
@@ -590,6 +592,11 @@ StatKaplanMeierSim <- ggplot2::ggproto(
 #'   stat_kaplanmeier_risktable(
 #'   aes(x = TIME, y = 1),
 #'   times = seq(0, 100, 10))
+#'
+#' # `times` should match the breaks of the x-axis
+#' ggplot(dat) +
+#'   stat_kaplanmeier_risktable(aes(x = TIME, y = 1)) +
+#'   scale_x_continuous(breaks = c(0, 15, 50, 99))
 #'
 #' # Default geom is "text", any compatible option can be used
 #' ggplot(dat, aes(x = TIME, y = 1)) +
@@ -612,14 +619,33 @@ stat_kaplanmeier_risktable <- function(mapping = NULL, data = NULL, geom = "text
 #' @export
 StatKaplanMeierRiskTable <- ggplot2::ggproto(
   "StatKaplanMeierRiskTable", Stat,
-  setup_params = function(data, params){
-    if(is.null(params$times)){
-      params$times <- seq(0, max(data$x), length.out = 5)
+  compute_group = function(data, scales, times = NULL) {
+    if(is.null(times)){
+      breaks <- scales$x$get_breaks()
+      if(any(is.na(breaks))){
+        if(is.null(scales$x$limits)||any(is.na(scales$x$limits)))
+          extended_limits <- labeling::extended(
+            dmin = scales$x$range$range[1],
+            dmax = scales$x$range$range[2],
+            m = 2)
+        if(is.na(breaks[1])){
+          if(is.null(scales$x$limits)||is.na(scales$x$limits[1])){
+            breaks[1] <- extended_limits[1]
+          } else {
+            breaks[1] <- scales$x$limits[1]
+          }
+        }
+        if(is.na(breaks[length(breaks)])){
+          if(is.null(scales$x$limits)||is.na(scales$x$limits[2])){
+            breaks[length(breaks)] <- extended_limits[2]
+          } else {
+            breaks[length(breaks)] <- scales$x$limits[2]
+          }
+        }
+      }
+      times <- breaks
     }
-    return(params)
-  },
 
-  compute_group = function(data, scales, times) {
     data %>%
       dplyr::group_by(y) %>%
       dplyr::summarise(
@@ -635,6 +661,7 @@ StatKaplanMeierRiskTable <- ggplot2::ggproto(
       tidyr::unnest(c(TABTIME, ATRISK)) %>%
       dplyr::select(
         x = TABTIME,
+        y = y,
         label = ATRISK
       )
   },

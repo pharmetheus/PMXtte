@@ -172,18 +172,72 @@ test_that("StatKaplanMeierRiskTable works", {
   ggda2$y <- 1
   ans <- StatKaplanMeierRiskTable$compute_group(data = ggda2, times = c(0, 200, 400))
   expect_s3_class(ans, "data.frame")
-  expect_named(ans, c("x", "label"))
+  expect_named(ans, c("x", "y", "label"))
   expect_equal(nrow(ans), 3)
   expect_equal(ans$x, c(0, 200, 400))
   expect_equal(ans$label, c(17, 8, 0))
 
-  ans <- StatKaplanMeierRiskTable$setup_params(data = ggda, param = list())
-  expect_true(is.list(ans))
-  expect_named(ans, "times")
-  expect_equal(ans$times,  c(0, 96, 192, 288, 384))
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))
+    )$data[[1]]$x,
+    c(0, 100, 200, 300, 400)
+  )
 
-  ans <- StatKaplanMeierRiskTable$setup_params(data = ggda, param = list(times = c(0, 200, 400)))
-  expect_equal(ans$times,  c(0, 200, 400))
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(limits = c(50, 250))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(50, 100, 150, 200, 250)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(limits = c(NA, 250))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(0, 50, 100, 150, 200, 250)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(limits = c(NA_real_, NA_real_))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(0, 100, 200, 300, 400)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(breaks = c(10, 20, 30))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(10, 20, 30)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(breaks = c(0, 400, 800), limits = c(0,900))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(0, 400, 800)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda2) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))+
+        scale_x_continuous(breaks = c(-10, 0), limits = c(-100, 20))
+    )$data[[1]]$x %>% suppressWarnings(),
+    c(-10, 0)
+  )
 
 })
 
