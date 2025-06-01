@@ -5,7 +5,7 @@
 #' @param time_var a character, the name of the time column in `data` and `sdata`. The variable should be numeric, ideally > 0.
 #' @param dv_var a character, the name of the dependent variable column in `data` and `sdata`. The variable should be numeric, either 0 or 1.
 #' @param iter_var a character, the name of the iteration column in `sdata`. The variable should be numeric, ideally a sequence of integers.
-#' @param col_var a character, the name of the column in `data` and `sdata` used to stratify by color. The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.
+#' @param color_var a character, the name of the column in `data` and `sdata` used to stratify by color. The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.
 #' @param facet_var a character, the name of the column in `data` and `sdata` used to facet the plot (Kaplan-Meier figure and risk tables) . The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.
 #' @param show_kpm a logical, should the Kaplan-Meier curve (and associated legend) appear on the plot? Default is `TRUE` if `data` is provided.
 #' @param show_censor a logical, should the censored events (and associated legend) appear on the plot? Default is `TRUE` if `data` is provided.
@@ -19,7 +19,7 @@
 #' @param ci_alpha a numeric, between 0 and 1, indicating the opacity of the confidence interval.
 #' @param censor_shape shape of the censoring event.
 #' @param censor_size a numeric, the size of the censoring event.
-#' @param median_linetype type of the median survival line.
+#' @param median_linetype a numeric, linetype of the median survival line.
 #' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
@@ -39,6 +39,7 @@
 #' @param title_risktable a character, the title above the risk table.
 #' @param arrange a logical, should the elements of the plot be arranged in a single plot with `cowplot::grid.arrange()` (default is `TRUE`). If `FALSE`, a list with separated elements will be returned (useful for advanced customization.)
 #' @param rel_heights a list specifying the relative heights (1) between the legends (default is 1 and 1, same height), (2) between the Kaplan-Meier figure and the risk table (default is 2 and 1, i.e. figure twice higher than table) and (3) overall (default is 1 and 8, combined legends takes 1/9 of heights, combined figure and tables takes 8/9 of heights)
+#' @param check_input a logical, should the data format be checked?
 #'
 #' @return by default, a single "ggplot" object arranged with `cowplot::plot.grid()`. If `arrange = FALSE`, a list of ggplot objects.
 #' @export
@@ -48,7 +49,10 @@
 #' dat <- PMXtte::simplettedata
 #' simdat <- PMXtte::simplettesimdata
 #'
-#' a <- ggKAP(dat)
+#' ggKAP(dat) # Graphical exploration
+#' ggKAP(dat, simdat) # VPC
+#' ggKAP(sdata = simdat) # Simulation only
+#'
 #' ggKAP(dat, show_kpm = FALSE)
 #' ggKAP(dat, show_censor = FALSE)
 #' ggKAP(dat, show_se = FALSE)
@@ -56,20 +60,30 @@
 #' ggKAP(dat, show_median = FALSE)
 #' try(ggKAP(dat, show_sim = TRUE), TRUE)
 #'
+#' ggKAP(dat, cuminc = TRUE)
 #'
-#' ggKAP(dat, col_var = "SEXF")
-#' ggKAP(dat, col_var = "SEXF", show_pval = FALSE)
-#' ggKAP(dat, col_var = "SEXF", scale_color_values = c("red", "yellow"))
-#' ggKAP(dat, col_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
-#' ggKAP(dat, col_var = "SEXF", ci_alpha = .3)
-#' ggKAP(dat, col_var = "SEXF", ci_alpha = .7)
+#' ggKAP(dat, color_var = "SEXF")
+#' ggKAP(dat, color_var = "SEXF", label_col = "Sex")
+#' ggKAP(dat, color_var = "SEXF", show_pval = FALSE)
+#' ggKAP(dat, color_var = "SEXF", scale_color_values = c("red", "yellow"))
+#' ggKAP(dat, color_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
+#' ggKAP(dat, color_var = "SEXF", ci_alpha = .3)
+#' ggKAP(dat, color_var = "SEXF", ci_alpha = .7)
+#'
+#' ggKAP(dat, color_var = "SEXF", ci_level = .5)
+#' ggKAP(
+#'   dat, ci_alpha = .2, censor_shape = 19,
+#'   censor_size = 6, median_linetype = 3
+#' )
+#'
+#' ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
 #'
 #' ggKAP(dat, rel_heights = list(
 #'   legends = c(1,1),
 #'   figtable = c(8,2),
 #'   overall = c(1,8)
 #' ))
-#' ggKAP(dat, col_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
+#' ggKAP(dat, color_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
 #'   legends = c(1,1),
 #'   figtable = c(8,4),
 #'   overall = c(2,8)
@@ -78,10 +92,10 @@
 #' ggKAP(dat, simdat, facet_var = "SEXF")
 #' ggKAP(sdata = simdat, facet_var = "SEXF")
 #'
-#' ggKAP(dat, col_var = "AUCQF")
-#' ggKAP(dat, col_var = "AUCQF", label_col = expression(AUC['0-24h']))
+#' ggKAP(dat, color_var = "AUCQF")
+#' ggKAP(dat, color_var = "AUCQF", label_col = expression(AUC['0-24h']))
 #' dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
-#' ggKAP(dat, col_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
+#' ggKAP(dat, color_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
 #'
 #' ggKAP(dat, facet_var = "AUCQF2")
 #' ggKAP(dat, facet_var = "AUCQF2", facetting_args = list(labeller = ggplot2::label_parsed, nrow = 2))
@@ -90,13 +104,13 @@ ggKAP <- function(data,
                   time_var = "TIME",
                   dv_var = "DV",
                   iter_var = "ITER",
-                  col_var = NULL,
+                  color_var = NULL,
                   facet_var = NULL,
                   show_kpm = !missing(data),
                   show_censor = !missing(data),
                   show_risktable = !missing(data),
                   show_se = !missing(data)&&missing(sdata),
-                  show_pval = !missing(data)&&missing(sdata)&&!is.null(col_var)&&(if(!is.null(facet_var)){col_var!=facet_var}else{TRUE}),
+                  show_pval = !missing(data)&&missing(sdata)&&!is.null(color_var)&&(if(!is.null(facet_var)){color_var!=facet_var}else{TRUE}),
                   show_median = !missing(data)&&missing(sdata),
                   show_sim = !missing(sdata),
                   ci_level = if(show_se) .95 else .90,
@@ -109,7 +123,7 @@ ggKAP <- function(data,
                   scale_y_labels = scales::percent,
                   label_x = "Time since first dose (weeks)",
                   label_y_fig = paste0("Subjects with", if(!cuminc){"out"}, " event (%)"),
-                  label_col = col_var,
+                  label_col = color_var,
                   label_y_risktab = label_col,
                   legend_label_kpm = "Observed",
                   legend_label_censor = "Censored",
@@ -127,11 +141,23 @@ ggKAP <- function(data,
                     legends = c(1,1),
                     figtable = c(2,1),
                     overall = c(1,8)
-                  )
+                  ),
+                  check_input = TRUE
 ){
 
   if(show_se && show_sim){
     stop("Both `show_se` and `show_sim` are TRUE. Cannot display both confidence intervals on the same plot.")
+  }
+
+  if(check_input){
+    check_ggKAP_input(
+      data = data,
+      sdata = sdata,
+      time_var = time_var,
+      dv_var = dv_var,
+      iter_var = iter_var,
+      color_var = color_var,
+      facet_var = facet_var)
   }
 
   if(!is.null(scale_x_break_by)){
@@ -140,8 +166,8 @@ ggKAP <- function(data,
     scale_x_breaks <- ggplot2::waiver()
   }
 
-  if(!is.null(col_var)){
-    ..col <- expr(.data[[col_var]])
+  if(!is.null(color_var)){
+    ..col <- expr(.data[[color_var]])
   } else {
     ..col <- NULL
   }
@@ -274,7 +300,7 @@ ggKAP <- function(data,
     leg <- leg +
       scale_linetype_manual(
         name = NULL,
-        values = setNames(c(2,1), c(legend_label_median, legend_label_kpm)),
+        values = setNames(c(median_linetype,1), c(legend_label_median, legend_label_kpm)),
         limits = force # so that "observed" or "median" are removed from legend if not in plot
       )
   }
@@ -377,4 +403,61 @@ ggKAP <- function(data,
   }
 
   ans
+}
+
+check_ggKAP_input <- function(
+    data,
+    sdata,
+    time_var = "TIME",
+    dv_var = "DV",
+    iter_var = "ITER",
+    color_var = NULL,
+    facet_var = NULL){
+  if(!missing(data)){
+    # Check if variable names are indeed in the data
+    # NULL wont return an error
+    check_var_exists(data, time_var)
+    check_var_exists(data, dv_var)
+    check_var_exists(data, color_var)
+    check_var_exists(data, facet_var)
+
+    # Check data classes
+    check_valid_class(data, time_var, valid_classes = c("integer", "numeric"))
+    check_valid_class(data, dv_var, valid_classes = c("integer", "numeric"))
+    check_valid_class(data, color_var, valid_classes = c("logical", "character", "factor"))
+  }
+  if(!missing(sdata)){
+    # Check if variable names are indeed in the data
+    check_var_exists(sdata, time_var)
+    check_var_exists(sdata, dv_var)
+    check_var_exists(sdata, iter_var)
+    check_var_exists(sdata, color_var)
+    check_var_exists(sdata, facet_var)
+
+    # Check data classes
+    check_valid_class(sdata, time_var, valid_classes = c("integer", "numeric"))
+    check_valid_class(sdata, dv_var, valid_classes = c("integer", "numeric"))
+    check_valid_class(sdata, iter_var, valid_classes = c("integer", "numeric"))
+    check_valid_class(sdata, color_var, valid_classes = c("logical", "character", "factor"))
+  }
+}
+
+check_var_exists <- function(data, x){
+  if(is.null(x)) {
+    return(TRUE)
+  } else {
+    if(!is.element(el = x, set = colnames(data))){
+      stop("Cannot find \"", x, " in data")
+    }
+  }
+}
+
+check_valid_class <- function(data, x, valid_classes = c("logical", "character", "factor")){
+  if(is.null(x)) {
+    return(TRUE)
+  } else {
+    if(!is.element(el = class(data[[x]]), set = valid_classes)){
+      stop("Possible classes for \"", x, "\" are: ", paste(valid_classes, collapse = ", "))
+    }
+  }
 }

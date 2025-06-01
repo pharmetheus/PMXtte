@@ -10,15 +10,15 @@ ggKAP(
   time_var = "TIME",
   dv_var = "DV",
   iter_var = "ITER",
-  col_var = NULL,
+  color_var = NULL,
   facet_var = NULL,
   show_kpm = !missing(data),
   show_censor = !missing(data),
   show_risktable = !missing(data),
   show_se = !missing(data) && missing(sdata),
-  show_pval = !missing(data) && missing(sdata) && !is.null(col_var) && (if
+  show_pval = !missing(data) && missing(sdata) && !is.null(color_var) && (if
     (!is.null(facet_var)) {
-     col_var != facet_var
+     color_var != facet_var
  } else {
      TRUE
  }),
@@ -36,7 +36,7 @@ ggKAP(
   label_y_fig = paste0("Subjects with", if (!cuminc) {
      "out"
  }, " event (\%)"),
-  label_col = col_var,
+  label_col = color_var,
   label_y_risktab = label_col,
   legend_label_kpm = "Observed",
   legend_label_censor = "Censored",
@@ -50,7 +50,8 @@ ggKAP(
   ylim = c(0, 1),
   title_risktable = "Number of subjects at risk",
   arrange = TRUE,
-  rel_heights = list(legends = c(1, 1), figtable = c(2, 1), overall = c(1, 8))
+  rel_heights = list(legends = c(1, 1), figtable = c(2, 1), overall = c(1, 8)),
+  check_input = TRUE
 )
 }
 \arguments{
@@ -64,7 +65,7 @@ ggKAP(
 
 \item{iter_var}{a character, the name of the iteration column in \code{sdata}. The variable should be numeric, ideally a sequence of integers.}
 
-\item{col_var}{a character, the name of the column in \code{data} and \code{sdata} used to stratify by color. The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.}
+\item{color_var}{a character, the name of the column in \code{data} and \code{sdata} used to stratify by color. The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.}
 
 \item{facet_var}{a character, the name of the column in \code{data} and \code{sdata} used to facet the plot (Kaplan-Meier figure and risk tables) . The variable should preferably be a factor, possibly a character or a logical, but not a double or integer.}
 
@@ -92,7 +93,7 @@ ggKAP(
 
 \item{censor_size}{a numeric, the size of the censoring event.}
 
-\item{median_linetype}{type of the median survival line.}
+\item{median_linetype}{a numeric, linetype of the median survival line.}
 
 \item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2).}
 
@@ -131,6 +132,8 @@ ggKAP(
 \item{arrange}{a logical, should the elements of the plot be arranged in a single plot with \code{cowplot::grid.arrange()} (default is \code{TRUE}). If \code{FALSE}, a list with separated elements will be returned (useful for advanced customization.)}
 
 \item{rel_heights}{a list specifying the relative heights (1) between the legends (default is 1 and 1, same height), (2) between the Kaplan-Meier figure and the risk table (default is 2 and 1, i.e. figure twice higher than table) and (3) overall (default is 1 and 8, combined legends takes 1/9 of heights, combined figure and tables takes 8/9 of heights)}
+
+\item{check_input}{a logical, should the data format be checked?}
 }
 \value{
 by default, a single "ggplot" object arranged with \code{cowplot::plot.grid()}. If \code{arrange = FALSE}, a list of ggplot objects.
@@ -143,7 +146,10 @@ Visualize Survival Data
 dat <- PMXtte::simplettedata
 simdat <- PMXtte::simplettesimdata
 
-a <- ggKAP(dat)
+ggKAP(dat) # Graphical exploration
+ggKAP(dat, simdat) # VPC
+ggKAP(sdata = simdat) # Simulation only
+
 ggKAP(dat, show_kpm = FALSE)
 ggKAP(dat, show_censor = FALSE)
 ggKAP(dat, show_se = FALSE)
@@ -151,20 +157,30 @@ ggKAP(dat, show_risktable = FALSE)
 ggKAP(dat, show_median = FALSE)
 try(ggKAP(dat, show_sim = TRUE), TRUE)
 
+ggKAP(dat, cuminc = TRUE)
 
-ggKAP(dat, col_var = "SEXF")
-ggKAP(dat, col_var = "SEXF", show_pval = FALSE)
-ggKAP(dat, col_var = "SEXF", scale_color_values = c("red", "yellow"))
-ggKAP(dat, col_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
-ggKAP(dat, col_var = "SEXF", ci_alpha = .3)
-ggKAP(dat, col_var = "SEXF", ci_alpha = .7)
+ggKAP(dat, color_var = "SEXF")
+ggKAP(dat, color_var = "SEXF", label_col = "Sex")
+ggKAP(dat, color_var = "SEXF", show_pval = FALSE)
+ggKAP(dat, color_var = "SEXF", scale_color_values = c("red", "yellow"))
+ggKAP(dat, color_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
+ggKAP(dat, color_var = "SEXF", ci_alpha = .3)
+ggKAP(dat, color_var = "SEXF", ci_alpha = .7)
+
+ggKAP(dat, color_var = "SEXF", ci_level = .5)
+ggKAP(
+  dat, ci_alpha = .2, censor_shape = 19,
+  censor_size = 6, median_linetype = 3
+)
+
+ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
 
 ggKAP(dat, rel_heights = list(
   legends = c(1,1),
   figtable = c(8,2),
   overall = c(1,8)
 ))
-ggKAP(dat, col_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
+ggKAP(dat, color_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
   legends = c(1,1),
   figtable = c(8,4),
   overall = c(2,8)
@@ -173,10 +189,10 @@ ggKAP(dat, col_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
 ggKAP(dat, simdat, facet_var = "SEXF")
 ggKAP(sdata = simdat, facet_var = "SEXF")
 
-ggKAP(dat, col_var = "AUCQF")
-ggKAP(dat, col_var = "AUCQF", label_col = expression(AUC['0-24h']))
+ggKAP(dat, color_var = "AUCQF")
+ggKAP(dat, color_var = "AUCQF", label_col = expression(AUC['0-24h']))
 dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
-ggKAP(dat, col_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
+ggKAP(dat, color_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
 
 ggKAP(dat, facet_var = "AUCQF2")
 ggKAP(dat, facet_var = "AUCQF2", facetting_args = list(labeller = ggplot2::label_parsed, nrow = 2))
