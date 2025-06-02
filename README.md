@@ -25,3 +25,16 @@ command, e.g.:
 ``` r
 install.packages("path_to_release.tar.gz")
 ```
+
+``` r
+tte1data <- rttedata %>% filter_xth_event(1)
+tte1data$DOSEF <- as.factor(tte1data$DOSEN)
+ggKAP(
+  tte1data,
+  time_var = "TSFDD", 
+  color_var = "DOSEF", 
+  label_color = "Dose"
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />

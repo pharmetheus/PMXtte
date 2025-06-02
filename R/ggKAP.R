@@ -38,8 +38,8 @@
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
 #' @param label_y_fig a character, the name of the y-axis (i.e. survival) of the Kaplan-Meier figure.
-#' @param label_col a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (`expression()`) if special character or super/subscripts should be shown.
-#' @param label_y_risktab a character, the name of the y-axis of the risk table. Default is the same as the name of the legend for colors `label_col`.
+#' @param label_color a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (`expression()`) if special character or super/subscripts should be shown.
+#' @param label_y_risktab a character, the name of the y-axis of the risk table. Default is the same as the name of the legend for colors `label_color`.
 #' @param legend_label_kpm a character, the label of the legend that describes the line type of the Kaplan-Meier curve.
 #' @param legend_label_censor a character, the label of the legend that describes the shape of the censoring events.
 #' @param legend_label_se a character, the label of the legend that describes the ribbon of parametric confidence interval. Default is computed as function of `ci_level`.
@@ -77,7 +77,7 @@
 #' ggKAP(dat, cuminc = TRUE)
 #'
 #' ggKAP(dat, color_var = "SEXF")
-#' ggKAP(dat, color_var = "SEXF", label_col = "Sex")
+#' ggKAP(dat, color_var = "SEXF", label_color = "Sex")
 #' ggKAP(dat, color_var = "SEXF", show_pval = FALSE)
 #' ggKAP(dat, color_var = "SEXF", scale_color_values = c("red", "yellow"))
 #' ggKAP(dat, color_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
@@ -107,9 +107,9 @@
 #' ggKAP(sdata = simdat, facet_var = "SEXF")
 #'
 #' ggKAP(dat, color_var = "AUCQF")
-#' ggKAP(dat, color_var = "AUCQF", label_col = expression(AUC['0-24h']))
+#' ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))
 #' dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
-#' ggKAP(dat, color_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
+#' ggKAP(dat, color_var = "AUCQF2", label_color = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
 #'
 #' ggKAP(dat, facet_var = "AUCQF2")
 #' ggKAP(dat, facet_var = "AUCQF2", facetting_args = list(labeller = ggplot2::label_parsed, nrow = 2))
@@ -137,8 +137,8 @@ ggKAP <- function(data,
                   scale_y_labels = scales::percent,
                   label_x = "Time since first dose (weeks)",
                   label_y_fig = paste0("Subjects with", if(!cuminc){"out"}, " event (%)"),
-                  label_col = color_var,
-                  label_y_risktab = label_col,
+                  label_color = color_var,
+                  label_y_risktab = label_color,
                   legend_label_kpm = "Observed",
                   legend_label_censor = "Censored",
                   legend_label_se = paste0(scales::percent(ci_level), " CI"),
@@ -361,8 +361,8 @@ ggKAP <- function(data,
       labs(
         x = label_x,
         y = label_y_fig,
-        col = label_col,
-        fill = label_col
+        col = label_color,
+        fill = label_color
       )
   }
 
@@ -371,7 +371,7 @@ ggKAP <- function(data,
       labs(
         subtitle = title_risktable,
         x = label_x,
-        y = label_col
+        y = label_color
       )
   }
 

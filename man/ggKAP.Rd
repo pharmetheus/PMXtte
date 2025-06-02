@@ -36,8 +36,8 @@ ggKAP(
   label_y_fig = paste0("Subjects with", if (!cuminc) {
      "out"
  }, " event (\%)"),
-  label_col = color_var,
-  label_y_risktab = label_col,
+  label_color = color_var,
+  label_y_risktab = label_color,
   legend_label_kpm = "Observed",
   legend_label_censor = "Censored",
   legend_label_se = paste0(scales::percent(ci_level), " CI"),
@@ -103,9 +103,9 @@ ggKAP(
 
 \item{label_y_fig}{a character, the name of the y-axis (i.e. survival) of the Kaplan-Meier figure.}
 
-\item{label_col}{a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (\code{expression()}) if special character or super/subscripts should be shown.}
+\item{label_color}{a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (\code{expression()}) if special character or super/subscripts should be shown.}
 
-\item{label_y_risktab}{a character, the name of the y-axis of the risk table. Default is the same as the name of the legend for colors \code{label_col}.}
+\item{label_y_risktab}{a character, the name of the y-axis of the risk table. Default is the same as the name of the legend for colors \code{label_color}.}
 
 \item{legend_label_kpm}{a character, the label of the legend that describes the line type of the Kaplan-Meier curve.}
 
@@ -173,7 +173,7 @@ try(ggKAP(dat, show_sim = TRUE), TRUE)
 ggKAP(dat, cuminc = TRUE)
 
 ggKAP(dat, color_var = "SEXF")
-ggKAP(dat, color_var = "SEXF", label_col = "Sex")
+ggKAP(dat, color_var = "SEXF", label_color = "Sex")
 ggKAP(dat, color_var = "SEXF", show_pval = FALSE)
 ggKAP(dat, color_var = "SEXF", scale_color_values = c("red", "yellow"))
 ggKAP(dat, color_var = "SEXF", scale_color_values = c(Male = "yellow", Female = "red"))
@@ -203,9 +203,9 @@ ggKAP(dat, simdat, facet_var = "SEXF")
 ggKAP(sdata = simdat, facet_var = "SEXF")
 
 ggKAP(dat, color_var = "AUCQF")
-ggKAP(dat, color_var = "AUCQF", label_col = expression(AUC['0-24h']))
+ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))
 dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
-ggKAP(dat, color_var = "AUCQF2", label_col = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
+ggKAP(dat, color_var = "AUCQF2", label_color = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
 
 ggKAP(dat, facet_var = "AUCQF2")
 ggKAP(dat, facet_var = "AUCQF2", facetting_args = list(labeller = ggplot2::label_parsed, nrow = 2))
