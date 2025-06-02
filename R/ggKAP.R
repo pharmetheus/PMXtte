@@ -1,5 +1,19 @@
 #' Visualize Survival Data
 #'
+#' Single function for graphical exploration of survival data,
+#' model evaluation of time-to-event model (VPC) and visualization of simulated data.
+#' If only observed data (`data`) is supplied, the Kaplan-Meier curve, censoring events, median survival time,
+#' risk table and parametric confidence interval are
+#' automatically reported, as well as log rank test p value if data is stratified by coloring groups (`color_var`).
+#' If both observed and simulated data (`sdata`) are supplied, censoring events, risk table and
+#' simulation-based confidence interval are reported.
+#' If only simulated data is supplied, the simulation-based prediction interval is reported.
+#' Choose to show/hide any of these elements with the `show_*` arguments.
+#'
+#' Data can be grouped/colored with the `color_var` argument, and faceted with the `facet_var` argument. Preferably, these should refer to factor variables.
+#'
+#' Arrange the relative heights between the legends, the figure and the risk table with the `rel_heights` argument.
+#'
 #' @param data a data.frame, observed data, assuming one time-to-event record per individual.
 #' @param sdata a data.frame, simulated data, assuming one time-to-event record per individual and iteration.
 #' @param time_var a character, the name of the time column in `data` and `sdata`. The variable should be numeric, ideally > 0.

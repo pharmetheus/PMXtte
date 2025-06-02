@@ -139,7 +139,20 @@ ggKAP(
 by default, a single "ggplot" object arranged with \code{cowplot::plot.grid()}. If \code{arrange = FALSE}, a list of ggplot objects.
 }
 \description{
-Visualize Survival Data
+Single function for graphical exploration of survival data,
+model evaluation of time-to-event model (VPC) and visualization of simulated data.
+If only observed data (\code{data}) is supplied, the Kaplan-Meier curve, censoring events, median survival time,
+risk table and parametric confidence interval are
+automatically reported, as well as log rank test p value if data is stratified by coloring groups (\code{color_var}).
+If both observed and simulated data (\code{sdata}) are supplied, censoring events, risk table and
+simulation-based confidence interval are reported.
+If only simulated data is supplied, the simulation-based prediction interval is reported.
+Choose to show/hide any of these elements with the \verb{show_*} arguments.
+}
+\details{
+Data can be grouped/colored with the \code{color_var} argument, and faceted with the \code{facet_var} argument. Preferably, these should refer to factor variables.
+
+Arrange the relative heights between the legends, the figure and the risk table with the \code{rel_heights} argument.
 }
 \examples{
 

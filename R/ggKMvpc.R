@@ -1,5 +1,9 @@
 #' Visual predictive checks Kaplan-Meier
-#' @description Returns visual predictive checks from observed and simulated time to event data, in the form of a Kaplan-Meier curve, generally to evaluate model performance.
+#' @description
+#'
+#' This function is deprecated. Please use `ggKAP()` instead.
+#'
+#' Returns visual predictive checks from observed and simulated time to event data, in the form of a Kaplan-Meier curve, generally to evaluate model performance.
 #'
 #' @param odata the observed data with one row per subject with a time and event indicator (1==event, 0==censored)
 #' @param sdata the simulated data with one row per subject and replicate with a time and event indicator (1==event, 0==censored)
@@ -109,7 +113,7 @@ ggKMvpc <- function(odata,
                     xlim = NULL,
                     ylim = c(0,1)
                     ){
-
+  .Deprecated("ggKAP")
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
 
   # group by stratifications if present

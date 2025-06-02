@@ -78,6 +78,8 @@ ggKMvpc(
 a ggplot2 object
 }
 \description{
+This function is deprecated. Please use \code{ggKAP()} instead.
+
 Returns visual predictive checks from observed and simulated time to event data, in the form of a Kaplan-Meier curve, generally to evaluate model performance.
 }
 \examples{
