@@ -26,7 +26,8 @@ NULL
 #' dat <- PMXtte::simplettedata
 #'
 #' ggplot(dat) +
-#'   stat_kaplanmeier(aes(x = TIME, y = DV))
+#'   stat_kaplanmeier(aes(x = TIME, y = DV)) +
+#'   stat_kaplanmeier_median(aes())
 #'
 #' # Supported variables defined in `aes()` and facetting
 #' ggplot(dat) +

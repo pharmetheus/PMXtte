@@ -1,4 +1,4 @@
-# PMXtte 0.13.3
+# PMXtte 0.14.0
 
 * New `ggKAP()` function to visualize time-to-event data, either from observed or simulated data.
 * New `stat_kaplanmeier()`, `stat_kaplanmeier_censor()`, `stat_kaplanmeier_median()`, `stat_kaplanmeier_pval()`, `stat_kaplanmeier_risktable()`, `stat_kaplanmeier_se()`, `stat_kaplanmeier_sim()`, low-level implementation of Kaplan-Meier curve elements.

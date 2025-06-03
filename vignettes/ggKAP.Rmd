@@ -1,0 +1,83 @@
+---
+title: "ggKAP"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ggKAP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(PMXtte)
+library(magrittr)
+```
+
+Time to event data can be visualized thanks to the `ggKAP()` function. After importing the data, you can generate a standard plot with the following command:
+
+```{r}
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+
+# Load observed data
+odata <- rttedata %>%
+  filter_xth_event(1)
+
+ggKAP(odata, time_var = "TSFDW", dv_var = "DV")
+
+```
+
+This output is composed of several parts arranged together, notably a risk table in the bottom and a figure in the middle, the latter contains a Kaplan-Meier curve, censoring events and a parametric confidence interval. It will also include the median survival curve if this is achieved. All these elements are described in a dedicated legend on the top. All these elements can be removed/added with the `show_*` arguments, e.g.:
+
+
+```{r}
+ggKAP(
+  odata, 
+  time_var = "TSFDW", dv_var = "DV", 
+  show_kpm = TRUE, 
+  show_censor = TRUE, 
+  show_risktable = FALSE, 
+  show_median = FALSE,
+  show_se = FALSE
+  )
+```
+
+
+It is possible to stratify the data, using different colors and facetting. Note that, for coloring, the variable should preferably be a factor, alternatively a character string or a logical, but not a numeric (double or integer) (you would get an error).
+
+```{r}
+odata$DOSEF <- as.factor(odata$DOSEN)
+ggKAP(
+  odata, 
+  time_var = "TSFDW", dv_var = "DV", 
+  color_var = "DOSEF", facet_var = "STUDYIDN", 
+  )
+```
+
+
+One can see that coloring variable automatically does a log-rank test between the groups in each panel of the figure. This can be shown/removed with the `show_pval` argument.
+
+
+Now, let's add simulated data.
+```{r}
+sdata <- readRDS(system.file('extdata/vpcdat.rds', package= 'PMXtte')) %>%
+  filter_xth_event(1)
+sdata$TSFDW <- sdata$TIME / (24*7)
+sdata$DOSEF <- as.factor(sdata$DOSE)
+sdata$SEXN <- as.factor(sdata$SEX)
+
+
+```
+
+
+
+
+
+
+
