@@ -32,7 +32,7 @@ ggKAP(
   median_linetype = 2,
   scale_x_break_by = NULL,
   scale_y_labels = scales::percent,
-  label_x = "Time since first dose (weeks)",
+  label_x = "Time",
   label_y_fig = paste0("Subjects with", if (!cuminc) {
      "out"
  }, " event (\%)"),

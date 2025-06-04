@@ -33,7 +33,7 @@ ggKAP(odata, time_var = "TSFDW", dv_var = "DV")
 
 ```
 
-This output is composed of several parts arranged together, notably a risk table in the bottom and a figure in the middle, the latter contains a Kaplan-Meier curve, censoring events and a parametric confidence interval. It will also include the median survival curve if this is achieved. All these elements are described in a dedicated legend on the top. All these elements can be removed/added with the `show_*` arguments, e.g.:
+This output is composed of several parts arranged together, notably a risk table in the bottom and a figure in the middle, the latter contains a Kaplan-Meier curve, censoring events and a parametric 95\% confidence interval. It will also include the median survival curve if this is achieved. All these elements are described in a dedicated legend on the top. All these elements can be removed/added with the `show_*` arguments, e.g.:
 
 
 ```{r}
@@ -56,7 +56,7 @@ odata$DOSEF <- as.factor(odata$DOSEN)
 ggKAP(
   odata, 
   time_var = "TSFDW", dv_var = "DV", 
-  color_var = "DOSEF", facet_var = "STUDYIDN", 
+  color_var = "DOSEF", facet_var = "SEXN", 
   )
 ```
 
@@ -66,15 +66,30 @@ One can see that coloring variable automatically does a log-rank test between th
 
 Now, let's add simulated data.
 ```{r}
+odata <- dplyr::filter(odata, STUDYIDN == 1)
 sdata <- readRDS(system.file('extdata/vpcdat.rds', package= 'PMXtte')) %>%
-  filter_xth_event(1)
+ dplyr::group_by(ITER, ID) %>% 
+  dplyr::slice(1) %>% 
+  dplyr::ungroup()
 sdata$TSFDW <- sdata$TIME / (24*7)
 sdata$DOSEF <- as.factor(sdata$DOSE)
-sdata$SEXN <- as.factor(sdata$SEX)
+sdata$SEXN <- sdata$SEX+1
 
-
+ggKAP(
+  data = odata, sdata = sdata, 
+  time_var = "TSFDW", iter_var = "ITER" 
+)
 ```
 
+When observed data and simulated data are provided, a Kaplan-Meier curve, censored events, simulation-based 90\% confidence interval and the risk table are reported. Stratifications can be applied as before.
+
+```{r}
+ggKAP(
+  odata, sdata,
+  time_var = "TSFDW", dv_var = "DV", 
+  color_var = "DOSEF", facet_var = "SEXN"
+  )
+```
 
 
 

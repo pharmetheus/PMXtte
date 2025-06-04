@@ -385,7 +385,9 @@ ggKAP <- function(data,
   risktab <- risktab +
     theme(
       legend.position = "none",
-      axis.ticks.y = element_blank()
+      axis.ticks.y = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
     )
 
   # Make list
