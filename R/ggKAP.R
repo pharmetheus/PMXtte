@@ -46,7 +46,7 @@
 #' @param legend_label_median a character, the label of the legend that describes the line type of the median survival.
 #' @param legend_label_sim a character, the label of the legend that describes the ribbon of simulation-based confidence interval. Default is computed as function of `ci_level`.
 #' @param scale_color_labels passed to `ggplot2::scale_color_manual(labels = )` for the Kaplan-Meier figure, and `ggplot2::scale_y_discrete(labels = )` for the risk table. The default is `waiver()` (calls the default setup of ggplot2), but can accept `scales::label_parsed` if the coloring variable is an expression (`expression()`) and special character or super/subscripts should be shown.
-#' @param scale_color_values passed to `ggplot2::scale_color_manual(values = )` for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome.
+#' @param scale_color_values passed to `ggplot2::scale_color_manual(values = )` for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome. Levels not available in the data will be dropped.
 #' @param facetting_args a list, arguments that will overwrite the default arguments of `facet_wrap()`. Note that it will not overwrite `vars`, the latter being informed by `facet_var`. Use `list(labeller = ggplot2::label_parsed)` if the facetting variable is an expression (`expression()`) and special character or super/subscripts should be shown.
 #' @param xlim a vector of 2 numeric values, limits of the x-axes. Default will use the default ggplot setup.
 #' @param ylim a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1.
@@ -319,6 +319,11 @@ ggKAP <- function(data,
       )
   }
 
+  do_force <- NULL
+  if(!is.null(color_var)){
+    do_force <- base::force
+  }
+
   fig <- fig +
     scale_x_continuous(
       breaks = scale_x_breaks,
@@ -331,7 +336,8 @@ ggKAP <- function(data,
     scale_color_manual(
       labels = scale_color_labels,
       values = scale_color_values,
-      aesthetics = c("fill", "colour")
+      aesthetics = c("fill", "colour"),
+      limits = do_force # so that only levels in the data show up
     )
 
   risktab <- risktab +

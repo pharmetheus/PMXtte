@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7, 
+  fig.height = 7
 )
 ```
 
@@ -91,8 +93,49 @@ ggKAP(
   )
 ```
 
+Using a factor as a color variable is highly recommended because it facilitates the coloring of curves. The default palette is the Pharmetheus palette, but one can specify a named vector of color, as defined from a Factor/Color .csv file for instance.
+
+```{r}
+cols <- list(SEXF = PMXtte:::PMXColors_PMXcolors$sexColL)
+odata$SEXF <- factor(odata$SEXN, levels = c(1,2), labels = c("Male", "Female"))
+
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  color_var = "SEXF", 
+  scale_color_values = cols[["SEXF"]]
+)
+
+```
 
 
+Greek characters, superscript and subscript can also be implemented in the figure, either in scales names (i.e. text below the x-axis, next to the y-axis and to the legend, etc...) or facetting panel titles. The code to implement this may not be super intuitive, but it respects the ggplot2 syntax to maximize your possibilities of personnalization. Let's do it on dummy factor variables: 
 
+```{r, fig.height=9}
+set.seed(123)
+odata$AUCQF <- factor(
+  sample(x = c(1,2,3), size = nrow(odata), replace = TRUE), 
+  labels = c("1^st~quartile", "2^nd~quartile","3^rd~quartile")
+)
+AUClegend <- expression(AUC['0-24h'])
 
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  color_var = "AUCQF", 
+  label_color = AUClegend, # accepts expression
+  scale_color_labels = scales::label_parse() #transform 1^st into superscript
+)
+
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  facet_var = "AUCQF", 
+  facetting_args = list(
+    labeller = ggplot2::label_parsed, #transform 1^st into superscript
+    nrow = 2 # also accept any other arguments of facet_wrap
+    )
+)
+
+```
 

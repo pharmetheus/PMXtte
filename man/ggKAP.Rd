@@ -119,7 +119,7 @@ ggKAP(
 
 \item{scale_color_labels}{passed to \code{ggplot2::scale_color_manual(labels = )} for the Kaplan-Meier figure, and \code{ggplot2::scale_y_discrete(labels = )} for the risk table. The default is \code{waiver()} (calls the default setup of ggplot2), but can accept \code{scales::label_parsed} if the coloring variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
-\item{scale_color_values}{passed to \code{ggplot2::scale_color_manual(values = )} for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome.}
+\item{scale_color_values}{passed to \code{ggplot2::scale_color_manual(values = )} for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome. Levels not available in the data will be dropped.}
 
 \item{facetting_args}{a list, arguments that will overwrite the default arguments of \code{facet_wrap()}. Note that it will not overwrite \code{vars}, the latter being informed by \code{facet_var}. Use \code{list(labeller = ggplot2::label_parsed)} if the facetting variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
