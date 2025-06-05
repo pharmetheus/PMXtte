@@ -1,0 +1,141 @@
+---
+title: "ggKAP"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ggKAP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7, 
+  fig.height = 7
+)
+```
+
+```{r setup}
+library(PMXtte)
+library(magrittr)
+```
+
+Time to event data can be visualized thanks to the `ggKAP()` function. After importing the data, you can generate a standard plot with the following command:
+
+```{r}
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+
+# Load observed data
+odata <- rttedata %>%
+  filter_xth_event(1)
+
+ggKAP(odata, time_var = "TSFDW", dv_var = "DV")
+
+```
+
+This output is composed of several parts arranged together, notably a risk table in the bottom and a figure in the middle, the latter contains a Kaplan-Meier curve, censoring events and a parametric 95\% confidence interval. It will also include the median survival curve if this is achieved. All these elements are described in a dedicated legend on the top. All these elements can be removed/added with the `show_*` arguments, e.g.:
+
+
+```{r}
+ggKAP(
+  odata, 
+  time_var = "TSFDW", dv_var = "DV", 
+  show_kpm = TRUE, 
+  show_censor = TRUE, 
+  show_risktable = FALSE, 
+  show_median = FALSE,
+  show_se = FALSE
+  )
+```
+
+
+It is possible to stratify the data, using different colors and facetting. Note that, for coloring, the variable should preferably be a factor, alternatively a character string or a logical, but not a numeric (double or integer) (you would get an error).
+
+```{r}
+odata$DOSEF <- as.factor(odata$DOSEN)
+ggKAP(
+  odata, 
+  time_var = "TSFDW", dv_var = "DV", 
+  color_var = "DOSEF", facet_var = "SEXN", 
+  )
+```
+
+
+One can see that coloring variable automatically does a log-rank test between the groups in each panel of the figure. This can be shown/removed with the `show_pval` argument.
+
+
+Now, let's add simulated data.
+```{r}
+odata <- dplyr::filter(odata, STUDYIDN == 1)
+sdata <- readRDS(system.file('extdata/vpcdat.rds', package= 'PMXtte')) %>%
+ dplyr::group_by(ITER, ID) %>% 
+  dplyr::slice(1) %>% 
+  dplyr::ungroup()
+sdata$TSFDW <- sdata$TIME / (24*7)
+sdata$DOSEF <- as.factor(sdata$DOSE)
+sdata$SEXN <- sdata$SEX+1
+
+ggKAP(
+  data = odata, sdata = sdata, 
+  time_var = "TSFDW", iter_var = "ITER" 
+)
+```
+
+When observed data and simulated data are provided, a Kaplan-Meier curve, censored events, simulation-based 90\% confidence interval and the risk table are reported. Stratifications can be applied as before.
+
+```{r}
+ggKAP(
+  odata, sdata,
+  time_var = "TSFDW", dv_var = "DV", 
+  color_var = "DOSEF", facet_var = "SEXN"
+  )
+```
+
+Using a factor as a color variable is highly recommended because it facilitates the coloring of curves. The default palette is the Pharmetheus palette, but one can specify a named vector of color, as defined from a Factor/Color .csv file for instance.
+
+```{r}
+cols <- list(SEXF = PMXtte:::PMXColors_PMXcolors$sexColL)
+odata$SEXF <- factor(odata$SEXN, levels = c(1,2), labels = c("Male", "Female"))
+
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  color_var = "SEXF", 
+  scale_color_values = cols[["SEXF"]]
+)
+
+```
+
+
+Greek characters, superscript and subscript can also be implemented in the figure, either in scales names (i.e. text below the x-axis, next to the y-axis and to the legend, etc...) or facetting panel titles. The code to implement this may not be super intuitive, but it respects the ggplot2 syntax to maximize your possibilities of personnalization. Let's do it on dummy factor variables: 
+
+```{r, fig.height=9}
+set.seed(123)
+odata$AUCQF <- factor(
+  sample(x = c(1,2,3), size = nrow(odata), replace = TRUE), 
+  labels = c("1^st~quartile", "2^nd~quartile","3^rd~quartile")
+)
+AUClegend <- expression(AUC['0-24h'])
+
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  color_var = "AUCQF", 
+  label_color = AUClegend, # accepts expression
+  scale_color_labels = scales::label_parse() #transform 1^st into superscript
+)
+
+ggKAP(
+  data = odata, 
+  time_var = "TSFDW",
+  facet_var = "AUCQF", 
+  facetting_args = list(
+    labeller = ggplot2::label_parsed, #transform 1^st into superscript
+    nrow = 2 # also accept any other arguments of facet_wrap
+    )
+)
+
+```
+

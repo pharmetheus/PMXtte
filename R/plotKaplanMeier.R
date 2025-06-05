@@ -1,5 +1,7 @@
 #' Create Kaplan Meier plots
 #'
+#' This function is deprecated. Please use `ggKAP()` instead.
+#'
 #' This function generates Kaplan Meier curves plot using ggsurvplot from a dataframe
 #' @param data dataframe used to fit survival curves
 #' @param time_col The name of the column containing the survival times.
@@ -138,6 +140,8 @@ plotKaplanMeier <- function(data,
                             censor.shape = '|',
                             censor.size = 4,
                             ...){
+  .Deprecated("ggKAP")
+
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
     stop('Input is not a dataframe')
