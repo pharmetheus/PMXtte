@@ -7,6 +7,34 @@ da[1,2] <- 1
 fit <- survival::survfit(survival::Surv(time, x) ~ 1, da)
 sufit <- summary(fit)
 
+
+da2 <- data.frame(
+  time = c(0, 6, 12, 24, 24, 24, 30, 36, 36, 42),
+  x =    c(0, 1,  0,  0,  1,  1,  1,  0,  0,  1)
+)
+fit2 <- survival::survfit(survival::Surv(time, x) ~ 1, da2)
+sufit2 <- summary(fit2)
+
+da3 <- data.frame(
+  time = c(0, 6, 12, 24, 24, 30, 36, 36, 42),
+  x =    c(0, 1,  0,  1,  0,  1,  0,  0,  1)
+)
+fit3 <- survival::survfit(survival::Surv(time, x) ~ 1, da3)
+sufit3 <- summary(fit3)
+
+DATAS <- data.frame(
+  REP = rep(seq_len(100), each = 20),
+  X = sample(x = c(0,1), size = 20*100, replace = TRUE),
+  TIME = sample(x = c(6, 12, 24, 36), size = 20*100, replace = TRUE)
+) %>%
+  split(~REP)
+
+
+
+
+
+
+
 testthat::test_that("kpm functions work", {
 
   # Checker works
@@ -31,6 +59,46 @@ testthat::test_that("kpm functions work", {
   expect_equal(
     atrisk(da$time)[timesubset], sufit$n.risk
   )
+
+
+  order2 <- order(da2$time, -(da2$x))
+  timesubset2 <-  which(da2$x[order2] == 1)[rev(!duplicated(rev(da2$time[order2][(da2$x[order2] == 1)])))]
+  timesubset2atrisk <-  which(da2$x[order2] == 1)[(!duplicated(da2$time[order2][(da2$x[order2] == 1)]))]
+
+  expect_equal(
+    kpm(da2$x[order2])[timesubset2], sufit2$surv
+  )
+  expect_equal(
+    kpm_se(da2$x[order2])[timesubset2], sufit2$std.err
+  )
+  CI <- kpm_ci(x = da2$x[order2], width = .95)
+  expect_equal(CI[,1][timesubset2], sufit2$lower)
+  expect_equal(CI[,2][timesubset2], sufit2$upper)
+
+  expect_equal(
+    atrisk(da2$time[order2])[timesubset2atrisk], sufit2$n.risk
+  )
+
+
+
+  order3 <- order(da3$time, -(da3$x))
+  timesubset3 <-  which(da3$x[order3] == 1)[rev(!duplicated(rev(da3$time[order3][(da3$x[order3] == 1)])))]
+  timesubset3atrisk <-  which(da3$x[order3] == 1)[(!duplicated(da3$time[order3][(da3$x[order3] == 1)]))]
+
+  expect_equal(
+    kpm(da3$x[order3])[timesubset3], sufit3$surv
+  )
+  expect_equal(
+    kpm_se(da3$x[order3])[timesubset3], sufit3$std.err
+  )
+  CI <- kpm_ci(x = da3$x[order3], width = .95)
+  expect_equal(CI[,1][timesubset3], sufit3$lower)
+  expect_equal(CI[,2][timesubset3], sufit3$upper)
+
+  expect_equal(
+    atrisk(da3$time[order3])[timesubset3atrisk], sufit3$n.risk
+  )
+
 
 })
 
@@ -77,6 +145,25 @@ testthat::test_that("kpm_stepfun functions work", {
     sufit$n.risk
   )
 
+
+  # On many data with tied event time/censoring
+  for(i in seq_along(DATAS)){
+    SUFIT <- summary(survival::survfit(survival::Surv(TIME, X) ~ 1, DATAS[[i]]))
+    expect_equal(
+      kpm_stepfun(time = DATAS[[i]]$TIME, dv = DATAS[[i]]$X)(SUFIT$time),
+      SUFIT$surv
+    )
+    expect_equal(
+      kpm_ci_stepfun(time = DATAS[[i]]$TIME, dv = DATAS[[i]]$X)(SUFIT$time)[,1],
+      SUFIT$lower
+    )
+    expect_equal(
+      kpm_ci_stepfun(time = DATAS[[i]]$TIME, dv = DATAS[[i]]$X)(SUFIT$time)[,2],
+      SUFIT$upper
+    )
+
+  }
+
   # Reordering is correct
   da2 <- dplyr::slice_sample(da, n = nrow(da))
 
@@ -93,6 +180,7 @@ testthat::test_that("kpm_stepfun functions work", {
     atrisk_stepfun(time = da$time)
   )
 })
+
 
 testthat::test_that("medsurvtime works", {
   expect_equal(medsurvtime(time = c(0,1,2), surv = c(1,0.5,0)), 1)
