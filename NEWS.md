@@ -1,3 +1,8 @@
+# PMXtte development version
+
+* Better handling of tied times, especially if both censoring and event are observed at the same time. Internally, 0 are reorder after 1 for the same given time. Better handling incalculable survival values by explicitly keeping NA in the step function. Tested over random 100 dataset with tied times.
+
+
 # PMXtte 0.14.0
 
 * New `ggKAP()` function to visualize time-to-event data, either from observed or simulated data.
