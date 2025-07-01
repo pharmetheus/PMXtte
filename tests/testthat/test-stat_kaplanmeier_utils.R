@@ -181,6 +181,16 @@ testthat::test_that("kpm_stepfun functions work", {
   )
 })
 
+test_that("atrisk captures multiple events/censoring at same time", {
+  expect_equal(
+    atrisk_stepfun(rep(0, 10))(0),
+    10
+  )
+  expect_equal(
+    atrisk_stepfun(rep(c(0,24,48), each = 2))(c(0,12,24,36,48,60)),
+    c(6, 4, 4, 2, 2, 0)
+  )
+})
 
 testthat::test_that("medsurvtime works", {
   expect_equal(medsurvtime(time = c(0,1,2), surv = c(1,0.5,0)), 1)

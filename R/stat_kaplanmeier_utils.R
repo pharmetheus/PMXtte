@@ -207,6 +207,7 @@ atrisk_stepfun <- function(time){
     x = time,
     y = c(atrisk(time), 0),
     right = TRUE,
+    ties = dplyr::first,
     f = 1 # carrying backward
   )
 }
