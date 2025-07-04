@@ -7,7 +7,7 @@
 createTTESim(
   modFile,
   outFile = paste0(tools::file_path_sans_ext(modFile), "vpc.mod"),
-  simTabFile = make_simtab_name(modFile),
+  simTabFile = PMXtte:::make_simtab_name(modFile),
   rtte = FALSE,
   mTimeResolution = 0.1,
   timeVar = "TIME",

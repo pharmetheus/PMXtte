@@ -12,6 +12,7 @@ makeSummaryTableTTE(
   showAvnObs = !isRTTE(df, myID = myID),
   nObsColNm = "\\\\textbf{nEvent\\\\textsuperscript{b}}",
   avnObsColNm = "\\\\textbf{pEvent\\\\textsuperscript{c}}",
+  avnObsPercent = TRUE,
   caption = "Number of patients and number of events",
   footnote = paste0("\\\\textsuperscript{a}Number of subjects\\\\newline",
     "\\\\textsuperscript{b}Number of events\\\\newline", if (showAvnObs) {
@@ -36,6 +37,8 @@ makeSummaryTableTTE(
 \item{nObsColNm}{is the character string to be printed as the column name with the number of observations, default is "\\\\textbf\{nEvent\\\\textsuperscript\{b\}\}"}
 
 \item{avnObsColNm}{is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\\\\textsuperscript\{c\}\}"}
+
+\item{avnObsPercent}{is a logical, should "pEvent" be printed as a percentage? TRUE}
 
 \item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
 
