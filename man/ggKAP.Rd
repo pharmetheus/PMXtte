@@ -123,9 +123,9 @@ ggKAP(
 
 \item{facetting_args}{a list, arguments that will overwrite the default arguments of \code{facet_wrap()}. Note that it will not overwrite \code{vars}, the latter being informed by \code{facet_var}. Use \code{list(labeller = ggplot2::label_parsed)} if the facetting variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
-\item{xlim}{a vector of 2 numeric values, limits of the x-axes. Default will use the default ggplot setup.}
+\item{xlim}{a vector of 2 numeric values, limits of the x-axes of the Kaplan-Meier plot and risk table. Default will use the default ggplot setup. Passed to \code{ggplot2::coord_cartesian()}.}
 
-\item{ylim}{a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1.}
+\item{ylim}{a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1. Passed to \code{ggplot2::coord_cartesian()}.}
 
 \item{title_risktable}{a character, the title above the risk table.}
 
@@ -187,6 +187,11 @@ ggKAP(
 )
 
 ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
+
+ggKAP(
+  dat, color_var = "SEXF",
+  xlim = c(0, 50), ylim = c(.10, .5)
+) # limits do not change the underlying data (e.g.: same p value)
 
 ggKAP(dat, rel_heights = list(
   legends = c(1,1),

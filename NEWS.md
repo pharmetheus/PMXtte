@@ -1,3 +1,7 @@
+# PMXtte development version
+
+* `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
+
 # PMXtte 0.14.0
 
 * New `ggKAP()` function to visualize time-to-event data, either from observed or simulated data.
