@@ -108,7 +108,7 @@
 #' createTTESim(modFile = mypath)
 createTTESim <- function(modFile,
                          outFile = paste0(tools::file_path_sans_ext(modFile), "vpc.mod"),
-                         simTabFile = paste0("vpctab", tools::file_path_sans_ext(modFile)),
+                         simTabFile = PMXtte:::make_simtab_name(modFile),
                          rtte = FALSE,
                          mTimeResolution = 0.1,
                          timeVar = "TIME",
@@ -463,4 +463,12 @@ createTTESim <- function(modFile,
   } else { # Or return model code as strings
     return(line)
   }
+}
+
+make_simtab_name <- function(x, prefix = "vpctab", suffix = ""){
+  paste0(
+    prefix,
+    tools::file_path_sans_ext(basename(x)),
+    suffix
+  )
 }

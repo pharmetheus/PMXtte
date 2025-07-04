@@ -24,12 +24,13 @@ ggKAP(
  }),
   show_median = !missing(data) && missing(sdata),
   show_sim = !missing(sdata),
-  ci_level = if (show_se) 0.95 else 0.9,
   cuminc = FALSE,
+  ci_level = if (show_se) 0.95 else 0.9,
   ci_alpha = 0.5,
   censor_shape = "|",
   censor_size = 4,
   median_linetype = 2,
+  pval_pos = NULL,
   scale_x_break_by = NULL,
   scale_y_labels = scales::percent,
   label_x = "Time",
@@ -83,9 +84,9 @@ ggKAP(
 
 \item{show_sim}{a logical, should a confidence interval (and associated legend) computed from simulated data (\code{sdata}) appear on the plot? Default is \code{TRUE} if \code{sdata} is provided.}
 
-\item{ci_level}{a numeric, between 0 and 1, indicating the level of the confidence interval. Default is \code{.95} (95\%) if the confidence interval is calculated from observed data (\code{data}), \code{.90} (90\%) if calculated from simulations (\code{sdata}).}
-
 \item{cuminc}{a logical, should the plot represent the cumulative incidence? If \code{FALSE}, the default, the survival is represented.}
+
+\item{ci_level}{a numeric, between 0 and 1, indicating the level of the confidence interval. Default is \code{.95} (95\%) if the confidence interval is calculated from observed data (\code{data}), \code{.90} (90\%) if calculated from simulations (\code{sdata}).}
 
 \item{ci_alpha}{a numeric, between 0 and 1, indicating the opacity of the confidence interval.}
 
@@ -94,6 +95,8 @@ ggKAP(
 \item{censor_size}{a numeric, the size of the censoring event.}
 
 \item{median_linetype}{a numeric, linetype of the median survival line.}
+
+\item{pval_pos}{a vector of 2 numeric, coordinate positions of the p-value text (\code{c(x,y)}). Default in \code{NULL}, should appear on the bottom left.}
 
 \item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2).}
 
@@ -123,9 +126,9 @@ ggKAP(
 
 \item{facetting_args}{a list, arguments that will overwrite the default arguments of \code{facet_wrap()}. Note that it will not overwrite \code{vars}, the latter being informed by \code{facet_var}. Use \code{list(labeller = ggplot2::label_parsed)} if the facetting variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
-\item{xlim}{a vector of 2 numeric values, limits of the x-axes. Default will use the default ggplot setup.}
+\item{xlim}{a vector of 2 numeric values, limits of the x-axes of the Kaplan-Meier plot and risk table. Default will use the default ggplot setup. Passed to \code{ggplot2::coord_cartesian()}.}
 
-\item{ylim}{a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1.}
+\item{ylim}{a vector of 2 numeric values, limits of the y-axis of the Kaplan-Meier figure. Default is 0 to 1. Passed to \code{ggplot2::coord_cartesian()}.}
 
 \item{title_risktable}{a character, the title above the risk table.}
 
@@ -188,6 +191,31 @@ ggKAP(
 
 ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
 
+ggKAP(
+  dat, color_var = "SEXF",
+  xlim = c(0, 50), ylim = c(.10, .5)
+) # limits do not change the underlying data (e.g.: same p value)
+
+ggKAP(
+  dat, color_var = "SEXF",
+  pval_pos = c(80, .8)
+) # manually define p value position on the top right
+
+# Labelling
+
+ggKAP(dat, color_var = "AUCQF")
+
+# This will update both the "color legend" label and the y axis of the risk table
+ggKAP(dat, color_var = "AUCQF", label_color = "Nice color label")
+
+# But it can be differentiated if needed
+ggKAP(dat, color_var = "AUCQF",
+  label_color = "Nice color label",
+  label_y_risktab = "Label for the\ny-axis of risk table"
+  )
+
+
+
 ggKAP(dat, rel_heights = list(
   legends = c(1,1),
   figtable = c(8,2),
@@ -201,6 +229,8 @@ ggKAP(dat, color_var = "SEXF", facet_var = "AUCQF", rel_heights = list(
 
 ggKAP(dat, simdat, facet_var = "SEXF")
 ggKAP(sdata = simdat, facet_var = "SEXF")
+
+# Special characters
 
 ggKAP(dat, color_var = "AUCQF")
 ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))

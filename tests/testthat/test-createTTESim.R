@@ -102,3 +102,22 @@ test_that("createTTESim stops if modFile does not exist", {
   expect_error(createTTESim(modFile = "non_existent_model.mod"), "Cannot find model file: non_existent_model.mod")
 })
 
+test_that("createTTESim make correct simfile name", {
+  expect_equal(
+    make_simtab_name("run101.mod"),
+    "vpctabrun101"
+  )
+  expect_equal(
+    make_simtab_name("path/to/model/run101.mod"),
+    "vpctabrun101"
+  )
+  expect_equal(
+    make_simtab_name("run101.mod", prefix = "simtab"),
+    "simtabrun101"
+  )
+  expect_equal(
+    make_simtab_name("run101.mod", prefix = "", suffix = "sim"),
+    "run101sim"
+  )
+})
+
