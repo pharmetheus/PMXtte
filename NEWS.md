@@ -1,10 +1,11 @@
-# PMXtte development version
+# PMXtte 0.14.1
 
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
 * New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
 * `ggKAP(label_y_risk = )` now specifically updates the name of the y-axis of the risk table, independently of `label_color`. It was the intended behavior originally but the implementation was wrong. (#25)
 * `createTTESim()` now implements the simulation file name from the base name of the model file, ignoring the entire path if provided. (#28)
 * New `makeSummaryTableTTE(avnObsPercent = TRUE)` to show the proportion of events as a percentage. (#29)
+* Better handling of tied times for the calculation of survival, especially if both censoring and event are observed at the same time. Internally, 0 are reorder after 1 for the same given time. Better handling incalculable survival values by explicitly keeping NA in the step function. Tested over random 100 dataset with tied times. Better handling of tied times for the calculation of the number at risk, now taking the first number of a vector if tied. Tested against `survival::survdiff()` too.
 
 
 # PMXtte 0.14.0

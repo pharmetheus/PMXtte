@@ -57,12 +57,13 @@ kpm_ci <- function(x, width = .95){
   se <- sqrt(cumsum(x/(atrisk*(atrisk-x))))
   logsurv <- ifelse(surv == 0, NA_real_, log(surv))
   z <- width2z(width)
-  matrix(c(
+  ans <- matrix(c(
     pmax(exp(logsurv - z * se), 0), # lower bound
     pmin(exp(logsurv + z * se), 1)  # upper bound
   ),
   ncol = 2
   )
+  ans
 }
 
 check_tteDV <- function(x){
@@ -133,43 +134,57 @@ check_tteDV <- function(x){
 #' ATRISK(outtimes)
 #'
 kpm_stepfun <- function(time, dv, cuminc = FALSE){
-  dv   <- dv[order(time)]
-  time <- time[order(time)]
+  dv   <- dv[order(time, -dv)]
+  time <- time[order(time, -dv)]
   surv <- kpm(dv)
+  xval <- c(0, time)
   yval <- c(1, surv) # before the first time of event, the survival = 1
   if(cuminc){
     yval <- 1 - yval # reverse the survival to obtain cumulative incidence
   }
 
-  stats::stepfun(
-    x = time,
+  stats::approxfun(
+    x = xval,
     y = yval,
-    f = 0 #carrying forward
+    method = "constant",
+    ties = "ordered",
+    rule = 2,
+    f = 0, #carrying forward
+    na.rm = FALSE,
   )
 }
 
 #' @rdname kpm_stepfun
 #' @export
 kpm_ci_stepfun <- function(time, dv, cuminc = FALSE, width = .95){
-  dv   <- dv[order(time)]
-  time <- time[order(time)]
+  dv   <- dv[order(time, -dv)]
+  time <- time[order(time, -dv)]
   survs <- kpm_ci(dv, width = width)
+  xval  <- c(0, time)
   yvals <- rbind(c(1,1), survs) # before the first time of event, the survival = 1
 
   if(cuminc){
     yvals <- 1 - yvals # reverse the survival to obtain cumulative incidence
   }
 
-  lofun <- stats::stepfun(
-    x = time,
+  lofun <- stats::approxfun(
+    x = xval,
     y = yvals[,1],
-    f = 0 #carrying forward
+    method = "constant",
+    ties = "ordered",
+    rule = 2,
+    f = 0, #carrying forward
+    na.rm = FALSE
   )
 
-  upfun <- stats::stepfun(
-    x = time,
+  upfun <- stats::approxfun(
+    x = xval,
     y = yvals[,2],
-    f = 0 #carrying forward
+    method = "constant",
+    ties = "ordered",
+    rule = 2,
+    f = 0, #carrying forward
+    na.rm = FALSE
   )
 
   function(v){
@@ -192,6 +207,7 @@ atrisk_stepfun <- function(time){
     x = time,
     y = c(atrisk(time), 0),
     right = TRUE,
+    ties = dplyr::first,
     f = 1 # carrying backward
   )
 }
@@ -254,3 +270,5 @@ width2bounds <- function(width){
 }
 # width2bounds(.95)
 # width2bounds(.90)
+
+
