@@ -44,6 +44,6 @@ test_that("checks works", {
     "Possible classes for \"DV\" are: logical, character, factor"
   )
   expect_no_error(
-    ggKAP(dat, color_var = "DV", check_input = FALSE)
+    suppressWarnings(ggKAP(dat, color_var = "DV", check_input = FALSE))
   )
 })

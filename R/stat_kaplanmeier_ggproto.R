@@ -520,7 +520,6 @@ StatKaplanMeierSim <- ggplot2::ggproto(
     if(is.null(xlim)){
       xlim <- c(0, max(data$x))
     }
-
     ans <- data %>%
       dplyr::group_by(iter, .add = TRUE) %>%
       dplyr::summarise(
