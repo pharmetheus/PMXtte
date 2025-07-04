@@ -103,6 +103,21 @@
 #'   pval_pos = c(80, .8)
 #' ) # manually define p value position on the top right
 #'
+#' # Labelling
+#'
+#' ggKAP(dat, color_var = "AUCQF")
+#'
+#' # This will update both the "color legend" label and the y axis of the risk table
+#' ggKAP(dat, color_var = "AUCQF", label_color = "Nice color label")
+#'
+#' # But it can be differentiated if needed
+#' ggKAP(dat, color_var = "AUCQF",
+#'   label_color = "Nice color label",
+#'   label_y_risktab = "Label for the\ny-axis of risk table"
+#'   )
+#'
+#'
+#'
 #' ggKAP(dat, rel_heights = list(
 #'   legends = c(1,1),
 #'   figtable = c(8,2),
@@ -116,6 +131,8 @@
 #'
 #' ggKAP(dat, simdat, facet_var = "SEXF")
 #' ggKAP(sdata = simdat, facet_var = "SEXF")
+#'
+#' # Special characters
 #'
 #' ggKAP(dat, color_var = "AUCQF")
 #' ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))
@@ -401,7 +418,7 @@ ggKAP <- function(data,
       labs(
         subtitle = title_risktable,
         x = label_x,
-        y = label_color
+        y = label_y_risktab
       )
   }
 

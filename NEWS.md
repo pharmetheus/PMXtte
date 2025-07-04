@@ -2,7 +2,7 @@
 
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
 * New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
-
+* `ggKAP(label_y_risk = )` now specifically updates the name of the y-axis of the risk table, independently of `label_color`. It was the intended behavior originally but the implementation was wrong.
 
 # PMXtte 0.14.0
 
