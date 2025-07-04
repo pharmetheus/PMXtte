@@ -1,6 +1,8 @@
 # PMXtte development version
 
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
+* New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
+
 
 # PMXtte 0.14.0
 

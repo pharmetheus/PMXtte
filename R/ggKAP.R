@@ -28,12 +28,13 @@
 #' @param show_pval a logical, should the p-value of a log-rank test appear on the plot? Default is `TRUE` if `data` alone is provided, and there are several Kaplan-Meier curves in each panel of the plot.
 #' @param show_median a logical, should the median survival (and associated legend) appear on the plot? Default is `TRUE` if `data` alone is provided, `FALSE` if `sdata` is also provided.
 #' @param show_sim a logical, should a confidence interval (and associated legend) computed from simulated data (`sdata`) appear on the plot? Default is `TRUE` if `sdata` is provided.
-#' @param ci_level a numeric, between 0 and 1, indicating the level of the confidence interval. Default is `.95` (95%) if the confidence interval is calculated from observed data (`data`), `.90` (90%) if calculated from simulations (`sdata`).
 #' @param cuminc a logical, should the plot represent the cumulative incidence? If `FALSE`, the default, the survival is represented.
+#' @param ci_level a numeric, between 0 and 1, indicating the level of the confidence interval. Default is `.95` (95%) if the confidence interval is calculated from observed data (`data`), `.90` (90%) if calculated from simulations (`sdata`).
 #' @param ci_alpha a numeric, between 0 and 1, indicating the opacity of the confidence interval.
 #' @param censor_shape shape of the censoring event.
 #' @param censor_size a numeric, the size of the censoring event.
 #' @param median_linetype a numeric, linetype of the median survival line.
+#' @param pval_pos a vector of 2 numeric, coordinate positions of the p-value text (`c(x,y)`). Default in `NULL`, should appear on the bottom left.
 #' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
@@ -97,6 +98,11 @@
 #'   xlim = c(0, 50), ylim = c(.10, .5)
 #' ) # limits do not change the underlying data (e.g.: same p value)
 #'
+#' ggKAP(
+#'   dat, color_var = "SEXF",
+#'   pval_pos = c(80, .8)
+#' ) # manually define p value position on the top right
+#'
 #' ggKAP(dat, rel_heights = list(
 #'   legends = c(1,1),
 #'   figtable = c(8,2),
@@ -132,12 +138,13 @@ ggKAP <- function(data,
                   show_pval = !missing(data)&&missing(sdata)&&!is.null(color_var)&&(if(!is.null(facet_var)){color_var!=facet_var}else{TRUE}),
                   show_median = !missing(data)&&missing(sdata),
                   show_sim = !missing(sdata),
-                  ci_level = if(show_se) .95 else .90,
                   cuminc = FALSE,
+                  ci_level = if(show_se) .95 else .90,
                   ci_alpha = .5,
                   censor_shape = "|",
                   censor_size = 4,
                   median_linetype = 2,
+                  pval_pos = NULL,
                   scale_x_break_by = NULL,
                   scale_y_labels = scales::percent,
                   label_x = "Time",
@@ -247,7 +254,9 @@ ggKAP <- function(data,
     fig <- fig +
       stat_kaplanmeier_pval(
         aes(strata = eval(..col)),
-        data = data
+        data = data,
+        xpos = pval_pos[1],
+        ypos = pval_pos[2]
       )
   }
 

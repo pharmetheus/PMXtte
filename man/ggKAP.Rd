@@ -24,12 +24,13 @@ ggKAP(
  }),
   show_median = !missing(data) && missing(sdata),
   show_sim = !missing(sdata),
-  ci_level = if (show_se) 0.95 else 0.9,
   cuminc = FALSE,
+  ci_level = if (show_se) 0.95 else 0.9,
   ci_alpha = 0.5,
   censor_shape = "|",
   censor_size = 4,
   median_linetype = 2,
+  pval_pos = NULL,
   scale_x_break_by = NULL,
   scale_y_labels = scales::percent,
   label_x = "Time",
@@ -83,9 +84,9 @@ ggKAP(
 
 \item{show_sim}{a logical, should a confidence interval (and associated legend) computed from simulated data (\code{sdata}) appear on the plot? Default is \code{TRUE} if \code{sdata} is provided.}
 
-\item{ci_level}{a numeric, between 0 and 1, indicating the level of the confidence interval. Default is \code{.95} (95\%) if the confidence interval is calculated from observed data (\code{data}), \code{.90} (90\%) if calculated from simulations (\code{sdata}).}
-
 \item{cuminc}{a logical, should the plot represent the cumulative incidence? If \code{FALSE}, the default, the survival is represented.}
+
+\item{ci_level}{a numeric, between 0 and 1, indicating the level of the confidence interval. Default is \code{.95} (95\%) if the confidence interval is calculated from observed data (\code{data}), \code{.90} (90\%) if calculated from simulations (\code{sdata}).}
 
 \item{ci_alpha}{a numeric, between 0 and 1, indicating the opacity of the confidence interval.}
 
@@ -94,6 +95,8 @@ ggKAP(
 \item{censor_size}{a numeric, the size of the censoring event.}
 
 \item{median_linetype}{a numeric, linetype of the median survival line.}
+
+\item{pval_pos}{a vector of 2 numeric, coordinate positions of the p-value text (\code{c(x,y)}). Default in \code{NULL}, should appear on the bottom left.}
 
 \item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2).}
 
@@ -192,6 +195,11 @@ ggKAP(
   dat, color_var = "SEXF",
   xlim = c(0, 50), ylim = c(.10, .5)
 ) # limits do not change the underlying data (e.g.: same p value)
+
+ggKAP(
+  dat, color_var = "SEXF",
+  pval_pos = c(80, .8)
+) # manually define p value position on the top right
 
 ggKAP(dat, rel_heights = list(
   legends = c(1,1),
