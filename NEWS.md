@@ -2,7 +2,8 @@
 
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
 * New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
-* `ggKAP(label_y_risk = )` now specifically updates the name of the y-axis of the risk table, independently of `label_color`. It was the intended behavior originally but the implementation was wrong.
+* `ggKAP(label_y_risk = )` now specifically updates the name of the y-axis of the risk table, independently of `label_color`. It was the intended behavior originally but the implementation was wrong. (#25)
+* `createTTESim()` now implements the simulation file name from the base name of the model file, ignoring the entire path if provided. (#28)
 
 # PMXtte 0.14.0
 
