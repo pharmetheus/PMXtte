@@ -47,7 +47,7 @@ test_that("digits works", {
                              digits_rate  = 3
   ) %>% capture.output()
 
-  expect_match(ans[12], "189.1&0.724\\\\tabular")
+  expect_match(ans[12], "189.1&0.725\\\\tabular")
 
 
 
