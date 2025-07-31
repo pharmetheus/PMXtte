@@ -1,7 +1,10 @@
 # PMXtte development version
 
+
 * `makeSummaryTableTTE(myID = , myDV = )` now define the column with the subject number and the column of the dependent variable. It was the intended behavior originally but the implementation was wrong. (#31)
 * `summaryFollowUpTime()` now rounds the total follow-up times after calculating the event rate. It rounded follow-up time first, possible rounding to 0 years of follow-up and an event rate of Infinity. (#32)
+* `summaryCountRTTE()` now correctly lumps the columns if the number of events is > 9. (#33)
+* `summaryCountRTTE()` now returns correct column names if these are lumped into a "X and more" category. (#34)
 
 # PMXtte 0.14.1
 
