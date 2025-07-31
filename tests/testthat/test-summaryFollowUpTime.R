@@ -52,3 +52,24 @@ test_that("digits works", {
 
 
 })
+
+
+test_that("summaryFollowUpTime() works with short durations", {
+  dat <- data.frame(
+    ID = 1:20,
+    TSFDD = rep(3, 20),
+    DV = c(1,1, rep(0, 20-2)),
+    STUDYIDN = rep(1, 20)
+  ) %>%
+    mutate(EVCOUNT = DV)
+
+  ans <- summaryFollowUpTime(dat, outerLevel="STUDYIDN",myTIME = "TSFDD", timeConversion = (1/365)) %>% capture.output()
+  expect_equal(ans[10], "All&2&0&12\\tabularnewline")
+
+  ans <- summaryFollowUpTime(dat, outerLevel="STUDYIDN",myTIME = "TSFDD", timeConversion = (1/365),
+                             digits = 3, digits_rate = 4) %>% capture.output()
+  expect_equal(ans[10], "All&2&0.164&12.17\\tabularnewline"  )
+
+
+})
+
