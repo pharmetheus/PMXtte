@@ -1,6 +1,8 @@
-# PMXtte 0.14.1
-
 # PMXtte development version
+
+* `makeSummaryTableTTE(myID = , myDV = )` now define the column with the subject number and the column of the dependent variable. It was the intended behavior originally but the implementation was wrong. (#31)
+
+# PMXtte 0.14.1
 
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
 * New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
