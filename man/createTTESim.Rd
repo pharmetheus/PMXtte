@@ -166,9 +166,12 @@ technique and is based on an existing NONMEM model file. The function
 modifies (adding and revising) the model file to enable simulations and
 output simulated event times and covariates. Default is to change to
 subroutine ADVAN6 in the simulations since other subroutines have been
-shown not to work adequately for this purpose. Note also that the created
-model file may need some further manual editing, eg, in the $ERROR section
-(removing Y expressions).
+shown not to work adequately for this purpose. Ensure to use the option
+endTimeVar to define COM(4) correctly (endTimeVar = "ENDTIME" is the default),
+since NONMEM will not complain if a variable not available in $INPUT is used.
+Note also that the created model file may need some further manual editing,
+eg, in the $DATA section with respect to IGNORE statements, in the $ERROR
+section (changing the first SUR to SURX, removing Y expressions etc).
 }
 \examples{
 # Example usage: RTTE with time-varying DOSEN covariate in output, not updating initial estimates

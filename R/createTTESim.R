@@ -6,9 +6,12 @@
 #' modifies (adding and revising) the model file to enable simulations and
 #' output simulated event times and covariates. Default is to change to
 #' subroutine ADVAN6 in the simulations since other subroutines have been
-#' shown not to work adequately for this purpose. Note also that the created
-#' model file may need some further manual editing, eg, in the $ERROR section
-#' (removing Y expressions).
+#' shown not to work adequately for this purpose. Ensure to use the option
+#' endTimeVar to define COM(4) correctly (endTimeVar = "ENDTIME" is the default),
+#' since NONMEM will not complain if a variable not available in $INPUT is used.
+#' Note also that the created model file may need some further manual editing,
+#' eg, in the $DATA section with respect to IGNORE statements, in the $ERROR
+#' section (changing the first SUR to SURX, removing Y expressions etc).
 #'
 #' @description This function generates a NONMEM control stream file for
 #'   simulating time-to-event (TTE) or repeated time-to-event (RTTE) data
@@ -165,12 +168,26 @@ createTTESim <- function(modFile,
     stop("No \\$DES record identified")
   }
 
+  # Adding initial comments to the user
+   linesProblem <- PMXFrem::findrecord(line, "\\$PROBLEM")
+  line <- PMXFrem::findrecord(line, "\\$PROBLEM",
+                              replace = c(
+                                linesProblem,
+                                "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
+                                "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS",
+                                "; CONSIDER IF $ERROR NEEDS UPDATE SUCH AS Y EXPRESSIONS TO BE REMOVED",
+                                "; IN TTE MODEL CHANGE FIRST ‘SUR’ TO  ‘SURX’",
+                                "; IN RTTE MODEL, IF NOT USING A TIME DEPENDENT HAZARD, REMOVE TIMEP=T IN $DES"
+                              )
+  )
+
   # Get $ABBREVIATED
   linesAbb <- PMXFrem::findrecord(line, "\\$ABB")
   newLinesAbb <- c(paste0("$ABB COMRES=", 7 + length(timeVaryingCovs)))
   if (length(linesAbb) != 0) {
     warning("$ABBR is overwritten by simulation COMRES, please check the $ABB code manually")
   }
+
 
   if (replaceSUB) {
     # Get $SUBROUTINE
@@ -312,6 +329,7 @@ createTTESim <- function(modFile,
       paste0(surVar, " = EXP(-(", hzdCompartment, "-COM(7))) ; Survival time T"),
       paste0("IF(COM(2).GT.", surVar, ".AND.T.LE.COM(4)) THEN      ; If event write event to output file"),
       "  COM(1)=T              ; Store event time",
+      "   TIMEP=T              ; Set previous time to event time",
       paste0("COM(3)=", surVar, "          ; Store survival"),
       paste0("COM(7)=", hzdCompartment, "          ; Set cumulative hazard"),
       "COM(6)=COM(6)+1          ; Event counter",
