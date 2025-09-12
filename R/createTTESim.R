@@ -47,6 +47,9 @@
 #'   counter. Default `"ITER"`. To be used in the code and header in the `simTabFile`.
 #' @param tmpDvVar Character string specifying a temporary variable name.
 #'   Default `"TDV"`. To be used to store the DV value for output, also used as `<TDV>X` in the code.
+#' @param timepVar Character string specifying the "previous event time" variable
+#'  name in the case of repeated time-to-event simulations. Default `"TIMEP"`.
+#'  To be searched in the `$DES` and replaced by `COM(1)`.
 #' @param baselineCovs Character vector of strings for all baseline covariates
 #'   to output in the `simTabFile`, e.g., `c("BCOV1","BCOV2")`. Default `NULL`,
 #'   i.e., no baseline covariates to output.
@@ -122,6 +125,7 @@ createTTESim <- function(modFile,
                          iCountVar = "ICOUNT",
                          iterVar = "ITER",
                          tmpDvVar = "TDV",
+                         timepVar = "TIMEP",
                          baselineCovs = NULL,
                          timeVaryingCovs = NULL,
                          endTimeVar = "ENDTIME",
@@ -176,8 +180,7 @@ createTTESim <- function(modFile,
                                 "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
                                 "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS",
                                 "; CONSIDER IF $ERROR NEEDS UPDATE SUCH AS Y EXPRESSIONS TO BE REMOVED",
-                                "; IN TTE MODEL CHANGE FIRST ‘SUR’ TO  ‘SURX’",
-                                "; IN RTTE MODEL, IF NOT USING A TIME DEPENDENT HAZARD, REMOVE TIMEP=T IN $DES"
+                                "; IN TTE MODEL CHANGE FIRST 'SUR' TO  'SURX'"
                               )
   )
 
@@ -219,6 +222,10 @@ createTTESim <- function(modFile,
     "\"  ENDIF",
     "ENDIF"
   )
+
+  initCOM1 <- "-1"
+  if(rtte) initCOM1 <- "0"
+
   # Build init code
   linesInit <- c(
     "IF (NEWIND.EQ.1) THEN      ; For every new ind except first in dataset",
@@ -231,7 +238,7 @@ createTTESim <- function(modFile,
     paste0("  COM(4) = ", endTimeVar, " ; Maxtime per individual (in hours)"),
     paste0("  COM(3) = -1          ; Variable for survival at event time"),
     paste0("  COM(2) = ", randomVar, "; Store the random number"),
-    paste0("  COM(1) = -1          ; Variable for the event time"),
+    paste0("  COM(1) = ", initCOM1, "            ; Variable for the event time"),
     paste0("  COM(6) = 0            ; Individual event counter"),
     paste0("  COM(7) = 0            ; Cumulative hazard"),
     " ENDIF",
@@ -323,13 +330,15 @@ createTTESim <- function(modFile,
 
   ### Create $DES code
   if (rtte) {
+    # update any "TIMEP" into "COM(1)"
+    linesDes <- str_replace_all(linesDes, timepVar, "COM(1)")
 
+    # add simulation specific code
     linesDESCode <- c(
       ";---------- RTTE Simulation specific",
       paste0(surVar, " = EXP(-(", hzdCompartment, "-COM(7))) ; Survival time T"),
       paste0("IF(COM(2).GT.", surVar, ".AND.T.LE.COM(4)) THEN      ; If event write event to output file"),
       "  COM(1)=T              ; Store event time",
-      "   TIMEP=T              ; Set previous time to event time",
       paste0("COM(3)=", surVar, "          ; Store survival"),
       paste0("COM(7)=", hzdCompartment, "          ; Set cumulative hazard"),
       "COM(6)=COM(6)+1          ; Event counter",

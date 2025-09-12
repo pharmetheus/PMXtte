@@ -18,6 +18,7 @@ createTTESim(
   iCountVar = "ICOUNT",
   iterVar = "ITER",
   tmpDvVar = "TDV",
+  timepVar = "TIMEP",
   baselineCovs = NULL,
   timeVaryingCovs = NULL,
   endTimeVar = "ENDTIME",
@@ -81,6 +82,10 @@ counter. Default \code{"ITER"}. To be used in the code and header in the \code{s
 
 \item{tmpDvVar}{Character string specifying a temporary variable name.
 Default \code{"TDV"}. To be used to store the DV value for output, also used as \verb{<TDV>X} in the code.}
+
+\item{timepVar}{Character string specifying the "previous event time" variable
+name in the case of repeated time-to-event simulations. Default \code{"TIMEP"}.
+To be searched in the \verb{$DES} and replaced by \code{COM(1)}.}
 
 \item{baselineCovs}{Character vector of strings for all baseline covariates
 to output in the \code{simTabFile}, e.g., \code{c("BCOV1","BCOV2")}. Default \code{NULL},
