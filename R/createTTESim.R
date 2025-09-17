@@ -97,6 +97,8 @@
 #'   or not. Default `FALSE`.
 #' @param replaceSUB Logical, indicating whether to replace `$SUBROUTINE` to
 #'   make sure it is using `ADVAN6`. Default `TRUE`.
+#' @param commentYERROR Logical, indicating whether to comment out lines of the
+#'  `$ERROR` block where "Y = " is found. Default `TRUE`.
 #'
 #' @return If `outFile` is specified, the function writes the NONMEM control
 #'   stream to the specified file and returns `NULL` invisibly. If `outFile` is
@@ -144,7 +146,8 @@ createTTESim <- function(modFile,
                          updateInits = TRUE,
                          includeThetaComments = TRUE,
                          includeTABLE = FALSE,
-                         replaceSUB = TRUE) {
+                         replaceSUB = TRUE,
+                         commentYERROR = TRUE) {
 
   if(!requireNamespace("PMXFrem", quietly = TRUE)) {
     stop(
@@ -179,7 +182,6 @@ createTTESim <- function(modFile,
                                 linesProblem,
                                 "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
                                 "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS",
-                                "; CONSIDER IF $ERROR NEEDS UPDATE SUCH AS Y EXPRESSIONS TO BE REMOVED",
                                 "; IN TTE MODEL CHANGE FIRST 'SUR' TO  'SURX'"
                               )
   )
@@ -373,6 +375,10 @@ createTTESim <- function(modFile,
   # Get $ERROR
   linesError <- PMXFrem::findrecord(line, "\\$ERR")
 
+  if(commentYERROR){
+    linesError <- comment_y(x = linesError)
+  }
+
   linesClose <- c(
     "IF (NDREC.EQ.LIREC.AND.NIREC.EQ.NINDR) THEN ; Last record for last individual",
     paste0("  CLOSE(", filePointer, ") ; Close File pointer"),
@@ -520,3 +526,6 @@ wrap_abs <- function(x, timepVar){
   )
 }
 
+comment_y <- function(x){
+  ifelse(str_detect(x, "\\bY\\s*="), paste0("; ", x), x)
+}

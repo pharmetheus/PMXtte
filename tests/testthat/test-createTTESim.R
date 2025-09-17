@@ -158,7 +158,14 @@ test_that("createTTESim wrap hazard time with abs()", {
   # works in the user-level function
   mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[60], "ABS\\(T-COM\\(1\\)\\)")
+  expect_match(newcode[59], "ABS\\(T-COM\\(1\\)\\)")
 
 })
 
+test_that("createTTESim comments out definitions of Y=", {
+  expect_equal(comment_y("Y = "), "; Y = ")
+  expect_equal(comment_y("Y= "), "; Y= ")
+  expect_equal(comment_y("IF(DV.EQ.1) Y= SUR*HAZ"), "; IF(DV.EQ.1) Y= SUR*HAZ")
+  expect_equal(comment_y("Hello"), "Hello")
+  expect_equal(comment_y("YY= "), "YY= ")
+})

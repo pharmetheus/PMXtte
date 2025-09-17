@@ -37,7 +37,8 @@ createTTESim(
   updateInits = TRUE,
   includeThetaComments = TRUE,
   includeTABLE = FALSE,
-  replaceSUB = TRUE
+  replaceSUB = TRUE,
+  commentYERROR = TRUE
 )
 }
 \arguments{
@@ -152,6 +153,9 @@ or not. Default \code{FALSE}.}
 
 \item{replaceSUB}{Logical, indicating whether to replace \verb{$SUBROUTINE} to
 make sure it is using \code{ADVAN6}. Default \code{TRUE}.}
+
+\item{commentYERROR}{Logical, indicating whether to comment out lines of the
+\verb{$ERROR} block where "Y = " is found. Default \code{TRUE}.}
 }
 \value{
 If \code{outFile} is specified, the function writes the NONMEM control
