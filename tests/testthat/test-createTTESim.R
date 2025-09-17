@@ -121,3 +121,44 @@ test_that("createTTESim make correct simfile name", {
   )
 })
 
+test_that("createTTESim wrap hazard time with abs()", {
+  rec1 <- "HAZ = LAM * EXP(SHP*(T-TIMEP)) ; Hazard for Placebo + Placebo "
+  rec2 <- "HAZ = LAM * EXP(SHP*(T) + RF) ;"
+  rec3 <- "DADT(1)=LAM*GAM*(LAM*(T-TIMEP)+DEL)**(GAM-1) ; Weibull distribution"
+  rec4 <- "TIMEP is time previous event"
+  rec5 <- "hello world"
+  rec6 <- "BEST-TIMEPREVIOUS"  # ignore if T is end of a word and TIMEP the beginning of a new one
+  rec7 <- "HAZ = LAM * EXP(SHP*(T -TIMEP))" # deals with white space
+  rec8 <- "HAZ = LAM * EXP(SHP*(T - TIMEP))"
+  rec9 <- "HAZ = LAM * EXP(SHP*(T- TIMEP))"
+  rec10 <- "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP)))" # dont wrap again if already there
+
+  recs <- c(rec1, rec2, rec3, rec4, rec5, rec6, rec7, rec8, rec9, rec10)
+  expect_equal(
+    wrap_abs(recs, timepVar = "TIMEP"),
+    c(
+      "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP))) ; Hazard for Placebo + Placebo ",
+      "HAZ = LAM * EXP(SHP*(T) + RF) ;",
+      "DADT(1)=LAM*GAM*(LAM*(ABS(T-TIMEP))+DEL)**(GAM-1) ; Weibull distribution",
+      "TIMEP is time previous event",
+      "hello world",
+      "BEST-TIMEPREVIOUS",
+      "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP)))",
+      "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP)))",
+      "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP)))",
+      "HAZ = LAM * EXP(SHP*(ABS(T-TIMEP)))")
+  )
+
+  rec <- "HAZ = LAM * EXP(SHP*(T- PTIME))" #Anything else than TIMEP
+  expect_equal(
+    wrap_abs(rec, timepVar = "PTIME"),
+    "HAZ = LAM * EXP(SHP*(ABS(T-PTIME)))"
+  )
+
+  # works in the user-level function
+  mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
+  expect_match(newcode[60], "ABS\\(T-COM\\(1\\)\\)")
+
+})
+

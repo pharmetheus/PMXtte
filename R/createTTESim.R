@@ -330,6 +330,10 @@ createTTESim <- function(modFile,
 
   ### Create $DES code
   if (rtte) {
+
+    # wrap any T-TIMEP with ABS()
+    linesDes <- wrap_abs(x = linesDes, timepVar = timepVar)
+
     # update any "TIMEP" into "COM(1)"
     linesDes <- str_replace_all(linesDes, timepVar, "COM(1)")
 
@@ -499,3 +503,20 @@ make_simtab_name <- function(x, prefix = "vpctab", suffix = ""){
     suffix
   )
 }
+
+wrap_abs <- function(x, timepVar){
+  expr <- paste0("T\\s*-\\s*", timepVar)
+  pattern <- paste0("\\b", expr,"\\b")
+  repl <- paste0("ABS(T-", timepVar,")")
+  ans <- stringr::str_replace_all(
+    string = x,
+    pattern = pattern,
+    replacement = repl
+  )
+  stringr::str_replace_all(
+    string = ans, # remove potential double ABS
+    pattern = "ABS\\(ABS\\((.*?)\\)\\)",
+    replacement = "ABS(\\1)"
+  )
+}
+
