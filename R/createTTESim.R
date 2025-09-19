@@ -97,8 +97,8 @@
 #'   or not. Default `FALSE`.
 #' @param replaceSUB Logical, indicating whether to replace `$SUBROUTINE` to
 #'   make sure it is using `ADVAN6`. Default `TRUE`.
-#' @param commentYERROR Logical, indicating whether to comment out lines of the
-#'  `$ERROR` block where "Y = " is found. Default `TRUE`.
+#' @param commentERROR Logical, indicating whether to comment out the lines of
+#'  original `$ERROR` block. Default `TRUE`.
 #'
 #' @return If `outFile` is specified, the function writes the NONMEM control
 #'   stream to the specified file and returns `NULL` invisibly. If `outFile` is
@@ -147,7 +147,7 @@ createTTESim <- function(modFile,
                          includeThetaComments = TRUE,
                          includeTABLE = FALSE,
                          replaceSUB = TRUE,
-                         commentYERROR = TRUE) {
+                         commentERROR = TRUE) {
 
   if(!requireNamespace("PMXFrem", quietly = TRUE)) {
     stop(
@@ -375,8 +375,8 @@ createTTESim <- function(modFile,
   # Get $ERROR
   linesError <- PMXFrem::findrecord(line, "\\$ERR")
 
-  if(commentYERROR){
-    linesError <- comment_y(x = linesError)
+  if(commentERROR){
+    linesError <- c(linesError[1], paste0("; ", linesError[-1]))
   }
 
   linesClose <- c(
@@ -524,8 +524,4 @@ wrap_abs <- function(x, timepVar){
     pattern = "ABS\\(ABS\\((.*?)\\)\\)",
     replacement = "ABS(\\1)"
   )
-}
-
-comment_y <- function(x){
-  ifelse(str_detect(x, "\\bY\\s*="), paste0("; ", x), x)
 }

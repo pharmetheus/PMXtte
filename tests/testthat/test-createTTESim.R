@@ -162,10 +162,22 @@ test_that("createTTESim wrap hazard time with abs()", {
 
 })
 
-test_that("createTTESim comments out definitions of Y=", {
-  expect_equal(comment_y("Y = "), "; Y = ")
-  expect_equal(comment_y("Y= "), "; Y= ")
-  expect_equal(comment_y("IF(DV.EQ.1) Y= SUR*HAZ"), "; IF(DV.EQ.1) Y= SUR*HAZ")
-  expect_equal(comment_y("Hello"), "Hello")
-  expect_equal(comment_y("YY= "), "YY= ")
+test_that("createTTESim comments out $ERROR", {
+  # In RTTE
+  mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
+  # if TRUE (the default)
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
+  expect_match(newcode[75], "^; DELX")
+  #if FALSE
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
+  expect_match(newcode[75], "^DELX")
+
+  # In TTE
+  mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
+  # if TRUE (the default)
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
+  expect_match(newcode[88], "^;   CHZ")
+  #if FALSE
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
+  expect_match(newcode[88], "^  CHZ")
 })
