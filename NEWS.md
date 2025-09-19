@@ -7,7 +7,9 @@
 * `summaryCountRTTE()` now returns correct column names if these are lumped into a "X and more" category. (#34)
 * New `ggKAP(scale_y_risktable_reverse = FALSE)`. If `TRUE`, reverses the y axis of the risk table. Useful to have the first levels of a vector from the first line and not from the bottom. Default remains `FALSE` to preserve reproducibility. (#35)
 * `createTTESim()` now provides a NONMEM code where the time of previous event in $DES is updated whenever a new event is simulated (using COM(1)), and where the time since last event is computed as absolute value to avoid potential negative times. This fixes a bug that was identified on several data sets where simulations crashed. New `createTTESim(timepVar = "TIMEP")` to identify the variable that corresponds to the time of previous event. 
-* New `createTTESim(commentYERROR = TRUE)` to comment out the lines of the $ERROR where "Y =" is defined. 
+* `createTTESim()` now provides a NONMEM code for TTE where SURX2, instead of SURX, is used to simulate a censoring event. This avoids the assumption of a definition of SURX in the legacy code, and make the simulation code more reliable.
+* New `createTTESim(commentERROR = TRUE)` to comment out the original $ERROR block.
+* 
 
 # PMXtte 0.14.1
 

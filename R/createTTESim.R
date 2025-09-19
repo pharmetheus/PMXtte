@@ -182,7 +182,6 @@ createTTESim <- function(modFile,
                                 linesProblem,
                                 "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
                                 "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS",
-                                "; IN TTE MODEL CHANGE FIRST 'SUR' TO  'SURX'"
                               )
   )
 
@@ -411,7 +410,7 @@ createTTESim <- function(modFile,
       paste0(surVarError, "2 = EXP(-(", hzdCompartment, "-COM(7))) ; Survival at last record"),
       "IF (LIREC.EQ.NDREC) THEN ;Last record per individual",
       " IF (COM(1).GT.COM(4)) THEN ;IF T > ENDTIME, T=ENDTIME",
-      paste0("  IF (COM(2).GT.", surVarError, ") THEN"),
+      paste0("  IF (COM(2).GT.", surVarError, "2) THEN"),
       "   COM(1) = COM(4)",
       "  ELSE ",
       "   COM(1) = -1 ;Integrated too far, reset event",
