@@ -158,7 +158,7 @@ test_that("createTTESim wrap hazard time with abs()", {
   # works in the user-level function
   mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[59], "ABS\\(T-COM\\(1\\)\\)")
+  expect_match(newcode[58], "ABS\\(T-COM\\(1\\)\\)")
 
 })
 
@@ -167,17 +167,17 @@ test_that("createTTESim comments out $ERROR", {
   mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
   # if TRUE (the default)
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[75], "^; DELX")
+  expect_match(newcode[74], "^; DELX")
   #if FALSE
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
-  expect_match(newcode[75], "^DELX")
+  expect_match(newcode[74], "^DELX")
 
   # In TTE
   mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
   # if TRUE (the default)
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[88], "^;   CHZ")
+  expect_match(newcode[87], "^;   CHZ")
   #if FALSE
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
-  expect_match(newcode[88], "^  CHZ")
+  expect_match(newcode[87], "^  CHZ")
 })

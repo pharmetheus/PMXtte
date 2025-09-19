@@ -9,9 +9,9 @@
 #' shown not to work adequately for this purpose. Ensure to use the option
 #' endTimeVar to define COM(4) correctly (endTimeVar = "ENDTIME" is the default),
 #' since NONMEM will not complain if a variable not available in $INPUT is used.
+#'
 #' Note also that the created model file may need some further manual editing,
-#' eg, in the $DATA section with respect to IGNORE statements, in the $ERROR
-#' section (changing the first SUR to SURX, removing Y expressions etc).
+#' eg, in the $DATA section with respect to IGNORE statements; scrutinize your code.
 #'
 #' @description This function generates a NONMEM control stream file for
 #'   simulating time-to-event (TTE) or repeated time-to-event (RTTE) data
@@ -181,7 +181,7 @@ createTTESim <- function(modFile,
                               replace = c(
                                 linesProblem,
                                 "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
-                                "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS",
+                                "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS"
                               )
   )
 
