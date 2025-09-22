@@ -86,4 +86,14 @@ test_that("makeSummaryTableTTE works with TTE", {
   expect_true(stringr::str_detect(ans[27], "\\{c\\}Proportion of "))
 })
 
+test_that("myID, myDV work", {
+  expect_equal(
+    makeSummaryTableTTE(rttedata %>% rename(BLABLA = ID), myID = "BLABLA"),
+    makeSummaryTableTTE(rttedata)
+  )
+  expect_equal(
+    makeSummaryTableTTE(rttedata %>% rename(BLABLA = ID, FOO = DV), myID = "BLABLA", myDV = "FOO"),
+    makeSummaryTableTTE(rttedata)
+  )
+})
 

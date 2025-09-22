@@ -91,9 +91,9 @@ makeSummaryTableTTE <- function(df,
 
   PhRame_makeSummaryTable(
     df = df,
-    myID = "ID",
-    myDV = "DV",
-    digits = 3,
+    myID = myID,
+    myDV = myDV,
+    digits = digits,
     nObsColNm = nObsColNm,
     avnObsColNm = avnObsColNm,
     caption = caption,

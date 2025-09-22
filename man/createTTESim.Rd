@@ -18,6 +18,7 @@ createTTESim(
   iCountVar = "ICOUNT",
   iterVar = "ITER",
   tmpDvVar = "TDV",
+  timepVar = "TIMEP",
   baselineCovs = NULL,
   timeVaryingCovs = NULL,
   endTimeVar = "ENDTIME",
@@ -36,7 +37,8 @@ createTTESim(
   updateInits = TRUE,
   includeThetaComments = TRUE,
   includeTABLE = FALSE,
-  replaceSUB = TRUE
+  replaceSUB = TRUE,
+  commentERROR = TRUE
 )
 }
 \arguments{
@@ -81,6 +83,10 @@ counter. Default \code{"ITER"}. To be used in the code and header in the \code{s
 
 \item{tmpDvVar}{Character string specifying a temporary variable name.
 Default \code{"TDV"}. To be used to store the DV value for output, also used as \verb{<TDV>X} in the code.}
+
+\item{timepVar}{Character string specifying the "previous event time" variable
+name in the case of repeated time-to-event simulations. Default \code{"TIMEP"}.
+To be searched in the \verb{$DES} and replaced by \code{COM(1)}.}
 
 \item{baselineCovs}{Character vector of strings for all baseline covariates
 to output in the \code{simTabFile}, e.g., \code{c("BCOV1","BCOV2")}. Default \code{NULL},
@@ -147,6 +153,9 @@ or not. Default \code{FALSE}.}
 
 \item{replaceSUB}{Logical, indicating whether to replace \verb{$SUBROUTINE} to
 make sure it is using \code{ADVAN6}. Default \code{TRUE}.}
+
+\item{commentERROR}{Logical, indicating whether to comment out the lines of
+original \verb{$ERROR} block. Default \code{TRUE}.}
 }
 \value{
 If \code{outFile} is specified, the function writes the NONMEM control
@@ -166,9 +175,12 @@ technique and is based on an existing NONMEM model file. The function
 modifies (adding and revising) the model file to enable simulations and
 output simulated event times and covariates. Default is to change to
 subroutine ADVAN6 in the simulations since other subroutines have been
-shown not to work adequately for this purpose. Note also that the created
-model file may need some further manual editing, eg, in the $ERROR section
-(removing Y expressions).
+shown not to work adequately for this purpose. Ensure to use the option
+endTimeVar to define COM(4) correctly (endTimeVar = "ENDTIME" is the default),
+since NONMEM will not complain if a variable not available in $INPUT is used.
+
+Note also that the created model file may need some further manual editing,
+eg, in the $DATA section with respect to IGNORE statements; scrutinize your code.
 }
 \examples{
 # Example usage: RTTE with time-varying DOSEN covariate in output, not updating initial estimates

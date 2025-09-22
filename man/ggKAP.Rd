@@ -33,6 +33,7 @@ ggKAP(
   pval_pos = NULL,
   scale_x_break_by = NULL,
   scale_y_labels = scales::percent,
+  scale_y_risktable_reverse = FALSE,
   label_x = "Time",
   label_y_fig = paste0("Subjects with", if (!cuminc) {
      "out"
@@ -101,6 +102,8 @@ ggKAP(
 \item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2).}
 
 \item{scale_y_labels}{passed to \code{ggplot2::scale_y_continuous(labels = )} when the Kaplan-Meier curve is constructed. Default is \code{scales::percent} to label the survival as percentage. Set to \code{identity} or \code{ggplot2::waiver()} for the original numeric values.}
+
+\item{scale_y_risktable_reverse}{a logical, should the y-axis of the risk table be reversed? By default, the levels of a factor variable are printed from bottom to top, but the human eyes expect to read a table from top to bottom.}
 
 \item{label_x}{a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.}
 
@@ -233,6 +236,7 @@ ggKAP(sdata = simdat, facet_var = "SEXF")
 # Special characters
 
 ggKAP(dat, color_var = "AUCQF")
+ggKAP(dat, color_var = "AUCQF", scale_y_risktable_reverse = TRUE) # 1st quartile on first row
 ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))
 dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
 ggKAP(dat, color_var = "AUCQF2", label_color = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())

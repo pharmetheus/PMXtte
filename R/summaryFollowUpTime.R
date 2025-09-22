@@ -103,11 +103,16 @@ summaryFollowUpTime <- function (df,
   if(asList | (is.null(outerLevel) & is.null(innerLevel))) {
     return(res_tab)
   }else{
-    followUpFunTable <- function(df){
-      df %>%
-        summarise(subjects=sum(finalCount),
-                  nObs=round(sum(annualT[!duplicated(!!rlang::sym(myID))]), digits = digits),
-                  avnObs=PhRame_out.digits(subjects/nObs, dig = digits_rate))
+    followUpFunTable <- function(df) {
+      df %>% summarise(
+        subjects = sum(finalCount),
+        nObs = sum(annualT[!duplicated(!!rlang::sym(myID))]),
+        avnObs = subjects/nObs
+      ) %>%
+        mutate(
+          nObs = round(nObs, digits = digits),
+          avnObs = PMXtte:::PhRame_out.digits(avnObs, dig = digits_rate)
+        )
     }
     PhRame_makeSummaryTable(df = sum_data,
                             myID = myID,

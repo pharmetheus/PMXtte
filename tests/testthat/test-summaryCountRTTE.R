@@ -1,7 +1,7 @@
-ttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
-ttedata <- dplyr::filter(ttedata, EVID == 0, TYPE == 2)
+rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
+rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 test_that("summaryCountRTTE() works", {
-  ans <- summaryCountRTTE(ttedata,
+  ans <- summaryCountRTTE(rttedata,
                           outerLevel   = "DOSEN",
                           outerLabel   = "Dose",
                           innerLevel   = "STUDYIDN",
@@ -17,10 +17,16 @@ test_that("summaryCountRTTE() works", {
     ans[[3]]$subjects
   )
 
+  # Columns names are correct if columns are lumped
+  expect_match(
+    capture.output(summaryCountRTTE(rttedata, outerLevel = "DOSEN", lumpCount = 2))[8],
+    "2 or more"
+  )
+
 })
 
 test_that("inner/outer levels work", {
-  ans <- summaryCountRTTE(ttedata,
+  ans <- summaryCountRTTE(rttedata,
                           outerLevel   = "DOSEN",
                           outerLabel   = "Dose",
                           asList = TRUE)
@@ -29,7 +35,7 @@ test_that("inner/outer levels work", {
   expect_length(ans, 2)
   expect_true("DOSEN" %in% names(ans[[2]]))
 
-  ans <- summaryCountRTTE(ttedata,
+  ans <- summaryCountRTTE(rttedata,
                           innerLevel   = "STUDYIDN",
                           innerLabel   = "Study",
                           asList = TRUE)
@@ -38,7 +44,7 @@ test_that("inner/outer levels work", {
   expect_length(ans, 2)
   expect_true("STUDYIDN" %in% names(ans[[2]]))
 
-  ans <- summaryCountRTTE(ttedata,
+  ans <- summaryCountRTTE(rttedata,
                           asList = TRUE)
 
   expect_type(ans, "list")
@@ -72,4 +78,18 @@ test_that("lump_drop_columns() works", {
   df[["1"]] <- 0
   ans <- lump_drop_columns(df, dropCount0 = TRUE)
   expect_null(ans[["1"]])
+
+  # even if n event > 10
+
+  ini <- tibble(
+    subjects = 1 + 10+20+30+40+50+60+70+80+90+100+110,
+    `0` = 1, `1` = 10, `2` = 20, `3` = 30, `4` = 40, `5` = 50, `6` = 60,
+    `7` = 70, `8` = 80, `9` = 90, `10` = 100, `11` = 110
+    )
+  ans <- lump_drop_columns(ini, lump = 4)
+  expect_equal(ans, tibble(
+    subjects = 661, `0` = 1, `1` = 10, `2` = 20, `3` = 30,
+    `4 or more` = 40+50+60+70+80+90+100+110
+  ))
+
 })
