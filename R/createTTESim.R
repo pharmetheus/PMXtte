@@ -266,22 +266,19 @@ createTTESim <- function(modFile,
     for (i in seq_along(timeVaryingCovs)) {
       lineTVCovs <- c(lineTVCovs, paste0("COM(", 7 + i, ")=", timeVaryingCovs[i]))
     }
+
+    # For TTE (not RTTE), a wrapper is needed
+    if(!rtte){
+      lineTVCovs <- c("IF (COM(1).EQ.-1) THEN ; IF NO EVENT SIMULATED YET",
+                      paste0(" ", lineTVCovs), "ENDIF")
+    }
   }
 
-  # Write $PK include time-varying covs for RTTE but not TTE
-  if (rtte) {
-    linesPk <- c(
+  # Concatenate the new lines of the $PK
+  linesPk <- c(
       newLinesAbb, linesPk[1], linesOpenFile, linesInit, linesPk[2:length(linesPk)],
-      linesMTime, "", lineTVCovs
+      linesMTime, lineTVCovs
     )
-  }
-  if (!rtte) {
-    linesPk <- c(
-      newLinesAbb, linesPk[1], linesOpenFile, linesInit, linesPk[2:length(linesPk)],
-      linesMTime, "", "IF (COM(1).EQ.-1) THEN ; IF NO EVENT SIMULATED YET",
-      paste0(" ", lineTVCovs), "ENDIF"
-    )
-  }
 
   # Update $PK with MTIME and Open file
   line <- PMXFrem::findrecord(line, "\\$PK", replace = linesPk)

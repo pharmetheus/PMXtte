@@ -158,7 +158,8 @@ test_that("createTTESim wrap hazard time with abs()", {
   # works in the user-level function
   mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[58], "ABS\\(T-COM\\(1\\)\\)")
+  index_to_check <- str_which(newcode, "DADT\\(1\\)=")
+  expect_match(newcode[index_to_check], "ABS\\(T-COM\\(1\\)\\)")
 
 })
 
@@ -167,17 +168,57 @@ test_that("createTTESim comments out $ERROR", {
   mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
   # if TRUE (the default)
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[74], "^; DELX")
+  index_to_check <- str_which(newcode, "\\$ERROR")+1
+  expect_match(newcode[index_to_check], "^; DELX")
   #if FALSE
   newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
-  expect_match(newcode[74], "^DELX")
+  expect_match(newcode[index_to_check], "^DELX")
 
   # In TTE
   mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
   # if TRUE (the default)
-  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
-  expect_match(newcode[87], "^;   CHZ")
+  newcode <- createTTESim(modFile = mypath, rtte = FALSE, outFile = NULL, updateInits = FALSE)
+  index_to_check <- str_which(newcode, "\\$ERROR")+2
+  expect_match(newcode[index_to_check], "^;   CHZ")
   #if FALSE
-  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, commentERROR = F)
-  expect_match(newcode[87], "^  CHZ")
+  newcode <- createTTESim(modFile = mypath, rtte = FALSE, outFile = NULL, updateInits = FALSE, commentERROR = F)
+  expect_match(newcode[index_to_check], "^  CHZ")
+})
+
+test_that("createTTESim does not create empty if", {
+  # In TTE
+  mypath <- system.file("extdata", "tte_weibull.mod", package = "PMXtte")
+  # if has time varying
+  newcode <- createTTESim(modFile = mypath, rtte = FALSE, outFile = NULL, updateInits = FALSE, timeVaryingCovs = "AGE")
+  index_to_check <- which(newcode == "$DES")-(4:1)
+  expect_equal(
+    newcode[index_to_check],
+    c("IF (COM(1).EQ.-1) THEN ; IF NO EVENT SIMULATED YET", " ", " COM(8)=AGE", "ENDIF")
+  )
+
+  # if does not have time varying
+  newcode <- createTTESim(modFile = mypath, rtte = FALSE, outFile = NULL, updateInits = FALSE)
+  index_to_check <- which(newcode == "$DES")-(2:1)
+  expect_equal(
+    newcode[index_to_check],
+    c("", "")
+  )
+
+  # In RTTE
+  mypath <- system.file("extdata", "rtte_mod.mod", package = "PMXtte")
+  # if has time varying
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE, timeVaryingCovs = "AGE")
+  index_to_check <- which(newcode == "$DES")-(3:1)
+  expect_equal(
+    newcode[index_to_check],
+    c("", "", "COM(8)=AGE")
+  )
+  # if does not have time varying
+  newcode <- createTTESim(modFile = mypath, rtte = TRUE, outFile = NULL, updateInits = FALSE)
+  index_to_check <- which(newcode == "$DES")-(2:1)
+  newcode[index_to_check]
+  expect_equal(
+    newcode[index_to_check],
+    c("", "")
+  )
 })
