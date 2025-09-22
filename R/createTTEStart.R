@@ -139,8 +139,8 @@ createTTEStart <- function(outFile = NULL,
   destinationError <- "TIME"
 
   if (rtte) {
-    destination <- "(T-TIMEP)"
-    destinationError <- "(TIME-TIMEP)"
+    destination <- "(ABS(T-TIMEP))"
+    destinationError <- "(ABS(TIME-TIMEP))"
   }
 
   if (distribution == "exponential" || distribution == "weibull" ||

@@ -37,6 +37,7 @@
 #' @param pval_pos a vector of 2 numeric, coordinate positions of the p-value text (`c(x,y)`). Default in `NULL`, should appear on the bottom left.
 #' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
+#' @param scale_y_risktable_reverse a logical, should the y-axis of the risk table be reversed? By default, the levels of a factor variable are printed from bottom to top, but the human eyes expect to read a table from top to bottom.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
 #' @param label_y_fig a character, the name of the y-axis (i.e. survival) of the Kaplan-Meier figure.
 #' @param label_color a character, the name of the legend for colors (and, by default, of the y-axis of the risk table). Can also be an expression (`expression()`) if special character or super/subscripts should be shown.
@@ -135,6 +136,7 @@
 #' # Special characters
 #'
 #' ggKAP(dat, color_var = "AUCQF")
+#' ggKAP(dat, color_var = "AUCQF", scale_y_risktable_reverse = TRUE) # 1st quartile on first row
 #' ggKAP(dat, color_var = "AUCQF", label_color = expression(AUC['0-24h']))
 #' dat$AUCQF2 <- factor(dat$AUCQF, labels = c("1^st", "2^nd~quartile", "The~3^rd~q"))
 #' ggKAP(dat, color_var = "AUCQF2", label_color = expression(AUC['0-24h']), scale_color_labels = scales::label_parse())
@@ -164,6 +166,7 @@ ggKAP <- function(data,
                   pval_pos = NULL,
                   scale_x_break_by = NULL,
                   scale_y_labels = scales::percent,
+                  scale_y_risktable_reverse = FALSE,
                   label_x = "Time",
                   label_y_fig = paste0("Subjects with", if(!cuminc){"out"}, " event (%)"),
                   label_color = color_var,
@@ -374,7 +377,8 @@ ggKAP <- function(data,
       breaks = scale_x_breaks,
     ) +
     scale_y_discrete(
-      labels = scale_color_labels
+      labels = scale_color_labels,
+      limits = if(scale_y_risktable_reverse) base::rev else NULL
     ) +
     scale_color_manual(
       values = scale_color_values

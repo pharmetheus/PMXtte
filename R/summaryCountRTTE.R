@@ -274,7 +274,7 @@ summaryCountRTTE <- function(
     }
 
     if(is.null(nEventColNm)){
-      nEventColNm <- seq_len(ncol(Ntable)-1)-1 # 0, 1, 2 etc..
+      nEventColNm <- setdiff(colnames(Ntable), "subjects")
       nEventColNm <- paste0("\\textbf{", nEventColNm, "\\textsuperscript{b}}")
 
       #nEventColNm[1] <- paste0("\\textbf{nEvent\\textsuperscript{b}:}\\newline", nEventColNm[1])
@@ -354,7 +354,7 @@ lump_drop_columns <- function(x, lump = Inf, dropCount0 = FALSE){
 
   ans <- x
 
-  counts <- names(x)[grepl("^\\d+$", names(x))]
+  counts <- as.double(names(x)[grepl("^\\d+$", names(x))])
 
   if(lump <= 0){
     stop("Cannot lump counts <= 0")

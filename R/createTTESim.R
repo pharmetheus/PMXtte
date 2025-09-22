@@ -6,9 +6,12 @@
 #' modifies (adding and revising) the model file to enable simulations and
 #' output simulated event times and covariates. Default is to change to
 #' subroutine ADVAN6 in the simulations since other subroutines have been
-#' shown not to work adequately for this purpose. Note also that the created
-#' model file may need some further manual editing, eg, in the $ERROR section
-#' (removing Y expressions).
+#' shown not to work adequately for this purpose. Ensure to use the option
+#' endTimeVar to define COM(4) correctly (endTimeVar = "ENDTIME" is the default),
+#' since NONMEM will not complain if a variable not available in $INPUT is used.
+#'
+#' Note also that the created model file may need some further manual editing,
+#' eg, in the $DATA section with respect to IGNORE statements; scrutinize your code.
 #'
 #' @description This function generates a NONMEM control stream file for
 #'   simulating time-to-event (TTE) or repeated time-to-event (RTTE) data
@@ -44,6 +47,9 @@
 #'   counter. Default `"ITER"`. To be used in the code and header in the `simTabFile`.
 #' @param tmpDvVar Character string specifying a temporary variable name.
 #'   Default `"TDV"`. To be used to store the DV value for output, also used as `<TDV>X` in the code.
+#' @param timepVar Character string specifying the "previous event time" variable
+#'  name in the case of repeated time-to-event simulations. Default `"TIMEP"`.
+#'  To be searched in the `$DES` and replaced by `COM(1)`.
 #' @param baselineCovs Character vector of strings for all baseline covariates
 #'   to output in the `simTabFile`, e.g., `c("BCOV1","BCOV2")`. Default `NULL`,
 #'   i.e., no baseline covariates to output.
@@ -91,6 +97,8 @@
 #'   or not. Default `FALSE`.
 #' @param replaceSUB Logical, indicating whether to replace `$SUBROUTINE` to
 #'   make sure it is using `ADVAN6`. Default `TRUE`.
+#' @param commentERROR Logical, indicating whether to comment out the lines of
+#'  original `$ERROR` block. Default `TRUE`.
 #'
 #' @return If `outFile` is specified, the function writes the NONMEM control
 #'   stream to the specified file and returns `NULL` invisibly. If `outFile` is
@@ -119,6 +127,7 @@ createTTESim <- function(modFile,
                          iCountVar = "ICOUNT",
                          iterVar = "ITER",
                          tmpDvVar = "TDV",
+                         timepVar = "TIMEP",
                          baselineCovs = NULL,
                          timeVaryingCovs = NULL,
                          endTimeVar = "ENDTIME",
@@ -137,7 +146,8 @@ createTTESim <- function(modFile,
                          updateInits = TRUE,
                          includeThetaComments = TRUE,
                          includeTABLE = FALSE,
-                         replaceSUB = TRUE) {
+                         replaceSUB = TRUE,
+                         commentERROR = TRUE) {
 
   if(!requireNamespace("PMXFrem", quietly = TRUE)) {
     stop(
@@ -165,12 +175,23 @@ createTTESim <- function(modFile,
     stop("No \\$DES record identified")
   }
 
+  # Adding initial comments to the user
+   linesProblem <- PMXFrem::findrecord(line, "\\$PROBLEM")
+  line <- PMXFrem::findrecord(line, "\\$PROBLEM",
+                              replace = c(
+                                linesProblem,
+                                "; THIS FILE MAY NEED SOME MANUAL EDITING, EG,",
+                                "; CONSIDER IF $DATA NEEDS UPDATE OF IGNORE STATEMENTS"
+                              )
+  )
+
   # Get $ABBREVIATED
   linesAbb <- PMXFrem::findrecord(line, "\\$ABB")
   newLinesAbb <- c(paste0("$ABB COMRES=", 7 + length(timeVaryingCovs)))
   if (length(linesAbb) != 0) {
     warning("$ABBR is overwritten by simulation COMRES, please check the $ABB code manually")
   }
+
 
   if (replaceSUB) {
     # Get $SUBROUTINE
@@ -202,6 +223,10 @@ createTTESim <- function(modFile,
     "\"  ENDIF",
     "ENDIF"
   )
+
+  initCOM1 <- "-1"
+  if(rtte) initCOM1 <- "0"
+
   # Build init code
   linesInit <- c(
     "IF (NEWIND.EQ.1) THEN      ; For every new ind except first in dataset",
@@ -214,7 +239,7 @@ createTTESim <- function(modFile,
     paste0("  COM(4) = ", endTimeVar, " ; Maxtime per individual (in hours)"),
     paste0("  COM(3) = -1          ; Variable for survival at event time"),
     paste0("  COM(2) = ", randomVar, "; Store the random number"),
-    paste0("  COM(1) = -1          ; Variable for the event time"),
+    paste0("  COM(1) = ", initCOM1, "            ; Variable for the event time"),
     paste0("  COM(6) = 0            ; Individual event counter"),
     paste0("  COM(7) = 0            ; Cumulative hazard"),
     " ENDIF",
@@ -241,22 +266,19 @@ createTTESim <- function(modFile,
     for (i in seq_along(timeVaryingCovs)) {
       lineTVCovs <- c(lineTVCovs, paste0("COM(", 7 + i, ")=", timeVaryingCovs[i]))
     }
+
+    # For TTE (not RTTE), a wrapper is needed
+    if(!rtte){
+      lineTVCovs <- c("IF (COM(1).EQ.-1) THEN ; IF NO EVENT SIMULATED YET",
+                      paste0(" ", lineTVCovs), "ENDIF")
+    }
   }
 
-  # Write $PK include time-varying covs for RTTE but not TTE
-  if (rtte) {
-    linesPk <- c(
+  # Concatenate the new lines of the $PK
+  linesPk <- c(
       newLinesAbb, linesPk[1], linesOpenFile, linesInit, linesPk[2:length(linesPk)],
-      linesMTime, "", lineTVCovs
+      linesMTime, lineTVCovs
     )
-  }
-  if (!rtte) {
-    linesPk <- c(
-      newLinesAbb, linesPk[1], linesOpenFile, linesInit, linesPk[2:length(linesPk)],
-      linesMTime, "", "IF (COM(1).EQ.-1) THEN ; IF NO EVENT SIMULATED YET",
-      paste0(" ", lineTVCovs), "ENDIF"
-    )
-  }
 
   # Update $PK with MTIME and Open file
   line <- PMXFrem::findrecord(line, "\\$PK", replace = linesPk)
@@ -307,6 +329,13 @@ createTTESim <- function(modFile,
   ### Create $DES code
   if (rtte) {
 
+    # wrap any T-TIMEP with ABS()
+    linesDes <- wrap_abs(x = linesDes, timepVar = timepVar)
+
+    # update any "TIMEP" into "COM(1)"
+    linesDes <- str_replace_all(linesDes, timepVar, "COM(1)")
+
+    # add simulation specific code
     linesDESCode <- c(
       ";---------- RTTE Simulation specific",
       paste0(surVar, " = EXP(-(", hzdCompartment, "-COM(7))) ; Survival time T"),
@@ -342,6 +371,10 @@ createTTESim <- function(modFile,
   # Get $ERROR
   linesError <- PMXFrem::findrecord(line, "\\$ERR")
 
+  if(commentERROR){
+    linesError <- c(linesError[1], paste0("; ", linesError[-1]))
+  }
+
   linesClose <- c(
     "IF (NDREC.EQ.LIREC.AND.NIREC.EQ.NINDR) THEN ; Last record for last individual",
     paste0("  CLOSE(", filePointer, ") ; Close File pointer"),
@@ -374,7 +407,7 @@ createTTESim <- function(modFile,
       paste0(surVarError, "2 = EXP(-(", hzdCompartment, "-COM(7))) ; Survival at last record"),
       "IF (LIREC.EQ.NDREC) THEN ;Last record per individual",
       " IF (COM(1).GT.COM(4)) THEN ;IF T > ENDTIME, T=ENDTIME",
-      paste0("  IF (COM(2).GT.", surVarError, ") THEN"),
+      paste0("  IF (COM(2).GT.", surVarError, "2) THEN"),
       "   COM(1) = COM(4)",
       "  ELSE ",
       "   COM(1) = -1 ;Integrated too far, reset event",
@@ -470,5 +503,21 @@ make_simtab_name <- function(x, prefix = "vpctab", suffix = ""){
     prefix,
     tools::file_path_sans_ext(basename(x)),
     suffix
+  )
+}
+
+wrap_abs <- function(x, timepVar){
+  expr <- paste0("T\\s*-\\s*", timepVar)
+  pattern <- paste0("\\b", expr,"\\b")
+  repl <- paste0("ABS(T-", timepVar,")")
+  ans <- stringr::str_replace_all(
+    string = x,
+    pattern = pattern,
+    replacement = repl
+  )
+  stringr::str_replace_all(
+    string = ans, # remove potential double ABS
+    pattern = "ABS\\(ABS\\((.*?)\\)\\)",
+    replacement = "ABS(\\1)"
   )
 }
