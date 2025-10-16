@@ -24,7 +24,7 @@ summaryFollowUpTime(
     "Summary of observation periods and annual event rates in the analysis data set.",
   label = "tab:anaSummaryFollowupTime",
   footnote =
-    "\\\\textsuperscript{a}Number of events\\\\newline\\\\textsuperscript{b}Total\\n                                 observation period calculated as sum of individual observation period per row.\\n                                 \\\\newline\\\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per\\n                                 group divided by total observation period per group.",
+    "\\\\textsuperscript{a}Total number of events\\\\newline\\\\textsuperscript{b}\\n                                 The observation period (total) is the sum of the individual observation periods per group.\\n                                 \\\\newline\\\\textsuperscript{c}Annual event rate is calculated, per group, as the total number of events divided by the observation period (total).",
   asList = FALSE,
   ...
 )

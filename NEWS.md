@@ -1,3 +1,8 @@
+# PMXtte development version
+* New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. The previous value was set internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
+* The latex output of `summaryCountRTTE()` now displays an extra-heading to distinguish the number of subjects on the left-hand side, and the number of subjects with the indicated number of events on the right-hand side. This is controlled by two new arguments, `summaryCountRTTE(cgroup, n.cgroup)`. The default value of `summaryCountRTTE(nIdColNm, caption)` was adapted consequently.
+* The default `footnote` argument of `makeSummaryTableTTE()`, `summaryCountRTTE()` and `summaryFollowUpTime()` were revised.
+
 # PMXtte 0.14.2
 
 * `makeSummaryTableTTE(myID = , myDV = )` now define the column with the subject number and the column of the dependent variable. It was the intended behavior originally but the implementation was wrong. (#31)
@@ -8,7 +13,7 @@
 * `createTTESim()` now provides a NONMEM code where the time of previous event in $DES is updated whenever a new event is simulated (using COM(1)), and where the time since last event is computed as absolute value to avoid potential negative times. This fixes a bug that was identified on several data sets where simulations crashed. New `createTTESim(timepVar = "TIMEP")` to identify the variable that corresponds to the time of previous event. 
 * `createTTESim()` now provides a NONMEM code for TTE where SURX2, instead of SURX, is used to simulate a censoring event. This avoids the assumption of a definition of SURX in the legacy code, and make the simulation code more reliable.
 * New `createTTESim(commentERROR = TRUE)` to comment out the original $ERROR block.
-* 
+
 
 # PMXtte 0.14.1
 

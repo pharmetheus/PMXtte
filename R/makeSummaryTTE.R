@@ -15,8 +15,9 @@
 #' @param avnObsColNm is the character string to be printed as the column name with the average number of observations per subject in a given strata, default is "\\\\textbf\{pEvent\\\\textsuperscript\{c\}\}"
 #' @param avnObsPercent is a logical, should "pEvent" be printed as a percentage? TRUE
 #' @param caption is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"
-#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.
+#' @param footnote is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Total number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.
 #' @param myFun internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.
+#' @param col.just passed to latex. Defaulted to "c("S", "S", "l")" to avoid a space between the number and the percentage sign in the last column.
 #' @param ...  passed to `PhRame_makeSummaryTable()`, possibly for the additional optional arguments compatible with latex
 #'
 #' @return By default, the table at Latex format. Alternatively, if `asList = TRUE`, a list of data.frame tables
@@ -60,10 +61,11 @@ makeSummaryTableTTE <- function(df,
                                 caption = "Number of patients and number of events",
                                 footnote = paste0(
                                   "\\textsuperscript{a}Number of subjects\\newline",
-                                  "\\textsuperscript{b}Number of events\\newline",
+                                  "\\textsuperscript{b}Total number of events\\newline",
                                   if(showAvnObs){"\\textsuperscript{c}Proportion of events"}
                                   ),
                                 myFun = NULL,
+                                col.just = c("S", "S", "l"),
                                 ...){
 
   if(is.null(myFun)){
@@ -99,6 +101,7 @@ makeSummaryTableTTE <- function(df,
     caption = caption,
     footnote = footnote,
     myFun = myFun,
+    col.just = col.just,
     ...
   )
 }

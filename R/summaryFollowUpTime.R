@@ -67,10 +67,9 @@ summaryFollowUpTime <- function (df,
                                  EventRateColNm = "\\textbf{Event rate (1/year)\\textsuperscript{c}}",
                                  caption = "Summary of observation periods and annual event rates in the analysis data set.",
                                  label = "tab:anaSummaryFollowupTime",
-                                 footnote = "\\textsuperscript{a}Number of events\\newline\\textsuperscript{b}Total
-                                 observation period calculated as sum of individual observation period per row.
-                                 \\newline\\textsuperscript{c}Annual event rate calculated, for each row, as number of events per
-                                 group divided by total observation period per group.",
+                                 footnote = "\\textsuperscript{a}Total number of events\\newline\\textsuperscript{b}
+                                 The observation period (total) is the sum of the individual observation periods per group.
+                                 \\newline\\textsuperscript{c}Annual event rate is calculated, per group, as the total number of events divided by the observation period (total).",
                                  asList = FALSE,
                                  ...) {
 
