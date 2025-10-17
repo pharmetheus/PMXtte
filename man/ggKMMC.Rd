@@ -6,7 +6,7 @@
 \usage{
 ggKMMC(
   odata,
-  sdata,
+  sdata = NULL,
   cov_col,
   cov_data = odata,
   time_col = "TIME",
