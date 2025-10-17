@@ -47,3 +47,11 @@ test_that("checks works", {
     suppressWarnings(ggKAP(dat, color_var = "DV", check_input = FALSE))
   )
 })
+
+test_that("Definition of x-breaks works", {
+  expect_no_warning(ggKAP(dat))
+  expect_no_warning(ggKAP(dat, scale_x_breaks = c(0,50,100)))
+  expect_no_warning(ggKAP(dat, scale_x_break_by = 20))
+  expect_warning(ggKAP(dat, scale_x_breaks = c(0,50,100), scale_x_break_by = 20), regexp = "\\`scale_x_break_by\\` is ignored, breaks of the x-axis being defined in \\`scale_x_breaks\\`")
+})
+

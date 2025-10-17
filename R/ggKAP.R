@@ -35,7 +35,8 @@
 #' @param censor_size a numeric, the size of the censoring event.
 #' @param median_linetype a numeric, linetype of the median survival line.
 #' @param pval_pos a vector of 2 numeric, coordinate positions of the p-value text (`c(x,y)`). Default in `NULL`, should appear on the bottom left.
-#' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
+#' @param scale_x_breaks passed to `ggplot2::scale_x_continuous(breaks = )` of the Kaplan-Meier curve and of the risk table. Default is `ggplot2::waiver()` (default setup of ggplot2). Overrules `scale_x_break_by`.
+#' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2). Ignored if `scale_x_breaks` is provided.
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
 #' @param scale_y_risktable_reverse a logical, should the y-axis of the risk table be reversed? By default, the levels of a factor variable are printed from bottom to top, but the human eyes expect to read a table from top to bottom.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
@@ -92,7 +93,8 @@
 #'   censor_size = 6, median_linetype = 3
 #' )
 #'
-#' ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
+#' ggKAP(dat, scale_x_breaks = c(0, 30, 40, 80, 100)) #Both risk table and graph are updated
+#' ggKAP(dat, scale_x_break_by = 12) #Or use this shortcut if you just want to play with the width of interval
 #'
 #' ggKAP(
 #'   dat, color_var = "SEXF",
@@ -164,6 +166,7 @@ ggKAP <- function(data,
                   censor_size = 4,
                   median_linetype = 2,
                   pval_pos = NULL,
+                  scale_x_breaks = ggplot2::waiver(),
                   scale_x_break_by = NULL,
                   scale_y_labels = scales::percent,
                   scale_y_risktable_reverse = FALSE,
@@ -206,10 +209,15 @@ ggKAP <- function(data,
       facet_var = facet_var)
   }
 
-  if(!is.null(scale_x_break_by)){
-    scale_x_breaks <- seq(0, max(data[[time_var]]), by = scale_x_break_by)
+  if(inherits(scale_x_breaks, "waiver")){ # if scale_x_breaks is set as default
+    # then evaluate the "break_by" shortcut
+    if(!is.null(scale_x_break_by)){
+      scale_x_breaks <- seq(0, max(data[[time_var]]), by = scale_x_break_by)
+    } # else: scale_x_breaks stays the default "waiver"
   } else {
-    scale_x_breaks <- ggplot2::waiver()
+    if(!is.null(scale_x_break_by)){
+      warning("`scale_x_break_by` is ignored, breaks of the x-axis being defined in `scale_x_breaks`" )
+    }
   }
 
   if(!is.null(color_var)){
