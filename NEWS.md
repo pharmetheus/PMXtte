@@ -2,6 +2,9 @@
 * New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. The previous value was set internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
 * The latex output of `summaryCountRTTE()` now displays an extra-heading to distinguish the number of subjects on the left-hand side, and the number of subjects with the indicated number of events on the right-hand side. This is controlled by two new arguments, `summaryCountRTTE(cgroup, n.cgroup)`. The default value of `summaryCountRTTE(nIdColNm, caption)` was adapted consequently.
 * The default `footnote` argument of `makeSummaryTableTTE()`, `summaryCountRTTE()` and `summaryFollowUpTime()` were revised.
+* In `stat_kaplanmeier_pval()`, a `strata` pointing to a character variable will now be coerced to a factor. This enables the calculation of the p value between the different "categories" of a character value, in particular if `ggKAP(color_var)` points to a character variable. (#37)
+* 
+
 
 # PMXtte 0.14.2
 

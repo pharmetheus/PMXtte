@@ -393,6 +393,14 @@ stat_kaplanmeier_pval <- function(mapping = NULL, data = NULL, geom = "text",
 StatKaplanMeierPval <- ggplot2::ggproto(
   "StatKaplanMeierPval", Stat,
 
+  setup_data = function(data, params) {
+    # Ensure the strata variable is a factor for reliable processing
+    if(is.character(data$strata)){
+      data$strata <- as.factor(data$strata)
+    }
+    data
+  },
+
   compute_panel = function(data, scales, xpos = NULL, ypos = NULL) {
     fit <- survival::survdiff(
       formula = (survival::Surv(x,y) ~ survival::strata(strata)),
