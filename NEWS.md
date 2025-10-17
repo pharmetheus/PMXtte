@@ -6,6 +6,7 @@
 * `ggKMMC(sdata = NULL)` is the new default argument, enabling to use the function with observed data only.
 * The legend of `ggKMMC()` do not inform the statistic used in the KMMC. Used to be "Observed mean" whatever the value of `ggKMMC(fun)`.
 * New `ggKAP(scale_x_breaks = ggplot2::waiver())`, passed to `ggplot2::scale_x_continuous(breaks)` to enable more granularity in the definition of breaks on the x-axis. Default is set to respect the default behavior of ggplot2. Overrules the existing `ggKAP(scale_x_break_width)` that just defines the width of regular intervals between breaks.
+* New `ggKAP(guide_legend_nrow = NULL)`, used to force the number of rows of the legend where the color categories are described. Useful when the categories are many or have long names.
 
 # PMXtte 0.14.2
 

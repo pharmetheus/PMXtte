@@ -46,6 +46,7 @@ ggKAP(
   legend_label_se = paste0(scales::percent(ci_level), " CI"),
   legend_label_median = "Median Survival",
   legend_label_sim = paste0("Simulated ", scales::percent(ci_level), " CI"),
+  guide_legend_nrow = NULL,
   scale_color_labels = waiver(),
   scale_color_values = unname(PMXColors_PMXcolors$default),
   facetting_args = list(),
@@ -125,6 +126,8 @@ ggKAP(
 \item{legend_label_median}{a character, the label of the legend that describes the line type of the median survival.}
 
 \item{legend_label_sim}{a character, the label of the legend that describes the ribbon of simulation-based confidence interval. Default is computed as function of \code{ci_level}.}
+
+\item{guide_legend_nrow}{a numeric, the number of rows of the color legend. Set a high number if you have many color categories.}
 
 \item{scale_color_labels}{passed to \code{ggplot2::scale_color_manual(labels = )} for the Kaplan-Meier figure, and \code{ggplot2::scale_y_discrete(labels = )} for the risk table. The default is \code{waiver()} (calls the default setup of ggplot2), but can accept \code{scales::label_parsed} if the coloring variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
@@ -211,6 +214,7 @@ ggKAP(
 # Labelling
 
 ggKAP(dat, color_var = "AUCQF")
+ggKAP(dat, color_var = "AUCQF", guide_legend_nrow = 2) # force the number of rows
 
 # This will update both the "color legend" label and the y axis of the risk table
 ggKAP(dat, color_var = "AUCQF", label_color = "Nice color label")
