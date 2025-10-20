@@ -1,3 +1,13 @@
+# PMXtte development version
+* New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. Previously, this was set up internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
+* The latex output of `summaryCountRTTE()` now displays an extra-heading to distinguish the number of subjects on the left-hand side, and the number of subjects with the indicated number of events on the right-hand side. This is controlled by two new arguments, `summaryCountRTTE(cgroup, n.cgroup)`. The default values of `summaryCountRTTE(nIdColNm, caption)` were adapted consequently.
+* The default `footnote` argument of `makeSummaryTableTTE()`, `summaryCountRTTE()` and `summaryFollowUpTime()` were revised.
+* In `stat_kaplanmeier_pval()`, a `strata` pointing to a character variable will now be coerced to a factor. This enables the calculation of the p value between the different "categories" of a character value, in particular if `ggKAP(color_var)` points to a character variable. (#37)
+* `ggKMMC(sdata = NULL)` is the new default argument, enabling to use the function with observed data only.
+* The legend of `ggKMMC()` do not inform the statistic used in the KMMC. Used to be "Observed mean" whatever the value of `ggKMMC(fun)`.
+* New `ggKAP(scale_x_breaks = ggplot2::waiver())`, passed to `ggplot2::scale_x_continuous(breaks)` to enable more granularity in the definition of breaks on the x-axis. Default is set to respect the default behavior of ggplot2. Overrules the existing `ggKAP(scale_x_break_width)` that just defines the width of regular intervals between breaks.
+* New `ggKAP(guide_legend_nrow = NULL)`, used to force the number of rows of the legend where the color categories are described. Useful when the categories are many or have long names.
+
 # PMXtte 0.14.2
 
 * `makeSummaryTableTTE(myID = , myDV = )` now define the column with the subject number and the column of the dependent variable. It was the intended behavior originally but the implementation was wrong. (#31)
@@ -8,7 +18,7 @@
 * `createTTESim()` now provides a NONMEM code where the time of previous event in $DES is updated whenever a new event is simulated (using COM(1)), and where the time since last event is computed as absolute value to avoid potential negative times. This fixes a bug that was identified on several data sets where simulations crashed. New `createTTESim(timepVar = "TIMEP")` to identify the variable that corresponds to the time of previous event. 
 * `createTTESim()` now provides a NONMEM code for TTE where SURX2, instead of SURX, is used to simulate a censoring event. This avoids the assumption of a definition of SURX in the legacy code, and make the simulation code more reliable.
 * New `createTTESim(commentERROR = TRUE)` to comment out the original $ERROR block.
-* 
+
 
 # PMXtte 0.14.1
 

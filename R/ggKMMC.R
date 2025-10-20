@@ -75,7 +75,7 @@
 #'
 ggKMMC <- function(
     odata,
-    sdata,
+    sdata = NULL,
     cov_col,
     cov_data = odata,
     time_col = "TIME",
@@ -91,6 +91,11 @@ ggKMMC <- function(
     simFill = PMXtte:::PMXColors_pmx_palettes(name="light"),
     ci = c(.05, .95)
 ){
+  provided_sdata <- !is.null(sdata)
+  if(!provided_sdata){
+    sdata <- slice(odata, 0)
+    sdata[[iter_col]] <- numeric(0)
+  }
 
   # Expanding covariate data over the full time grid
   expanded_cov_data <- expand_covariate_data(
@@ -139,15 +144,22 @@ ggKMMC <- function(
     return(ggKMMCdata)
   }
 
-  obs_guide_name <- "Observed mean"
+  obs_guide_name <- paste0("Observed ")
   sim_guide_name <- paste0("Simulated ",100*diff(ci),"% CI")
 
+
   p <- ggKMMCdata %>%
-    ggplot(aes(x = .data[[time_col]])) +
-    geom_ribbon(
-      aes(ymin = .data$lo, ymax = .data$up, fill = sim_guide_name),
-      data = ggKMMCdata %>% filter(.data$DATASET == "SDATA")
-    ) +
+    ggplot(aes(x = .data[[time_col]]))
+
+  if(provided_sdata){
+    p <- p +
+      geom_ribbon(
+        aes(ymin = .data$lo, ymax = .data$up, fill = sim_guide_name),
+        data = ggKMMCdata %>% filter(.data$DATASET == "SDATA")
+      )
+  }
+
+  p <- p +
     geom_line(
       aes(y = .data$med, col = obs_guide_name),
       data = ggKMMCdata %>% filter(.data$DATASET == "ODATA")

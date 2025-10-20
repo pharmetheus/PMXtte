@@ -134,6 +134,21 @@ test_that("StatKaplanMeierPval works", {
   ans2 <- StatKaplanMeierPval$compute_panel(data = ggda2, xpos = 99, ypos = -66)
   expect_equal(ans2$x, 99)
   expect_equal(ans2$y, -66)
+
+  # one level in strata works
+  ggda3 <- ggda2
+  ggda3$strata <- 1
+  expect_error(
+    StatKaplanMeierPval$compute_panel(data = ggda3),
+    "There is only 1 group"
+  )
+
+  # strata is character
+  ggda4 <- ggda2
+  ggda4$strata <- as.character(ggda4$strata)
+  ans <- ggplot(ggda4)+
+    stat_kaplanmeier_pval(aes(x = x, y = y, strata = strata))
+  expect_equal(ggplot2::ggplot_build(ans)$data[[1]]$label, "p=0.015")
 })
 
 test_that("StatKaplanMeierSim works", {

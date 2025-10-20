@@ -208,7 +208,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                    rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                    outerLevel]), (res_tab[, outerLevel]), length),
                    colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                   col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                   size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
       if (saveTex) {
@@ -219,7 +219,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                             rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                             outerLevel]), (res_tab[, outerLevel]), length),
                             colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                            col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                            size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)
       }
@@ -229,7 +229,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
                    colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                   col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                    size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
       if (saveTex) {
@@ -238,7 +238,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
                             colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                            col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                             size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)
       }
@@ -248,7 +248,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
                    colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                   col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                    size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar, ...)
       if (saveTex) {
@@ -257,7 +257,7 @@ PhRame_makeSummaryTable <- function (df, addFactors = FALSE, filterExpr = NULL, 
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
                             colheads = c(nIdColNm, nObsColNm, avnObsColNm),
-                            col.just = rep("S", 3), size = textSize, insert.bottom = footnote,
+                           size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar, ...)
       }

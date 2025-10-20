@@ -15,11 +15,12 @@ makeSummaryTableTTE(
   avnObsPercent = TRUE,
   caption = "Number of patients and number of events",
   footnote = paste0("\\\\textsuperscript{a}Number of subjects\\\\newline",
-    "\\\\textsuperscript{b}Number of events\\\\newline", if (showAvnObs) {
+    "\\\\textsuperscript{b}Total number of events\\\\newline", if (showAvnObs) {
     
     "\\\\textsuperscript{c}Proportion of events"
  }),
   myFun = NULL,
+  col.just = c("S", "S", "l"),
   ...
 )
 }
@@ -42,9 +43,11 @@ makeSummaryTableTTE(
 
 \item{caption}{is the table caption. Assign NULL to this argument produce table without caption. Default is "Number of patients and number of events"}
 
-\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.}
+\item{footnote}{is the text for footnote, default is "\\\\textsuperscript\{a\}Number of subjects\\\\newline\\\\textsuperscript\{b\}Total number of events\\\\newline\\\\textsuperscript\{c\}Proportion of number of events" for TTE data.}
 
 \item{myFun}{internal function for the calculation of summarized data. If NULL, the default, an internal function specific to R(TTE) data is used. This should not be changed for a standard use.}
+
+\item{col.just}{passed to latex. Defaulted to "c("S", "S", "l")" to avoid a space between the number and the percentage sign in the last column.}
 
 \item{...}{passed to \code{PhRame_makeSummaryTable()}, possibly for the additional optional arguments compatible with latex}
 }

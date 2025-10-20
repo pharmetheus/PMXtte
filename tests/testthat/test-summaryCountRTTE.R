@@ -19,7 +19,7 @@ test_that("summaryCountRTTE() works", {
 
   # Columns names are correct if columns are lumped
   expect_match(
-    capture.output(summaryCountRTTE(rttedata, outerLevel = "DOSEN", lumpCount = 2))[8],
+    capture.output(summaryCountRTTE(rttedata, outerLevel = "DOSEN", lumpCount = 2))[9],
     "2 or more"
   )
 
