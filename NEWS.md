@@ -1,4 +1,5 @@
-# PMXtte development version
+# PMXtte 0.14.3
+
 * New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. Previously, this was set up internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
 * The latex output of `summaryCountRTTE()` now displays an extra-heading to distinguish the number of subjects on the left-hand side, and the number of subjects with the indicated number of events on the right-hand side. This is controlled by two new arguments, `summaryCountRTTE(cgroup, n.cgroup)`. The default values of `summaryCountRTTE(nIdColNm, caption)` were adapted consequently.
 * The default `footnote` argument of `makeSummaryTableTTE()`, `summaryCountRTTE()` and `summaryFollowUpTime()` were revised.
