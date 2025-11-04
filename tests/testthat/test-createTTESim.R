@@ -222,3 +222,28 @@ test_that("createTTESim does not create empty if", {
     c("", "")
   )
 })
+
+
+
+test_that("createTTESim fixes OMEGA BLOCK", {
+  if(requireNamespace("PMXFrem", quietly = TRUE)) {
+    tmpdir <- tempdir()
+    dummyext <- "TABLE NO.     1:  ESTIMATION STEP
+ ITERATION         THETA1      THETA2      THETA3    SIGMA(1,1)   OMEGA(1,1)   OMEGA(2,1)   OMEGA(2,2)   OMEGA(3,1)   OMEGA(3,2)   OMEGA(3,3)   OMEGA(4,1)   OMEGA(4,2)   OMEGA(4,3)   OMEGA(4,4)   OMEGA(5,1)   OMEGA(5,2)   OMEGA(5,3)   OMEGA(5,4)   OMEGA(5,5)        OBJ
+-1000000000    1.50E+00    2.00E+01    5.00E-01     4.00E-02     1.23E-01     0.00E+00     4.56E-01     0.00E+00     0.00E+00     4.56E-01     0.00E+00     0.00E+00     0.00E+00     2.50E-01     0.00E+00     0.00E+00     0.00E+00     1.50E-01     3.60E-01    123.456
+-1000000006    0.00E+00    0.00E+00    0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00     0.00E+00"
+    readr::write_lines(dummyext, file.path(tmpdir, "test.ext"))
+    readr::write_lines("$PROBLEM\nDUMMY\n$PK\nDUMMY\n$DES\nDUMMY\n$TAB\nDUMMY\n$THETA 1 2 3\n$OMEGA 1\n$OMEGA BLOCK(1)  2\n$OMEGA BLOCK(1) SAME\n$OMEGA BLOCK(2) 2 1 2\n$COV\nDUMMY\n$ERROR\nDUMMY\n",
+                       file = file.path(tmpdir, "test.mod"))
+    ans <- createTTESim(file.path(tmpdir, "test.mod"), outFile = NULL)
+    expect_equal(
+      PMXFrem::findrecord(ans),
+      c("$OMEGA BLOCK(1)  FIXED", "0.123 ",
+        "$OMEGA BLOCK(1)  FIXED", "0.456 ",
+        "$OMEGA BLOCK(1)  FIXED", "0.456 ",
+        "$OMEGA BLOCK(2)  FIXED", "0.25 ", "0.15 0.36 ")
+    )
+    file.remove( file.path(tmpdir, "test.ext"))
+    file.remove( file.path(tmpdir, "test.mod"))
+  }
+})

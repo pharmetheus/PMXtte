@@ -473,11 +473,10 @@ createTTESim <- function(modFile,
     line <- PMXFrem::findrecord(line, record = "\\$THETA", replace = inputTheta)
 
     # Build OM Matrix
-    newOmMatrix <- PMXFrem::buildmatrix(as.matrix(OM))
-    # IF TTE, FIX OMEGA
-    if (!rtte) {
-      newOmMatrix[length(newOmMatrix)] <- paste0(newOmMatrix[length(newOmMatrix)], " FIX")
-    }
+    newOmMatrix <- PMXFrem::buildmatrix(as.matrix(OM),assumesame = FALSE)
+
+    # Fix the values (needed if OMEGA set to 0)
+    newOmMatrix[str_detect(newOmMatrix, "BLOCK")] <- paste0(newOmMatrix[str_detect(newOmMatrix, "BLOCK")], " FIXED")
 
     # Replace $OMEGA
     line <- PMXFrem::findrecord(line, record = "\\$OMEGA", replace = newOmMatrix)
@@ -486,8 +485,6 @@ createTTESim <- function(modFile,
   if (length(PMXFrem::findrecord(line, "\\$TAB")) > 0 && !includeTABLE) {
     line <- PMXFrem::findrecord(line, "\\$TAB", replace = "")
   }
-
-
   if (!is.null(outFile)) { # Print simulation file
     con <- file(outFile, open = "w")
     writeLines(line, con)
@@ -515,9 +512,10 @@ wrap_abs <- function(x, timepVar){
     pattern = pattern,
     replacement = repl
   )
-  stringr::str_replace_all(
+  ans <- stringr::str_replace_all(
     string = ans, # remove potential double ABS
     pattern = "ABS\\(ABS\\((.*?)\\)\\)",
     replacement = "ABS(\\1)"
   )
+  ans
 }

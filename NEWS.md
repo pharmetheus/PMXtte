@@ -1,3 +1,6 @@
+# PMXtte development version
+* `createTTESim()` systematically fixes (`FIXED`) the values in the `$OMEGA`in the output, either in TTE or RTTE settings, and deals with multiple `$OMEGA` records and blocks (`BLOCK(n)`) specifications.
+
 # PMXtte 0.14.3
 
 * New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. Previously, this was set up internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
