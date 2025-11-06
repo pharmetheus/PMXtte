@@ -20,7 +20,7 @@ An object of class \code{StatKaplanMeierMedian} (inherits from \code{Stat}, \cod
 
 An object of class \code{StatKaplanMeierSE} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{StatKaplanMeierPval} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatKaplanMeierPval} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{StatKaplanMeierSim} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 

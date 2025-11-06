@@ -18,12 +18,12 @@ summaryCountRTTE(
   digits = 3,
   lumpCount = Inf,
   dropCount0 = FALSE,
-  nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
+  nIdColNm = "\\\\textbf{Total}",
   nEventColNm = NULL,
-  caption = "Number of repeated events",
+  caption = NULL,
   label = "tab:anaSummary",
   footnote =
-    "\\\\textsuperscript{a}Initial number of subjects\\\\newline\\\\textsuperscript{b}Number of subjects with this number of events",
+    "\\\\textsuperscript{a}Number of subjects. \\\\textsuperscript{b}Number of events",
   footnoteSize = "footnotesize",
   textSize = "small",
   here = TRUE,
@@ -33,6 +33,9 @@ summaryCountRTTE(
   fileName = NULL,
   filePath = "./",
   myFun = NULL,
+  cgroup = c("\\\\textbf{nID\\\\textsuperscript{a}}",
+    "\\\\textbf{nID\\\\textsuperscript{a} with the indicated nEvent\\\\textsuperscript{b}}"),
+  n.cgroup = NULL,
   ...
 )
 }
@@ -78,23 +81,19 @@ Only works for Latex code. Default is \strong{FALSE} (don't drop)}
 
 \item{nIdColNm}{is the character string to be printed as the column name
 with the number of subjects, default is
-\strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}}
+\strong{"Total"}}
 
 \item{nEventColNm}{is the character string to be printed as the column names
 with the number of subjects with this number of events. Default is \code{NULL},
 because this is dynamically generated depending on the data.}
 
-\item{caption}{is the table caption. Assign \strong{NULL} to this argument
-produce table without caption. Default is \strong{"PK analysis data set:
-Number of subjects with observations and number of observations"}}
+\item{caption}{is the table caption. Assign \strong{NULL} (the default) to this argument
+produce table without caption.}
 
 \item{label}{is the label for the table used for cross-reference, default is
 \strong{"tab:anaSummary"}}
 
-\item{footnote}{is the text for footnote, default is
-\strong{"\\textsuperscript\{a\} Initial number of
-subjects\\\\newline\\\\textsuperscript\{b\} Number of subjects with this
-number of events"}}
+\item{footnote}{is the text for footnote.}
 
 \item{footnoteSize}{is the footnote text size, default is
 \strong{"footnotesize"}}
@@ -113,9 +112,7 @@ be placed within $ symbols, default is \strong{FALSE}}
 \item{asList}{if \strong{TRUE} the data summary is returned as a list where
 different elements in the list contain summary of different stratification
 levels. If \strong{FALSE} the data summary is returned as a latex table. If
-no stratification variable is provided, this function always returns a list
-of two items (Number of subjects, Number of observarions and Average number
-of observarions per subject)}
+no stratification variable is provided, this function always returns a list}
 
 \item{saveTex}{is the logical argument determining if the LaTex code for the
 table will be saved on disk. Default is \strong{FALSE}}
@@ -131,6 +128,13 @@ Default is \strong{"/"}.}
 \item{myFun}{internal function for the calculation of summarized data. If
 NULL, the default, an internal function specific to R(TTE) data is used.
 This should not be changed for a standard use.}
+
+\item{cgroup}{is the names of the column groups, to be display as the first
+row of column name.}
+
+\item{n.cgroup}{is the number of columns for which each element of cgroup is
+a heading. Default is \code{NULL}, because this is dynamically generated
+depending on the data.}
 
 \item{...}{is the additional optional arguments compatible with latex}
 }

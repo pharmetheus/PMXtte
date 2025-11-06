@@ -129,3 +129,22 @@ test_that("ggKMMC works", {
     ans$med[ans$DATASET=='ODATA'], c(100, 100, 500, 900)
   )
 })
+
+
+test_that("ggKMMC works with sdata and/or odata only", {
+  odat <- data.frame(ID = c(1,2,3), TIME = c(24, 48, 96), COV = c(100, 200, 300))
+  sdat  <- data.frame(
+    ID = rep(c(1,2,3), 3), COV = rep(c(100, 200, 300), 3),
+    ITER = rep(c(1,2,3), each =3),
+    TIME = c(5, 45, 74, 70, 59, 93, 13, 90, 96)
+  )
+
+  ans1 <- ggKMMC(odata = odat, sdata = sdat, cov_col = "COV")
+  expect_true(all(c("ymin", "ymax", "x") %in% colnames(ggplot_build(ans1)$data[[1]]))) #ribbon of sims
+  expect_true(all(c("y", "x") %in% colnames(ggplot_build(ans1)$data[[2]]))) # line of obs
+
+  ans2 <- ggKMMC(odata = odat, cov_col = "COV")
+  expect_true(all(c("y", "x") %in% colnames(ggplot_build(ans2)$data[[1]]))) # line of obs
+  expect_length(ggplot_build(ans2)$data, 1)# and nothing more
+
+})

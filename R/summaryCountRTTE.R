@@ -4,6 +4,7 @@
 #' It is similar to `PhRame_makeSummaryTable()`, the same arguments should apply the same to both functions. There is a possibility to
 #' lump counts of event (e.g., if `lumpCount = 3`, a column "3 or more" will be shown). It is possible to remove
 #' counts if there are no events with `dropCount0 = TRUE`.
+#'
 #' @param df is the data frame (e.g. anaDataF) or data object created using
 #'   \code{pmxdata::derived_data} (e.g. DATobject)
 #' @param addFactors if \strong{TRUE}, factors are added to the input data.
@@ -32,19 +33,15 @@
 #'   Only works for Latex code. Default is \strong{FALSE} (don't drop)
 #' @param nIdColNm is the character string to be printed as the column name
 #'   with the number of subjects, default is
-#'   \strong{"\\\\textbf\{nID\\\\textsuperscript\{a\}\}"}
+#'   \strong{"Total"}
 #' @param nEventColNm is the character string to be printed as the column names
 #'   with the number of subjects with this number of events. Default is `NULL`,
 #'   because this is dynamically generated depending on the data.
-#' @param caption is the table caption. Assign \strong{NULL} to this argument
-#'   produce table without caption. Default is \strong{"PK analysis data set:
-#'   Number of subjects with observations and number of observations"}
+#' @param caption is the table caption. Assign \strong{NULL} (the default) to this argument
+#'   produce table without caption.
 #' @param label is the label for the table used for cross-reference, default is
 #'   \strong{"tab:anaSummary"}
-#' @param footnote is the text for footnote, default is
-#'   \strong{"\\textsuperscript\{a\} Initial number of
-#'   subjects\\\\newline\\\\textsuperscript\{b\} Number of subjects with this
-#'   number of events"}
+#' @param footnote is the text for footnote.
 #' @param footnoteSize is the footnote text size, default is
 #'   \strong{"footnotesize"}
 #' @param textSize is the text size, default is \strong{"small"}
@@ -59,8 +56,6 @@
 #'   different elements in the list contain summary of different stratification
 #'   levels. If \strong{FALSE} the data summary is returned as a latex table. If
 #'   no stratification variable is provided, this function always returns a list
-#'   of two items (Number of subjects, Number of observarions and Average number
-#'   of observarions per subject)
 #' @param saveTex is the logical argument determining if the LaTex code for the
 #'   table will be saved on disk. Default is \strong{FALSE}
 #' @param fileName is the name of the Tex file (without extension) with the
@@ -73,6 +68,11 @@
 #' @param myFun internal function for the calculation of summarized data. If
 #'   NULL, the default, an internal function specific to R(TTE) data is used.
 #'   This should not be changed for a standard use.
+#' @param cgroup is the names of the column groups, to be display as the first
+#'   row of column name.
+#' @param n.cgroup is the number of columns for which each element of cgroup is
+#'   a heading. Default is `NULL`, because this is dynamically generated
+#'    depending on the data.
 #'
 #' @return By default, the table at Latex format. Alternatively, if
 #'   `asList = TRUE`, a list of data.frame tables.
@@ -118,11 +118,11 @@ summaryCountRTTE <- function(
     digits = 3,
     lumpCount = Inf,
     dropCount0 = FALSE,
-    nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
+    nIdColNm = "\\textbf{Total}",
     nEventColNm = NULL,
-    caption = "Number of repeated events",
+    caption = NULL,
     label = "tab:anaSummary",
-    footnote = "\\textsuperscript{a}Initial number of subjects\\newline\\textsuperscript{b}Number of subjects with this number of events",
+    footnote = "\\textsuperscript{a}Number of subjects. \\textsuperscript{b}Number of events",
     footnoteSize = "footnotesize",
     textSize = "small",
     here = TRUE,
@@ -132,6 +132,8 @@ summaryCountRTTE <- function(
     fileName = NULL,
     filePath = "./",
     myFun = NULL,
+    cgroup = c("\\textbf{nID\\textsuperscript{a}}", "\\textbf{nID\\textsuperscript{a} with the indicated nEvent\\textsuperscript{b}}"),
+    n.cgroup = NULL,
     ...
 ){
   if ((!is.null(rlang::peek_option("save.script")) && rlang::peek_option("save.script") ==
@@ -275,15 +277,13 @@ summaryCountRTTE <- function(
 
     if(is.null(nEventColNm)){
       nEventColNm <- setdiff(colnames(Ntable), "subjects")
-      nEventColNm <- paste0("\\textbf{", nEventColNm, "\\textsuperscript{b}}")
-
-      #nEventColNm[1] <- paste0("\\textbf{nEvent\\textsuperscript{b}:}\\newline", nEventColNm[1])
-      #nEventColNm <- c("\\textbf{nEvent\\textsuperscript{b}:}", nEventColNm)
-      # Ntable <- Ntable %>%
-      #   mutate(nevent = "", .after = subjects)
+      nEventColNm <- paste0("\\textbf{", nEventColNm, "}")
     }
 
     coljust <- rep("S", ncol(Ntable))
+    if(is.null(n.cgroup)){
+      n.cgroup <- c(1, ncol(Ntable)-1)
+    }
 
     if (!is.null(outerLevel) & !is.null(innerLevel)) {
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
@@ -294,7 +294,9 @@ summaryCountRTTE <- function(
                    colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
-                   numeric.dollar = numeric.dollar, ...)
+                   numeric.dollar = numeric.dollar,
+                   cgroup = cgroup, n.cgroup = n.cgroup,
+                   ...)
       if (saveTex) {
         tmp <- Hmisc::latex(Ntable, file = paste0(filePath,
                                                   fileName, ".tex"), first.hline.double = FALSE,
@@ -305,7 +307,8 @@ summaryCountRTTE <- function(
                             colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
-                            numeric.dollar = numeric.dollar, ...)
+                            numeric.dollar = numeric.dollar,
+                            cgroup = cgroup, n.cgroup = n.cgroup, ...)
       }
     }
     else if (!is.null(outerLevel) & is.null(innerLevel)) {
@@ -315,7 +318,8 @@ summaryCountRTTE <- function(
                    colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
-                   numeric.dollar = numeric.dollar, ...)
+                   numeric.dollar = numeric.dollar,
+                   cgroup = cgroup, n.cgroup = n.cgroup, ...)
       if (saveTex) {
         tmp <- Hmisc::latex(Ntable, file = paste0(filePath,
                                                   fileName, ".tex"), first.hline.double = FALSE,
@@ -324,7 +328,8 @@ summaryCountRTTE <- function(
                             colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
-                            numeric.dollar = numeric.dollar, ...)
+                            numeric.dollar = numeric.dollar,
+                            cgroup = cgroup, n.cgroup = n.cgroup, ...)
       }
     }
     else if (is.null(outerLevel) & !is.null(innerLevel)) {
@@ -334,7 +339,8 @@ summaryCountRTTE <- function(
                    colheads = c(nIdColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
-                   numeric.dollar = numeric.dollar, ...)
+                   numeric.dollar = numeric.dollar,
+                   cgroup = cgroup, n.cgroup = n.cgroup, ...)
       if (saveTex) {
         tmp <- Hmisc::latex(Ntable, file = paste0(filePath,
                                                   fileName, ".tex"), first.hline.double = FALSE,
@@ -343,7 +349,8 @@ summaryCountRTTE <- function(
                             colheads = c(nIdColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
-                            numeric.dollar = numeric.dollar, ...)
+                            numeric.dollar = numeric.dollar,
+                            cgroup = cgroup, n.cgroup = n.cgroup, ...)
       }
     }
   }

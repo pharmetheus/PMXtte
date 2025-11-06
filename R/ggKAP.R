@@ -35,7 +35,8 @@
 #' @param censor_size a numeric, the size of the censoring event.
 #' @param median_linetype a numeric, linetype of the median survival line.
 #' @param pval_pos a vector of 2 numeric, coordinate positions of the p-value text (`c(x,y)`). Default in `NULL`, should appear on the bottom left.
-#' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2).
+#' @param scale_x_breaks passed to `ggplot2::scale_x_continuous(breaks = )` of the Kaplan-Meier curve and of the risk table. Default is `ggplot2::waiver()` (default setup of ggplot2). Overrules `scale_x_break_by`.
+#' @param scale_x_break_by a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every `4` weeks), as well as the times when the number of patient at risk is calculated. Default is `NULL` (calls the default setup of ggplot2). Ignored if `scale_x_breaks` is provided.
 #' @param scale_y_labels passed to `ggplot2::scale_y_continuous(labels = )` when the Kaplan-Meier curve is constructed. Default is `scales::percent` to label the survival as percentage. Set to `identity` or `ggplot2::waiver()` for the original numeric values.
 #' @param scale_y_risktable_reverse a logical, should the y-axis of the risk table be reversed? By default, the levels of a factor variable are printed from bottom to top, but the human eyes expect to read a table from top to bottom.
 #' @param label_x a character, the name of the x-axis (i.e. time) of the Kaplan-Meier figure and of the risk table.
@@ -47,6 +48,7 @@
 #' @param legend_label_se a character, the label of the legend that describes the ribbon of parametric confidence interval. Default is computed as function of `ci_level`.
 #' @param legend_label_median a character, the label of the legend that describes the line type of the median survival.
 #' @param legend_label_sim a character, the label of the legend that describes the ribbon of simulation-based confidence interval. Default is computed as function of `ci_level`.
+#' @param guide_legend_nrow a numeric, the number of rows of the color legend. Set a high number if you have many color categories.
 #' @param scale_color_labels passed to `ggplot2::scale_color_manual(labels = )` for the Kaplan-Meier figure, and `ggplot2::scale_y_discrete(labels = )` for the risk table. The default is `waiver()` (calls the default setup of ggplot2), but can accept `scales::label_parsed` if the coloring variable is an expression (`expression()`) and special character or super/subscripts should be shown.
 #' @param scale_color_values passed to `ggplot2::scale_color_manual(values = )` for the Kaplan-Meier figure and the risk table. Default will use the default PMX graphic charter, but named vectors of colors (with names matching with factor levels) are welcome. Levels not available in the data will be dropped.
 #' @param facetting_args a list, arguments that will overwrite the default arguments of `facet_wrap()`. Note that it will not overwrite `vars`, the latter being informed by `facet_var`. Use `list(labeller = ggplot2::label_parsed)` if the facetting variable is an expression (`expression()`) and special character or super/subscripts should be shown.
@@ -92,7 +94,8 @@
 #'   censor_size = 6, median_linetype = 3
 #' )
 #'
-#' ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
+#' ggKAP(dat, scale_x_breaks = c(0, 30, 40, 80, 100)) #Both risk table and graph are updated
+#' ggKAP(dat, scale_x_break_by = 12) #Or use this shortcut if you just want to play with the width of interval
 #'
 #' ggKAP(
 #'   dat, color_var = "SEXF",
@@ -107,6 +110,7 @@
 #' # Labelling
 #'
 #' ggKAP(dat, color_var = "AUCQF")
+#' ggKAP(dat, color_var = "AUCQF", guide_legend_nrow = 2) # force the number of rows
 #'
 #' # This will update both the "color legend" label and the y axis of the risk table
 #' ggKAP(dat, color_var = "AUCQF", label_color = "Nice color label")
@@ -164,6 +168,7 @@ ggKAP <- function(data,
                   censor_size = 4,
                   median_linetype = 2,
                   pval_pos = NULL,
+                  scale_x_breaks = ggplot2::waiver(),
                   scale_x_break_by = NULL,
                   scale_y_labels = scales::percent,
                   scale_y_risktable_reverse = FALSE,
@@ -176,6 +181,7 @@ ggKAP <- function(data,
                   legend_label_se = paste0(scales::percent(ci_level), " CI"),
                   legend_label_median = "Median Survival",
                   legend_label_sim = paste0("Simulated ", scales::percent(ci_level), " CI"),
+                  guide_legend_nrow = NULL,
                   scale_color_labels = waiver(),
                   scale_color_values = unname(PMXColors_PMXcolors$default),
                   facetting_args = list(),
@@ -206,10 +212,15 @@ ggKAP <- function(data,
       facet_var = facet_var)
   }
 
-  if(!is.null(scale_x_break_by)){
-    scale_x_breaks <- seq(0, max(data[[time_var]]), by = scale_x_break_by)
+  if(inherits(scale_x_breaks, "waiver")){ # if scale_x_breaks is set as default
+    # then evaluate the "break_by" shortcut
+    if(!is.null(scale_x_break_by)){
+      scale_x_breaks <- seq(0, max(data[[time_var]]), by = scale_x_break_by)
+    } # else: scale_x_breaks stays the default "waiver"
   } else {
-    scale_x_breaks <- ggplot2::waiver()
+    if(!is.null(scale_x_break_by)){
+      warning("`scale_x_break_by` is ignored, breaks of the x-axis being defined in `scale_x_breaks`" )
+    }
   }
 
   if(!is.null(color_var)){
@@ -397,13 +408,18 @@ ggKAP <- function(data,
     )
 
   # Guides
+  fig <- fig +
+    guides(
+      color = guide_legend(nrow = guide_legend_nrow),
+      fill = guide_legend(nrow = guide_legend_nrow)
+    )
+
   leg <- leg +
     guides(
       linetype = guide_legend(order = 1),
       fill = guide_legend(order = 2),
       shape = guide_legend(order = 3)
     )
-
 
   # Titles
   # labs() don't accept NULL as input, so need to wrap with an if()

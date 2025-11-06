@@ -31,6 +31,7 @@ ggKAP(
   censor_size = 4,
   median_linetype = 2,
   pval_pos = NULL,
+  scale_x_breaks = ggplot2::waiver(),
   scale_x_break_by = NULL,
   scale_y_labels = scales::percent,
   scale_y_risktable_reverse = FALSE,
@@ -45,6 +46,7 @@ ggKAP(
   legend_label_se = paste0(scales::percent(ci_level), " CI"),
   legend_label_median = "Median Survival",
   legend_label_sim = paste0("Simulated ", scales::percent(ci_level), " CI"),
+  guide_legend_nrow = NULL,
   scale_color_labels = waiver(),
   scale_color_values = unname(PMXColors_PMXcolors$default),
   facetting_args = list(),
@@ -99,7 +101,9 @@ ggKAP(
 
 \item{pval_pos}{a vector of 2 numeric, coordinate positions of the p-value text (\code{c(x,y)}). Default in \code{NULL}, should appear on the bottom left.}
 
-\item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2).}
+\item{scale_x_breaks}{passed to \code{ggplot2::scale_x_continuous(breaks = )} of the Kaplan-Meier curve and of the risk table. Default is \code{ggplot2::waiver()} (default setup of ggplot2). Overrules \code{scale_x_break_by}.}
+
+\item{scale_x_break_by}{a numeric, interval width when the x-axis (i.e. time) will be broken (e.g. every \code{4} weeks), as well as the times when the number of patient at risk is calculated. Default is \code{NULL} (calls the default setup of ggplot2). Ignored if \code{scale_x_breaks} is provided.}
 
 \item{scale_y_labels}{passed to \code{ggplot2::scale_y_continuous(labels = )} when the Kaplan-Meier curve is constructed. Default is \code{scales::percent} to label the survival as percentage. Set to \code{identity} or \code{ggplot2::waiver()} for the original numeric values.}
 
@@ -122,6 +126,8 @@ ggKAP(
 \item{legend_label_median}{a character, the label of the legend that describes the line type of the median survival.}
 
 \item{legend_label_sim}{a character, the label of the legend that describes the ribbon of simulation-based confidence interval. Default is computed as function of \code{ci_level}.}
+
+\item{guide_legend_nrow}{a numeric, the number of rows of the color legend. Set a high number if you have many color categories.}
 
 \item{scale_color_labels}{passed to \code{ggplot2::scale_color_manual(labels = )} for the Kaplan-Meier figure, and \code{ggplot2::scale_y_discrete(labels = )} for the risk table. The default is \code{waiver()} (calls the default setup of ggplot2), but can accept \code{scales::label_parsed} if the coloring variable is an expression (\code{expression()}) and special character or super/subscripts should be shown.}
 
@@ -192,7 +198,8 @@ ggKAP(
   censor_size = 6, median_linetype = 3
 )
 
-ggKAP(dat, scale_x_break_by = 12) #Both risk table and graph are updated
+ggKAP(dat, scale_x_breaks = c(0, 30, 40, 80, 100)) #Both risk table and graph are updated
+ggKAP(dat, scale_x_break_by = 12) #Or use this shortcut if you just want to play with the width of interval
 
 ggKAP(
   dat, color_var = "SEXF",
@@ -207,6 +214,7 @@ ggKAP(
 # Labelling
 
 ggKAP(dat, color_var = "AUCQF")
+ggKAP(dat, color_var = "AUCQF", guide_legend_nrow = 2) # force the number of rows
 
 # This will update both the "color legend" label and the y axis of the risk table
 ggKAP(dat, color_var = "AUCQF", label_color = "Nice color label")
