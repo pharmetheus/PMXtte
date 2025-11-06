@@ -1,3 +1,7 @@
+# 0.14.4
+
+* Change the license to GPL (>= 3).
+
 # PMXtte 0.14.3
 
 * New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. Previously, this was set up internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
