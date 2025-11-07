@@ -79,14 +79,14 @@ labelled only by variable grouping levels.}
 
 \item{label.parsed}{if TRUE (default), facet labels can include superscipts and greek letters}
 
-\item{xlab}{main title and axis labels}
+\item{xlab}{x axis label}
 
-\item{ylab}{main title and axis labels}
+\item{ylab}{y axis label}
 
 \item{break.time.by}{numeric value controlling time axis breaks. Default value
 is NULL.}
 
-\item{xlim}{x and y axis limits e.g. xlim = c(0, 1000), ylim = c(0, 1).}
+\item{xlim}{x axis limits e.g. \code{xlim = c(0, 1000)}.}
 
 \item{ggtheme}{function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.}
 
