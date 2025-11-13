@@ -1,5 +1,6 @@
 # PMXtte development version
-* `createTTESim()` systematically fixes (`FIXED`) the values in the `$OMEGA`in the output, either in TTE or RTTE settings, and deals with multiple `$OMEGA` records and blocks (`BLOCK(n)`) specifications.
+* New `checkTTESim()` to check several assumptions expected from a TTE/RTTE data set simulated using NONMEM.
+* `createTTESim()` now systematically fixes (`FIXED`) the values in the `$OMEGA`in the output, either in TTE or RTTE settings, and deals with multiple `$OMEGA` records and blocks (`BLOCK(n)`) specifications.
 * `makeSummaryTableTTE()` now removes any superfluous 'All'-row when grouping by two variables results in a single group.
 
 # PMXtte 0.14.3
