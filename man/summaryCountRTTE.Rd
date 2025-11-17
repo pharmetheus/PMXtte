@@ -59,16 +59,16 @@ acceptable to this argument.}
 \item{myEVCOUNT}{is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}}
 
 \item{outerLevel}{is the outer level (1st level) of stratification variable,
-eg. "DOSENF"}
+eg. "STUDYIDN"}
 
 \item{innerLevel}{is the inner level (2nd level) of stratification variable,
-eg. "DOSENF"}
+eg. "TRTF"}
 
 \item{outerLabel}{is the label for the outer level (1st level) of
 stratification variable, eg. "Study")}
 
 \item{innerLabel}{is the label for the inner level (2nd level) of
-stratification variable, eg. "Dose"}
+stratification variable, eg. "Treatment"}
 
 \item{digits}{is the number of significant digits}
 
@@ -151,12 +151,14 @@ counts if there are no events with \code{dropCount0 = TRUE}.
 \examples{
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
+
 # create summary as a list
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     asList = TRUE)
 
 
@@ -164,13 +166,13 @@ summaryCountRTTE(rttedata,
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose")
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment")
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     lumpCount    = 3
                     )
 }

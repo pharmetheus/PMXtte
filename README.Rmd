@@ -32,12 +32,12 @@ install.packages("path_to_release.tar.gz")
 
 ```{r, fig.height=7}
 tte1data <- rttedata %>% filter_xth_event(1)
-tte1data$DOSEF <- as.factor(tte1data$DOSEN)
+tte1data$TRTF <- factor(paste(tte1data$TRTN, "mg"), levels = paste(sort(unique(tte1data$TRTN)), "mg"))
 ggKAP(
   tte1data,
   time_var = "TSFDD", 
-  color_var = "DOSEF", 
-  label_color = "Dose"
+  color_var = "TRTF", 
+  label_color = "Treatment"
 )
 ```
 

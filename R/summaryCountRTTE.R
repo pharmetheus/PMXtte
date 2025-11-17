@@ -18,13 +18,13 @@
 #' @param myDV is the name of the DV column, default is \strong{"DV"}
 #' @param myEVCOUNT is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}
 #' @param outerLevel is the outer level (1st level) of stratification variable,
-#'   eg. "DOSENF"
+#'   eg. "STUDYIDN"
 #' @param innerLevel is the inner level (2nd level) of stratification variable,
-#'   eg. "DOSENF"
+#'   eg. "TRTF"
 #' @param outerLabel is the label for the outer level (1st level) of
 #'   stratification variable, eg. "Study")
 #' @param innerLabel is the label for the inner level (2nd level) of
-#'   stratification variable, eg. "Dose"
+#'   stratification variable, eg. "Treatment"
 #' @param digits is the number of significant digits
 #' @param lumpCount is the maximum number of event to display, e.g. if `lumpcount=3`,
 #'   the category "3 or more" will be display. Only works for Latex code.
@@ -82,12 +82,14 @@
 #' @examples
 #' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 #' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+#' rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
+#'
 #' # create summary as a list
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     asList = TRUE)
 #'
 #'
@@ -95,13 +97,13 @@
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose")
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment")
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     lumpCount    = 3
 #'                     )
 summaryCountRTTE <- function(

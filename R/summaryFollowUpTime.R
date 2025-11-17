@@ -32,13 +32,14 @@
 #' @examples
 #' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 #' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+#' rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
 #'
 #' #create summary as a list
 #' summaryFollowUpTime(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     asList = TRUE,
 #'                     timeConversion = 1/24/365.25)
 #'
@@ -46,8 +47,8 @@
 #' summaryFollowUpTime(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     timeConversion = 1/24/365.25)
 
 summaryFollowUpTime <- function (df,
