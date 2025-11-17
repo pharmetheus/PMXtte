@@ -41,16 +41,18 @@
 #' # Example TTE model with Weibull distribution and output to file
 #' # File path to a data object (embedded in the package as an example)
 #' mypath <- system.file("extdata", "tte_data1.dat", package = "PMXtte")
+#' \dontrun{
 #' createTTEStart(
 #'   outFile = "tte_weibull_auto.mod",
 #'   dataFile = mypath,
 #'   distribution = "weibull",
 #'   rtte = FALSE
 #' )
-#'
+#'}
 #' # Example RTTE model with Weibull distribution, data from CSV,
 #' # replacing "TSFDY" with "TIME" in $INPUT
 #' mypath <- system.file("extdata", "DAT-1a-PMX-RTTEWorkshop-PFPMX-1.csv", package = "PMXtte")
+#' \dontrun{
 #' createTTEStart(
 #'   outFile = "rtte_mod.mod",
 #'   dataFile = mypath,
@@ -58,6 +60,7 @@
 #'   rtte = TRUE,
 #'   replaceAsTime = "TSFDY"
 #' )
+#' }
 createTTEStart <- function(outFile = NULL,
                            rtte = FALSE,
                            dataFile = NULL,

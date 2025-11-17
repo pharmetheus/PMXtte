@@ -110,7 +110,7 @@ summaryFollowUpTime <- function (df,
       ) %>%
         mutate(
           nObs = round(nObs, digits = digits),
-          avnObs = PMXtte:::PhRame_out.digits(avnObs, dig = digits_rate)
+          avnObs = PhRame_out.digits(avnObs, dig = digits_rate)
         )
     }
     PhRame_makeSummaryTable(df = sum_data,
