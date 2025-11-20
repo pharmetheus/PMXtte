@@ -6,6 +6,10 @@
 * `summaryCountRTTE()` now displays a new column with the total number of event.
 * The example documentation now uses "Treatment", not "Dose", as a stratification variable. 
 
+# PMXtte 0.14.4
+
+* Change the license to GPL (>= 3).
+
 # PMXtte 0.14.3
 
 * New `makeSummaryTableTTE(col.just = c("S", "S", "l"))` to avoid a space between the number and the percentage sign in the last column in latex. Previously, this was set up internally. Restore old behavior with`makeSummaryTableTTE(col.just = c("S", "S", "S"))`.
@@ -27,10 +31,6 @@
 * `createTTESim()` now provides a NONMEM code where the time of previous event in $DES is updated whenever a new event is simulated (using COM(1)), and where the time since last event is computed as absolute value to avoid potential negative times. This fixes a bug that was identified on several data sets where simulations crashed. New `createTTESim(timepVar = "TIMEP")` to identify the variable that corresponds to the time of previous event. 
 * `createTTESim()` now provides a NONMEM code for TTE where SURX2, instead of SURX, is used to simulate a censoring event. This avoids the assumption of a definition of SURX in the legacy code, and make the simulation code more reliable.
 * New `createTTESim(commentERROR = TRUE)` to comment out the original $ERROR block.
-
-
-# PMXtte 0.14.1
-
 * `ggKAP(xlim = )` and `ggKAP(ylim = )` are now passed to `ggplot2::coord_cartesian()` instead of `ggplot2::scale_*_continuous()` to preserve the original underlying data set. (#23)
 * New `ggKAP(pval_pos = )` to manually define the coordinate position of the p-value on the plot. (#24)
 * `ggKAP(label_y_risk = )` now specifically updates the name of the y-axis of the risk table, independently of `label_color`. It was the intended behavior originally but the implementation was wrong. (#25)
