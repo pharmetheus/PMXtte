@@ -88,6 +88,8 @@ is NULL.}
 
 \item{xlim}{x and y axis limits e.g. xlim = c(0, 1000), ylim = c(0, 1).}
 
+\item{ylim, surv.scale, add.ciWidth.to.legend, conf.int.alpha, conf.int.fill, risk.table.y.text, risk.table.y.text.col, table.clip, surv.median.line.title, risk.table.ylab, legend.box, legend.title.size, legend.spacing, censor.shape, censor.size}{see \code{survminer::ggsurvplot()}}
+
 \item{ggtheme}{function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.}
 
 \item{palette}{the color palette to be used. Allowed values include "hue" for

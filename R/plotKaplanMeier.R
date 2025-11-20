@@ -21,6 +21,7 @@
 #' @param pval.size size of font for the pval in points
 #' @param pval logical value, a numeric or a string. If logical and TRUE, the p-value is added on the plot. If numeric, then the computed p-value is substituted with the one passed with this parameter. If character, then the customized string appears on the plot.
 #' @param facet.by a character vector containing the name of grouping variables to facet the survival curves into multiple panels. Should be of length <= 2. Alias of the ggsurvplot_facet() function. the function does not facet tables therefor only the plots will be faceted and tables will not be produced.
+#' @param ylim,surv.scale,add.ciWidth.to.legend,conf.int.alpha,conf.int.fill,risk.table.y.text,risk.table.y.text.col,table.clip,surv.median.line.title,risk.table.ylab,legend.box,legend.title.size,legend.spacing,censor.shape,censor.size see `survminer::ggsurvplot()`
 #' @inheritParams survminer::ggsurvplot
 #' @inheritParams survminer::ggsurvplot_facet
 #' @inheritParams survminer::ggsurvtable
@@ -140,7 +141,7 @@ plotKaplanMeier <- function(data,
                             censor.shape = '|',
                             censor.size = 4,
                             ...){
-  .Deprecated("ggKAP")
+  if (interactive()) {.Deprecated("ggKAP")}
 
   # Check if the input is a dataframe
   if (!is.data.frame(data)){
