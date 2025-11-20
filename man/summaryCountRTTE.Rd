@@ -18,12 +18,13 @@ summaryCountRTTE(
   digits = 3,
   lumpCount = Inf,
   dropCount0 = FALSE,
-  nIdColNm = "\\\\textbf{Total}",
+  nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
+  nEventTotColNm = "\\\\textbf{nEventTot\\\\textsuperscript{b}}",
   nEventColNm = NULL,
   caption = NULL,
   label = "tab:anaSummary",
   footnote =
-    "\\\\textsuperscript{a}Number of subjects. \\\\textsuperscript{b}Number of events",
+    "\\\\textsuperscript{a}Total number of subjects. \\\\textsuperscript{b}Total number of events.\\\\newline\\\\textsuperscript{c}Number of subjects with the indicated cumulative number of events.",
   footnoteSize = "footnotesize",
   textSize = "small",
   here = TRUE,
@@ -33,8 +34,7 @@ summaryCountRTTE(
   fileName = NULL,
   filePath = "./",
   myFun = NULL,
-  cgroup = c("\\\\textbf{nID\\\\textsuperscript{a}}",
-    "\\\\textbf{nID\\\\textsuperscript{a} with the indicated nEvent\\\\textsuperscript{b}}"),
+  cgroup = c("\\\\textbf{Total}", "\\\\textbf{nID per nEvent\\\\textsuperscript{c}}"),
   n.cgroup = NULL,
   ...
 )
