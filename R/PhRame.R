@@ -324,79 +324,93 @@ PhRame_dataSummaryBy_all <- function (x, addFactors = FALSE, filterExpr = NULL, 
   return(tab)
 }
 
-PhRame_dataSummaryBy_comb <- function (x, addFactors = FALSE, filterExpr = NULL, fn, grp_var = NULL)
-{
-  if ((!is.null(rlang::peek_option("save.script")) && rlang::peek_option("save.script") ==
-       TRUE) && !str_detect(as.character(match.call()[1]),
-                            "_script")) {
-    argsList <- c(list(funcName = match.call()[1] %>% as.character() %>%
-                         str_remove(".+:+") %>% str_c("PhRame:::", .) %>%
-                         str_remove("\\(\\)")), as.list(environment()))
+PhRame_dataSummaryBy_comb <- function(x,
+                                      addFactors = FALSE,
+                                      filterExpr = NULL,
+                                      fn,
+                                      grp_var = NULL){
+  # save.script functionality
+  if((!is.null(rlang::peek_option("save.script")) &&
+      rlang::peek_option("save.script") == TRUE) &&
+     !str_detect(as.character(match.call()[1]), "_script")){
+
+    argsList <- c(list(funcName = match.call()[1] %>%
+                         as.character() %>%
+                         str_remove(".+:+") %>%
+                         str_c("PhRame:::", .) %>%
+                         str_remove("\\(\\)")),
+                  as.list(environment()))
     return(do.call("save_script", argsList))
   }
-  if (is.data.frame(x)) {
+
+  if(is.data.frame(x)){
     x <- as.data.frame(x) %>% droplevels()
-  }
-  else if (all(class(x) == c("data_file", "derived_data"))) {
-    if(!requireNamespace("pmxdata", quietly = TRUE)) {
-      stop(
-        "Package \"pmxdata\" must be installed to use derived_data ",
-        call. = FALSE
-      )
-    }
+  }else if(all(class(x) == c("data_file","derived_data"))){
     x <- pmxdata::analysis_data(deriveddatafile = x, addFactors = addFactors)
-    if (!is.null(filterExpr)) {
-      if (is_formula(filterExpr)) {
-        x <- x %>% filter(!!filterExpr) %>% as.data.frame() %>%
-          droplevels()
+
+    if(!is.null(filterExpr)){
+      if(is_formula(filterExpr)){
+        x <- x %>% filter(!!filterExpr) %>% as.data.frame() %>% droplevels()
       }
-      if (!is_formula(filterExpr)) {
-        if (!is_formula(eval(parse(text = paste0("quo(",
-                                                 filterExpr, ")"))))) {
+      if(!is_formula(filterExpr)){
+        if(!is_formula(eval(parse(text = paste0("quo(",filterExpr,")"))))){
           stop("If filterExpr is not in non standard evaluation format, this must be a character string with R-compatible expression used to filter data.\n")
-        }
-        else {
-          x <- x %>% filter(eval(parse(text = paste0("quo(",
-                                                     filterExpr, ")")))) %>% as.data.frame() %>%
-            droplevels()
+        }else{
+          x <- x %>% filter(eval(parse(text = paste0("quo(",filterExpr,")")))) %>% as.data.frame() %>% droplevels()
         }
       }
     }
-  }
-  else {
+  }else{
     stop("x must be either a data frame or a data object.\n")
   }
+
   tab <- PhRame_dataSummaryBy_all(x, fn = fn, grp_var = grp_var)
-  if (is.null(grp_var)) {
+
+  if(is.null(grp_var)){
     tab <- tab[[1]] %>% as.data.frame()
     return(tab)
-  }
-  else {
-    tab_comb <- suppressWarnings(tab %>% invoke(bind_rows,
-                                                .))
-    for (i in seq_along(grp_var)) {
-      tab_comb[, grp_var[i]] <- factor(tab_comb[, grp_var[i]],
-                                       levels = c(levels(x[, grp_var[i]]), "All"))
+  }else{
+    tab_comb <- suppressWarnings(tab %>% invoke(bind_rows, .))
+
+    for(i in seq_along(grp_var)){
+      tab_comb[,grp_var[i]] <- factor(tab_comb[,grp_var[i]],
+                                      levels = c(levels(x[,grp_var[i]]), "All"))
     }
-    if (length(grp_var) == 1) {
-      tab_comb <- tab_comb %>% dplyr::arrange(tab_comb[,
-                                                       grp_var[1]], desc(stratlvl)) %>% mutate(interactstrat = length(unique(.data[[grp_var[1]]]))) %>%
-        filter(c(stratlvl != 1 | interactstrat != 2)) %>%
-        droplevels() %>% as.data.frame()
-    }
-    else if (length(grp_var) == 2) {
-      tab_comb <- tab_comb %>% dplyr::arrange(tab_comb[,
-                                                       grp_var[1]], desc(stratlvl), tab_comb[, grp_var[2]]) %>%
-        group_by(across(all_of(grp_var[1]))) %>% mutate(interactstrat = length(unique(interaction(.data[[grp_var[1]]],
-                                                                                     .data[[grp_var[2]]])))) %>% ungroup() %>% filter(c(stratlvl !=
-                                                                                                                                          1 | interactstrat != 2)) %>% droplevels() %>%
+
+    if(length(grp_var)==1){
+      tab_comb <- tab_comb %>%
+        # reorder by stratlvl
+        dplyr::arrange(tab_comb[,grp_var[1]], desc(stratlvl)) %>%
+        # group_by_at(grp_var[1]) %>%
+        mutate(interactstrat = length(unique(.data[[grp_var[1]]]))) %>%
+        # ungroup() %>%
+        ## remove summary of stratification 1 if number of stratification 2 levels = 1
+        filter(c(stratlvl !=1 | interactstrat !=2)) %>%
+        droplevels() %>%
         as.data.frame()
-    }
-    else {
+    }else if(length(grp_var)==2){
+      tab_comb <- tab_comb %>%
+        # reorder by stratlvl
+        dplyr::arrange(tab_comb[,grp_var[1]], desc(stratlvl), tab_comb[,grp_var[2]]) %>%
+        group_by_at(grp_var[1]) %>%
+        mutate(interactstrat = length(unique(interaction(.data[[grp_var[1]]],.data[[grp_var[2]]])))) %>%
+        ungroup() %>%
+        ## remove summary of stratification 1 if number of stratification 2 levels = 1
+        filter(c(stratlvl !=1 | interactstrat !=2)) %>%
+        droplevels() %>%
+        as.data.frame()
+    }else{
       stop("This function currently supports upto 2 leves of stratification.\n")
     }
-    tab_comb <- tab_comb %>% dplyr::select(-one_of("stratlvl",
-                                                   "interactstrat"))
+
+    tab_comb <- tab_comb %>%
+      dplyr::select(-one_of("stratlvl","interactstrat"))
+
+    # If there are only two rows, the "All" row is superfluous
+    if (nrow(tab_comb) == 2) {
+      tab_comb <- tab_comb %>% slice(1)
+    }
+
     return(tab_comb)
   }
 }

@@ -18,13 +18,13 @@
 #' @param myDV is the name of the DV column, default is \strong{"DV"}
 #' @param myEVCOUNT is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}
 #' @param outerLevel is the outer level (1st level) of stratification variable,
-#'   eg. "DOSENF"
+#'   eg. "STUDYIDN"
 #' @param innerLevel is the inner level (2nd level) of stratification variable,
-#'   eg. "DOSENF"
+#'   eg. "TRTF"
 #' @param outerLabel is the label for the outer level (1st level) of
 #'   stratification variable, eg. "Study")
 #' @param innerLabel is the label for the inner level (2nd level) of
-#'   stratification variable, eg. "Dose"
+#'   stratification variable, eg. "Treatment"
 #' @param digits is the number of significant digits
 #' @param lumpCount is the maximum number of event to display, e.g. if `lumpcount=3`,
 #'   the category "3 or more" will be display. Only works for Latex code.
@@ -32,8 +32,9 @@
 #' @param dropCount0 is a logical, should categories with zero event be dropped.
 #'   Only works for Latex code. Default is \strong{FALSE} (don't drop)
 #' @param nIdColNm is the character string to be printed as the column name
-#'   with the number of subjects, default is
-#'   \strong{"Total"}
+#'   with the number of subjects
+#' @param nEventTotColNm is the character string to be printed as the column name
+#'   with the total number of event
 #' @param nEventColNm is the character string to be printed as the column names
 #'   with the number of subjects with this number of events. Default is `NULL`,
 #'   because this is dynamically generated depending on the data.
@@ -82,12 +83,14 @@
 #' @examples
 #' rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 #' rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+#' rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
+#'
 #' # create summary as a list
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     asList = TRUE)
 #'
 #'
@@ -95,13 +98,13 @@
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose")
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment")
 #' summaryCountRTTE(rttedata,
 #'                     outerLevel   ="STUDYIDN" ,
 #'                     outerLabel   = "Study",
-#'                     innerLevel   = "DOSEN",
-#'                     innerLabel   = "Dose",
+#'                     innerLevel   = "TRTF",
+#'                     innerLabel   = "Treatment",
 #'                     lumpCount    = 3
 #'                     )
 summaryCountRTTE <- function(
@@ -118,11 +121,12 @@ summaryCountRTTE <- function(
     digits = 3,
     lumpCount = Inf,
     dropCount0 = FALSE,
-    nIdColNm = "\\textbf{Total}",
+    nIdColNm = "\\textbf{nID\\textsuperscript{a}}",
+    nEventTotColNm =  "\\textbf{nEventTot\\textsuperscript{b}}",
     nEventColNm = NULL,
     caption = NULL,
     label = "tab:anaSummary",
-    footnote = "\\textsuperscript{a}Number of subjects. \\textsuperscript{b}Number of events",
+    footnote = "\\textsuperscript{a}Total number of subjects. \\textsuperscript{b}Total number of events.\\newline\\textsuperscript{c}Number of subjects with the indicated cumulative number of events.",
     footnoteSize = "footnotesize",
     textSize = "small",
     here = TRUE,
@@ -132,8 +136,9 @@ summaryCountRTTE <- function(
     fileName = NULL,
     filePath = "./",
     myFun = NULL,
-    cgroup = c("\\textbf{nID\\textsuperscript{a}}", "\\textbf{nID\\textsuperscript{a} with the indicated nEvent\\textsuperscript{b}}"),
-    n.cgroup = NULL,
+  #  cgroup = c("\\textbf{Total}", "\\textbf{nID\\textsuperscript{a} with the indicated cumulative nEvent\\textsuperscript{b}}"),
+  cgroup = c("\\textbf{Total}", "\\textbf{nID per nEvent\\textsuperscript{c}}"),
+  n.cgroup = NULL,
     ...
 ){
   if ((!is.null(rlang::peek_option("save.script")) && rlang::peek_option("save.script") ==
@@ -210,6 +215,7 @@ summaryCountRTTE <- function(
   if (is.null(myFun)) {
     myFun <- function(x) {
       ans1 <- x %>%
+        # EVCOUNT as factor so that groups with n=0 subjects do not drop.
         mutate(EVCOUNT = factor(!!rlang::sym(myEVCOUNT), levels = seq(0,maxcountOverall))) %>%
         group_by(!!rlang::sym(myID), .add = TRUE) %>%
         slice_tail(n = 1) %>%
@@ -223,9 +229,11 @@ summaryCountRTTE <- function(
       ans2 <- x %>%
         summarise(
           # use summarise() because `x` can be a grouped data frame.
-          subjects = length(unique(!!rlang::sym(myID)))
-          )
+          subjects = length(unique(!!rlang::sym(myID))),
+          nEventTot = sum(.data[[myDV]])
+        )
       ans1$subjects <- ans2$subjects # no mutate() we dont want a groupwise operation
+      ans1$nEventTot <- ans2$nEventTot # no mutate() we dont want a groupwise operation
       ans1 %>%
         as.data.frame()
     }
@@ -250,7 +258,7 @@ summaryCountRTTE <- function(
   else {
     res_tab <- res_tab %>% droplevels() %>% as.data.frame()
     Ntable <- res_tab %>%
-      dplyr::select(any_of("subjects"), matches("^\\d+$")) %>%
+      dplyr::select(any_of(c("subjects", "nEventTot")), matches("^\\d+$")) %>%
       mutate(across(everything(), ~ ifelse(is.na(.x), 0, .x))) %>%
       lump_drop_columns(
         lump = lumpCount,
@@ -276,13 +284,13 @@ summaryCountRTTE <- function(
     }
 
     if(is.null(nEventColNm)){
-      nEventColNm <- setdiff(colnames(Ntable), "subjects")
+      nEventColNm <- setdiff(colnames(Ntable), c("subjects", "nEventTot"))
       nEventColNm <- paste0("\\textbf{", nEventColNm, "}")
     }
 
     coljust <- rep("S", ncol(Ntable))
     if(is.null(n.cgroup)){
-      n.cgroup <- c(1, ncol(Ntable)-1)
+      n.cgroup <- c(2, ncol(Ntable)-2)
     }
 
     if (!is.null(outerLevel) & !is.null(innerLevel)) {
@@ -291,7 +299,7 @@ summaryCountRTTE <- function(
                    rowname = as.character(res_tab[, innerLevel]),
                    rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                    outerLevel]), (res_tab[, outerLevel]), length),
-                   colheads = c(nIdColNm, nEventColNm),
+                   colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar,
@@ -304,7 +312,7 @@ summaryCountRTTE <- function(
                             rowname = as.character(res_tab[, innerLevel]),
                             rowlabel = rowLabel, n.rgroup = tapply((res_tab[,
                                                                             outerLevel]), (res_tab[, outerLevel]), length),
-                            colheads = c(nIdColNm, nEventColNm),
+                            colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar,
@@ -315,7 +323,7 @@ summaryCountRTTE <- function(
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                   colheads = c(nIdColNm, nEventColNm),
+                   colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar,
@@ -325,7 +333,7 @@ summaryCountRTTE <- function(
                                                   fileName, ".tex"), first.hline.double = FALSE,
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           outerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                            colheads = c(nIdColNm, nEventColNm),
+                            colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar,
@@ -336,7 +344,7 @@ summaryCountRTTE <- function(
       Hmisc::latex(Ntable, file = "", first.hline.double = FALSE,
                    rgroup = NULL, rowname = as.character(res_tab[,
                                                                  innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                   colheads = c(nIdColNm, nEventColNm),
+                   colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                    col.just = coljust, size = textSize, insert.bottom = footnote,
                    caption = caption, label = label, here = here,
                    numeric.dollar = numeric.dollar,
@@ -346,7 +354,7 @@ summaryCountRTTE <- function(
                                                   fileName, ".tex"), first.hline.double = FALSE,
                             rgroup = NULL, rowname = as.character(res_tab[,
                                                                           innerLevel]), rowlabel = rowLabel, n.rgroup = NULL,
-                            colheads = c(nIdColNm, nEventColNm),
+                            colheads = c(nIdColNm, nEventTotColNm, nEventColNm),
                             col.just = coljust, size = textSize, insert.bottom = footnote,
                             caption = caption, label = label, here = here,
                             numeric.dollar = numeric.dollar,

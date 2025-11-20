@@ -79,14 +79,16 @@ labelled only by variable grouping levels.}
 
 \item{label.parsed}{if TRUE (default), facet labels can include superscipts and greek letters}
 
-\item{xlab}{x axis label}
+\item{xlab}{main title and axis labels}
 
-\item{ylab}{y axis label}
+\item{ylab}{main title and axis labels}
 
 \item{break.time.by}{numeric value controlling time axis breaks. Default value
 is NULL.}
 
-\item{xlim}{x axis limits e.g. \code{xlim = c(0, 1000)}.}
+\item{xlim}{x and y axis limits e.g. xlim = c(0, 1000), ylim = c(0, 1).}
+
+\item{ylim, surv.scale, add.ciWidth.to.legend, conf.int.alpha, conf.int.fill, risk.table.y.text, risk.table.y.text.col, table.clip, surv.median.line.title, risk.table.ylab, legend.box, legend.title.size, legend.spacing, censor.shape, censor.size}{see \code{survminer::ggsurvplot()}}
 
 \item{ggtheme}{function, ggplot2 theme name. Default value is theme_pmx. Allowed values include ggplot2 official themes.}
 

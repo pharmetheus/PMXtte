@@ -28,7 +28,7 @@ test_that('similar plots', {
   sdata1 <- sdata %>% filter_xth_event(1)
 
   svg()
-  p1 <- ggKMvpc(odata1,
+  p1 <- suppressWarnings(ggKMvpc(odata1,
                 sdata1,
                 time=TIME,
                 event=DV,
@@ -40,8 +40,8 @@ test_that('similar plots', {
                 obsCol='blue',
                 posObs=NULL,
                 show.censor=T
-  )
-  p2 <- ggKMvpc(odata,
+  ))
+  p2 <- suppressWarnings(ggKMvpc(odata,
                 sdata,
                 time=TIME,
                 event=DV,
@@ -53,9 +53,9 @@ test_that('similar plots', {
                 obsCol='blue',
                 posObs=NULL,
                 show.censor=T
-  )
+  ))
 
-  p3 <- ggKMvpc(odata,
+  p3 <- suppressWarnings(ggKMvpc(odata,
                 sdata,
                 time=TIME,
                 event=DV,
@@ -74,7 +74,7 @@ test_that('similar plots', {
                 xlim = c(0,5000),
                 ylim = NULL
 
-  )
+  ))
 
   dev.off()
   vdiffr::expect_doppelganger('vpc with strat', p1)

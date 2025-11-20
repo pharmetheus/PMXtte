@@ -18,12 +18,13 @@ summaryCountRTTE(
   digits = 3,
   lumpCount = Inf,
   dropCount0 = FALSE,
-  nIdColNm = "\\\\textbf{Total}",
+  nIdColNm = "\\\\textbf{nID\\\\textsuperscript{a}}",
+  nEventTotColNm = "\\\\textbf{nEventTot\\\\textsuperscript{b}}",
   nEventColNm = NULL,
   caption = NULL,
   label = "tab:anaSummary",
   footnote =
-    "\\\\textsuperscript{a}Number of subjects. \\\\textsuperscript{b}Number of events",
+    "\\\\textsuperscript{a}Total number of subjects. \\\\textsuperscript{b}Total number of events.\\\\newline\\\\textsuperscript{c}Number of subjects with the indicated cumulative number of events.",
   footnoteSize = "footnotesize",
   textSize = "small",
   here = TRUE,
@@ -33,8 +34,7 @@ summaryCountRTTE(
   fileName = NULL,
   filePath = "./",
   myFun = NULL,
-  cgroup = c("\\\\textbf{nID\\\\textsuperscript{a}}",
-    "\\\\textbf{nID\\\\textsuperscript{a} with the indicated nEvent\\\\textsuperscript{b}}"),
+  cgroup = c("\\\\textbf{Total}", "\\\\textbf{nID per nEvent\\\\textsuperscript{c}}"),
   n.cgroup = NULL,
   ...
 )
@@ -59,16 +59,16 @@ acceptable to this argument.}
 \item{myEVCOUNT}{is the name of the EVCOUNT column, default is \strong{"EVCOUNT"}}
 
 \item{outerLevel}{is the outer level (1st level) of stratification variable,
-eg. "DOSENF"}
+eg. "STUDYIDN"}
 
 \item{innerLevel}{is the inner level (2nd level) of stratification variable,
-eg. "DOSENF"}
+eg. "TRTF"}
 
 \item{outerLabel}{is the label for the outer level (1st level) of
 stratification variable, eg. "Study")}
 
 \item{innerLabel}{is the label for the inner level (2nd level) of
-stratification variable, eg. "Dose"}
+stratification variable, eg. "Treatment"}
 
 \item{digits}{is the number of significant digits}
 
@@ -80,8 +80,10 @@ Default is \strong{Inf} (no lumping)}
 Only works for Latex code. Default is \strong{FALSE} (don't drop)}
 
 \item{nIdColNm}{is the character string to be printed as the column name
-with the number of subjects, default is
-\strong{"Total"}}
+with the number of subjects}
+
+\item{nEventTotColNm}{is the character string to be printed as the column name
+with the total number of event}
 
 \item{nEventColNm}{is the character string to be printed as the column names
 with the number of subjects with this number of events. Default is \code{NULL},
@@ -151,12 +153,14 @@ counts if there are no events with \code{dropCount0 = TRUE}.
 \examples{
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
+
 # create summary as a list
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     asList = TRUE)
 
 
@@ -164,13 +168,13 @@ summaryCountRTTE(rttedata,
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose")
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment")
 summaryCountRTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     lumpCount    = 3
                     )
 }

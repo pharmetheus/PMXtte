@@ -10,11 +10,18 @@ test_that("summaryCountRTTE() works", {
 
   expect_type(ans, "list")
   expect_length(ans, 3)
-  expect_named(ans[[1]], c(as.character(0:6), "subjects", 'stratlvl',"DOSEN", "STUDYIDN"))
+  expect_named(ans[[1]], c(as.character(0:6), "subjects", "nEventTot", 'stratlvl',"DOSEN", "STUDYIDN"))
 
+  # The dispatch (1,2,3...) matches the total number of subject
   expect_equal(
     rowSums(ans[[3]][as.character(0:6)]),
     ans[[3]]$subjects
+  )
+
+  # The dispatch (1,2,3...) matches the total number of event
+  expect_equal(
+    colSums(t(ans[[3]][as.character(0:6)])*c(0:6)),
+    ans[[3]]$nEventTot
   )
 
   # Columns names are correct if columns are lumped
@@ -49,7 +56,7 @@ test_that("inner/outer levels work", {
 
   expect_type(ans, "list")
   expect_false(inherits(ans, "data.frame"))
-  expect_named(ans, c(as.character(0:6), "subjects", 'stratlvl'))
+  expect_named(ans, c(as.character(0:6), "subjects", "nEventTot", "stratlvl"))
 })
 
 test_that("lump_drop_columns() works", {

@@ -64,27 +64,29 @@ only for single event data, not for RTTE data.
 \examples{
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+rttedata$TRTF <- factor(paste(rttedata$TRTN, "mg"), levels = paste(sort(unique(rttedata$TRTN)), "mg"))
+
 # create summary as a list
 makeSummaryTableTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     asList = TRUE)
 
 # output as latex table
 makeSummaryTableTTE(rttedata,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose")
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment")
 
 # Time to first event only
 tte1data <- filter_xth_event(rttedata, event = 1)
 makeSummaryTableTTE(tte1data,
                     outerLevel   ="STUDYIDN" ,
                     outerLabel   = "Study",
-                    innerLevel   = "DOSEN",
-                    innerLabel   = "Dose",
+                    innerLevel   = "TRTF",
+                    innerLabel   = "Treatment",
                     asList = TRUE)
 }

@@ -97,3 +97,12 @@ test_that("myID, myDV work", {
   )
 })
 
+test_that("No superfluous 'All'-row when grouping by two variables results in a single group", {
+  ans <- rttedata %>%
+    filter(!(STUDYIDN==1&DOSEN!=200)) %>% # 200mg is the only category in study 1
+    makeSummaryTableTTE(outerLevel = "STUDYIDN", innerLevel = "DOSEN") %>%
+    capture.output()
+  row_to_check <- str_which(ans, "200&200&109")+1
+  expect_false(str_detect(ans[row_to_check], "All")) # No "All line" after
+  expect_true(str_detect(ans[row_to_check], "hline")) # But new line (hline) instead
+})

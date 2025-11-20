@@ -1,18 +1,18 @@
 Package: PMXtte
 Type: Package
 Title: Support (Repeated) Time-To-Event data analysis
-Version: 0.14.4
+Version: 0.14.5
 Authors@R: c(
     person("Pharmetheus AB", email = "info@pharmetheus.com", role = c("cre","cph")),
     person("Felicien", "Le Louedec", role = c("aut")),
     person("Joakim", "Nyberg", role = c("ctb")),
     person("Niclas", "Jonsson", role = c("ctb"))
     )
-ription: Support functions for (Repeated) Time-To-Event data analysis. Generate summary tables and Kaplan-Meier plot for the exploratory analyses, and visual predictive checks for model evaluation. 
+Description: Support functions for (Repeated) Time-To-Event data analysis. Generate summary tables and Kaplan-Meier plot for the exploratory analyses, and visual predictive checks for model evaluation. 
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.2.1
 Imports: 
     cowplot,
     dplyr,

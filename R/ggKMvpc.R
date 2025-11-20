@@ -113,7 +113,7 @@ ggKMvpc <- function(odata,
                     xlim = NULL,
                     ylim = c(0,1)
                     ){
-  .Deprecated("ggKAP")
+  if (interactive()) {.Deprecated("ggKAP")}
   show.obse=F # logical to indicate whether the uncertainty of observed should be shown. NB: this one differs from the survfit function and RA and JL cannot see why it would, kept here for now
 
   # group by stratifications if present
