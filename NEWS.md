@@ -1,7 +1,8 @@
-# PMXtte development version
+# PMXtte 0.14.5
+
 * New `checkTTESim()` to check several assumptions expected from a TTE/RTTE data set simulated using NONMEM.
 * New `factor_rtte()` to create a factor variable with an appealing label (e.g. "Event #2") instead of numeric value.
-* `createTTESim()` now systematically fixes (`FIXED`) the values in the `$OMEGA`in the output, either in TTE or RTTE settings, and deals with multiple `$OMEGA` records and blocks (`BLOCK(n)`) specifications.
+* `createTTESim()` now systematically fixes (`FIXED`) the values in the `$OMEGA` in the output, either in TTE or RTTE settings, and deals with multiple `$OMEGA` records and blocks (`BLOCK(n)`) specifications.
 * `makeSummaryTableTTE()` now removes any superfluous 'All'-row when grouping by two variables results in a single group.
 * `summaryCountRTTE()` now displays a new column with the total number of event.
 * The example documentation now uses "Treatment", not "Dose", as a stratification variable. 
