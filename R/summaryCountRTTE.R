@@ -32,8 +32,9 @@
 #' @param dropCount0 is a logical, should categories with zero event be dropped.
 #'   Only works for Latex code. Default is \strong{FALSE} (don't drop)
 #' @param nIdColNm is the character string to be printed as the column name
-#'   with the number of subjects, default is
-#'   \strong{"Total"}
+#'   with the number of subjects
+#' @param nEventTotColNm is the character string to be printed as the column name
+#'   with the total number of event
 #' @param nEventColNm is the character string to be printed as the column names
 #'   with the number of subjects with this number of events. Default is `NULL`,
 #'   because this is dynamically generated depending on the data.

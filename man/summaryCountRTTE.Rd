@@ -80,8 +80,10 @@ Default is \strong{Inf} (no lumping)}
 Only works for Latex code. Default is \strong{FALSE} (don't drop)}
 
 \item{nIdColNm}{is the character string to be printed as the column name
-with the number of subjects, default is
-\strong{"Total"}}
+with the number of subjects}
+
+\item{nEventTotColNm}{is the character string to be printed as the column name
+with the total number of event}
 
 \item{nEventColNm}{is the character string to be printed as the column names
 with the number of subjects with this number of events. Default is \code{NULL},
