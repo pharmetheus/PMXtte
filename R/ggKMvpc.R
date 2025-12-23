@@ -51,7 +51,7 @@
 #'
 #' # VPC for time to first event data
 #' odata1 <- odata %>% filter_xth_event(1)
-#' sdata1 <- sdata %>% filter_xth_event(1)
+#' sdata1 <- sdata %>% filter_xth_event(1,time_since_last_event=NULL)
 #'
 #' ggKMvpc(
 #'   odata = odata1,
@@ -79,14 +79,11 @@
 #' ggpubr::ggarrange(plotlist = plotlist)
 #'
 #' # Second option (preferred): use RTTE as a stratification covariate
-#' odata <- odata %>%
-#'   dplyr::group_by(ID) %>%
-#'   dplyr::mutate(RTTE = seq_along(DV)) %>% #create RTTE in obs data
-#'   dplyr::ungroup()
-#'
 #' ggKMvpc(
-#'   odata = odata %>% dplyr::filter(RTTE <= 4), #keep a reasonable number of ID
-#'   sdata = sdata %>% dplyr::filter(RTTE <= 4),
+#'   odata = odata %>%
+#'     filter_xth_event(1:4, time_since_last_event=NULL),
+#'   sdata = sdata %>%
+#'     filter_xth_event(1:4, time_since_last_event=NULL),
 #'   strat = "RTTE"
 #'  )
 #'

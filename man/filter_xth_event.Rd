@@ -7,27 +7,30 @@
 filter_xth_event(
   x,
   event = 1,
-  event_col = "DV",
-  evcount_col = NULL,
   time_since_last_event = "TSLE",
-  time_col = "TSFDW"
+  time_col = "TSFDW",
+  id_col = "ID",
+  iter_col = "ITER",
+  rtte_col = "RTTE"
 )
 }
 \arguments{
 \item{x}{a dataset, with only observations regarding time to event data. It often means data filtered with \code{EVID==0} and with a unique "TYPE" value.}
 
-\item{event}{a integer of length 1, informs if the time to 1st, 2nd, 3rd event (etc...) should be returned. Default is 1 (time to first event data).}
+\item{event}{a integer, one or multiple values, informs if the time to 1st, 2nd, 3rd event (etc...) should be returned. Default is 1 (time to first event data).}
 
-\item{event_col}{a character, the event column in the data.}
-
-\item{evcount_col}{a character, the event count column in the data. Default is \code{NULL}, will create or use the column \code{EVCOUNT}, expected as the cumulative sum of the event column (i.e. starts at 0, not incremented of +1 in case of censoring event).}
-
-\item{time_since_last_event}{a character, the name of the column to create that will inform the time since the last event. If \code{NULL}, no column will be created. Ignored if \code{event=1}.}
+\item{time_since_last_event}{a character, the name of the column to create that will inform the time since the last event. If \code{NULL}, no column will be created.}
 
 \item{time_col}{a character, the name of the time column used to calculate the time since last event. Ignored if \code{time_since_last_event=NULL} or if \code{event=1}.}
+
+\item{id_col}{a character, the name of the column to identify a subject.}
+
+\item{iter_col}{a character, the name of the column to identify replicates of the data set. Useful to apply on simulated (VPC) data.}
+
+\item{rtte_col}{a character, the name of the column that will inform the event number (time to 1st, 2nd, 3rd). If missing, will be created from \code{id_col} and \code{iter_col}.}
 }
 \value{
-a dataset, filtered for the analysis of a particular event number (time to 1st event, time to 2nd event, etc...). If the event number (\code{event}) is greater than 1, a new column that informs the time since the last event is created (default is \code{TSLE}, based on \code{TSFDW}).
+a dataset, filtered for the analysis of (a) particular event number(s) (time to 1st event, time to 2nd event, etc...). If missing, \code{RTTE} and \code{TLSE} (the default) will be created.
 }
 \description{
 Filter a repeated time to event dataset into a time to 1st event, time to 2nd event (etc...) dataset. Particularly useful for summary statistics, Kaplan-Meier plots or Visual Predictive checks of time to second (and more) event data. This function preserves the data.frame/tibble attributes and potential grouping.
@@ -38,16 +41,25 @@ library(magrittr)
 rttedata <- readr::read_csv(system.file('extdata/DAT-1c-RED-1a-PMX-WOWTTE-PFPMX-1.csv', package= 'PMXtte'), show_col_types = FALSE)
 # Filter observations
 rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
+
+
+# By default, filters event 1
 filter_xth_event(rttedata) # By default, filters event 1
 filter_xth_event(rttedata, event = 2)
-filter_xth_event(rttedata, event = 3) # etc... # The number of ID decreases
+filter_xth_event(rttedata, 3) # etc... # The number of ID decreases
+
+filter_xth_event(rttedata, 1:3) # Max 3 events per ID
 
 rttedata \%>\%
-  filter_xth_event(2) \%>\%
-  plotKaplanMeier( # KPM plot of time to second event data
-    cov_col = "DOSEN",
-    time_col = "TSLE", #x-axis: time since Last event (not first dose),
-    xlab = "Time since last event (week)" #in week because `time_col="TSFDW"`
+  filter_xth_event(1:3) \%>\%
+  dplyr::mutate(
+    RTTEF = factor_rtte(RTTE)
+  ) \%>\%
+  ggKAP( # KPM plot of time to second event data
+    facet_var = "RTTEF",
+    time_var = "TSLE", #x-axis: time since Last event (not first dose)
+    label_x = "Time since first (1) or last (2-3) event (weeks)", # in week because `time_col="TSFDW"`
+    show_pval = FALSE, show_median = FALSE, show_se = FALSE
   )
 
 }
