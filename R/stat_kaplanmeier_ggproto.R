@@ -628,6 +628,7 @@ StatKaplanMeierRiskTable <- ggplot2::ggproto(
   "StatKaplanMeierRiskTable", Stat,
   compute_group = function(data, scales, times = NULL) {
     if(is.null(times)){
+      scales$x$train(0) # force 0 as a limit
       breaks <- scales$x$get_breaks()
       if(any(is.na(breaks))){
         if(is.null(scales$x$limits)||any(is.na(scales$x$limits)))
@@ -652,7 +653,6 @@ StatKaplanMeierRiskTable <- ggplot2::ggproto(
       }
       times <- breaks
     }
-
     data %>%
       dplyr::group_by(y) %>%
       dplyr::summarise(

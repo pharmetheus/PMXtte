@@ -1,9 +1,10 @@
 # PMXtte development version
 * `filter_xth_event()` was refactored:
-  + `filter_xth_event(event = 1)` now accepts a vector of length > 1, useful to keep the time to Xth first events, in order to study times to multiple events all at once: for instance `filter_xth_event(event = c(1,2,3)` to preserve 1st, 2nd and Xth events.
+  + `filter_xth_event(event = 1)` now accepts a vector of length > 1, useful to keep the time to Xth first events, in order to study times to multiple events all at once: for instance `filter_xth_event(event = c(1,2,3))` to preserve 1st, 2nd and 3rd events.
   + New `filter_xth_event(iter_col = "ITER")` to apply the logic over replicates of the data, typically simulated data for VPC.
   + The variable for "time since last event" will be created without condition on `filter_xth_event(event)`. It used to be created only if `event > 1`. 
   + It now relies on an `RTTE` variable (name can be customized with `filter_xth_event(rtte_col = "RTTE")`). If missing, will be created using `filter_xth_event(id_col = "ID", iter_col = "ITER")`, and added to the output data set. The previous behavior relied on `DV` and `EVCOUNT`, which was inefficient, and the arguments `filter_xth_event(event_col, evcount_col)` are now removed.
+* `StatKaplanMeierRiskTable()` now includes 0 as a training value to calculate the values of x when the number of subjects at risk should be calculated. This fixes a bug where the number of subjects at risk was not displayed if the first record was at a time "too far" from 0, and makes the use of `ggKAP(scale_x_breaks)` and `ggKAP(scale_x_break_by)` more predictable.
 
 # PMXtte 0.14.5
 
