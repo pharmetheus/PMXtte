@@ -5,6 +5,8 @@
   + The variable for "time since last event" will be created without condition on `filter_xth_event(event)`. It used to be created only if `event > 1`. 
   + It now relies on an `RTTE` variable (name can be customized with `filter_xth_event(rtte_col = "RTTE")`). If missing, will be created using `filter_xth_event(id_col = "ID", iter_col = "ITER")`, and added to the output data set. The previous behavior relied on `DV` and `EVCOUNT`, which was inefficient, and the arguments `filter_xth_event(event_col, evcount_col)` are now removed.
 * `StatKaplanMeierRiskTable()` now includes 0 as a training value to calculate the values of x when the number of subjects at risk should be calculated. This fixes a bug where the number of subjects at risk was not displayed if the first record was at a time "too far" from 0, and makes the use of `ggKAP(scale_x_breaks)` and `ggKAP(scale_x_break_by)` more predictable.
+* New `ggKAParrange()` to arrange a list of objects produced by `ggKAP(arrange = FALSE)`. Useful for advanced customization of the plot, i.e. size of font, axis settings, etc. This function is also used internally by `ggKAP(arrange = TRUE)`.
+
 
 # PMXtte 0.14.5
 

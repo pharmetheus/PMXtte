@@ -468,25 +468,78 @@ ggKAP <- function(data,
   ans <- ans[!sapply(ans, is.null)]
 
   if(arrange){
-    ans <- cowplot::plot_grid(
-      cowplot::plot_grid(
-        plotlist = ans[str_detect(names(ans), "leg")],
-        ncol = 1,
-        rel_heights = rel_heights[["legends"]]
-      ),
-      cowplot::plot_grid(
-        plotlist = ans[str_detect(names(ans), "leg", negate = TRUE)],
-        ncol = 1,
-        align = "v",
-        rel_heights = rel_heights[["figtable"]]
-      ),
-      ncol = 1,
-      rel_heights = rel_heights[["overall"]]
+    ans <- ggKAParrange(
+      x = ans,
+      legends = rel_heights$legends,
+      figtable = rel_heights$figtable,
+      overall = rel_heights$overall
     )
   }
 
   ans
 }
+
+
+
+#' Arrange ggKAP() results on a single plot
+#'
+#' @param x a named list, returned by `ggKAP(arrange = FALSE)`. See Details for the expected names.
+#' @param legends,figtable,overall relative heights (1) between the legends (default is 1 and 1, same height), (2) between the Kaplan-Meier figure and the risk table (default is 2 and 1, i.e. figure twice higher than table) and (3) overall (default is 1 and 8, combined legends takes 1/9 of heights, combined figure and tables takes 8/9 of heights)
+#' @details
+#' Expected names are: `leg_col` (legends of the categories of the coloring variable),
+#' `leg_kpm` (legends of the different objects on the Kaplan-Meier figure),
+#' `fig` (ggplot object for the Kaplan-Meier figure),
+#' and `risktab` (ggplot object for the risk table).
+#'
+#' @return a ggplot object
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' dat <- PMXtte::simplettedata
+#'
+#' plotlist <- ggKAP(dat, color_var = "SEXF", arrange = FALSE)
+#'
+#' # The Kaplan-Meier figure is in $fig
+#' # The Risk table is in $risktab
+#' # Custom these elements to your needs:
+#' plotlist$fig <- plotlist$fig +
+#'   theme(
+#'     text = element_text(size = 20),
+#'     axis.text.x = element_text(angle = 90, hjust = 1)
+#'     )
+#'
+#' # Re-arrange them with ggKAParrange:
+#' ggKAParrange(plotlist)
+#' ggKAParrange(plotlist, figtable = c(1,2))
+ggKAParrange <- function(x, legends, figtable, overall){
+  if(missing(legends)){
+    legends <- eval(formals("ggKAP")$rel_heights$legends)
+  }
+  if(missing(figtable)){
+    figtable <- eval(formals("ggKAP")$rel_heights$figtable)
+  }
+  if(missing(overall)){
+    overall <- eval(formals("ggKAP")$rel_heights$overall)
+  }
+
+  cowplot::plot_grid(
+    cowplot::plot_grid(
+      plotlist = x[str_detect(names(x), "leg")],
+      ncol = 1,
+      rel_heights = legends
+    ),
+    cowplot::plot_grid(
+      plotlist = x[str_detect(names(x), "leg", negate = TRUE)],
+      ncol = 1,
+      align = "v",
+      rel_heights = figtable
+    ),
+    ncol = 1,
+    rel_heights = overall
+  )
+}
+
 
 check_ggKAP_input <- function(
     data,
