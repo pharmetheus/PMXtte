@@ -6,7 +6,8 @@
   + It now relies on an `RTTE` variable (name can be customized with `filter_xth_event(rtte_col = "RTTE")`). If missing, will be created using `filter_xth_event(id_col = "ID", iter_col = "ITER")`, and added to the output data set. The previous behavior relied on `DV` and `EVCOUNT`, which was inefficient, and the arguments `filter_xth_event(event_col, evcount_col)` are now removed.
 * `StatKaplanMeierRiskTable()` now includes 0 as a training value to calculate the values of x when the number of subjects at risk should be calculated. This fixes a bug where the number of subjects at risk was not displayed if the first record was at a time "too far" from 0, and makes the use of `ggKAP(scale_x_breaks)` and `ggKAP(scale_x_break_by)` more predictable.
 * New `ggKAParrange()` to arrange a list of objects produced by `ggKAP(arrange = FALSE)`. Useful for advanced customization of the plot, i.e. size of font, axis settings, etc. This function is also used internally by `ggKAP(arrange = TRUE)`.
-* `createTTESim()` now add the suffix ".csv" to the name of the simulation table. This can still be controlled from the argument `createTTESim(simTabFile)`.
+* `createTTESim()` now adds the suffix ".csv" to the name of the simulation table. This can still be controlled from the argument `createTTESim(simTabFile)`.
+* `createTTESim()` now enforces "\$ADVAN=6 TOL=6", not only "\$SUB ADVAN=6", because high TOL values were associated with a higher risk of erroneous simulation tables. If `createTTESim(replaceSUB = FALSE)`, the original "\$SUB" preserved as before, but a more informative warning message is printed to the console.
 
 # PMXtte 0.14.5
 

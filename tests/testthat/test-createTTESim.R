@@ -72,7 +72,7 @@ test_that("createTTESim replaces SUBROUTINE to ADVAN6 when replaceSUB=TRUE", {
 
   expect_warning(
     createTTESim(modFile = mod_file_path, outFile = NULL, replaceSUB = FALSE),
-    "Note that other ADVAN\'s than ADVAN6 might not work properly with MTIME simulations"
+    "Note that other settings ADVAN6 "
   )
   model_code_no_replace_sub <- suppressWarnings(createTTESim(modFile = mod_file_path, outFile = NULL, replaceSUB = FALSE))
   sub_line_no_replace <- model_code_no_replace_sub[grepl("\\$SUBROUTINE", model_code_no_replace_sub)]
@@ -246,4 +246,39 @@ test_that("createTTESim fixes OMEGA BLOCK", {
     file.remove( file.path(tmpdir, "test.ext"))
     file.remove( file.path(tmpdir, "test.mod"))
   }
+})
+
+
+test_that("update_sub_advan_tol correctly enforces ADVAN=6 and TOL=6", {
+  # Test Case 1: Simple replacement
+  expect_equal(update_sub_advan_tol("$SUB ADVAN2"), "$SUB ADVAN=6 TOL=6")
+
+  # Test Case 2: Existing TOL update
+  expect_equal(update_sub_advan_tol("$SUBROUTINES ADVAN=11 TOL=9"), "$SUBROUTINES ADVAN=6 TOL=6")
+
+  # Test Case 3: Mixed formatting and other parameters
+  expect_equal(update_sub_advan_tol("$SUB ADVAN 4 TOL 3 TRANS=1"), "$SUB ADVAN=6 TOL=6 TRANS=1")
+
+  # Test Case 4: Case insensitivity
+  expect_equal(update_sub_advan_tol("$sub advan13"), "$sub ADVAN=6 TOL=6")
+
+  # Test Case 5: TOL already present at 6
+  expect_equal(update_sub_advan_tol("$SUB ADVAN=6 TOL=6"), "$SUB ADVAN=6 TOL=6")
+
+  # Test Case: ADVAN on line 1, TOL on line 2
+  input_split <- c("$SUB ADVAN=2", "TOL=9 TRANS=1")
+  expected_split <- c("$SUB ADVAN=6", "TOL=6 TRANS=1")
+  expect_equal(update_sub_advan_tol(input_split), expected_split)
+
+  # Test Case: ADVAN on line 1, TOL missing entirely
+  input_no_tol <- c("$SUB ADVAN2", "TRANS1")
+  expected_no_tol <- c("$SUB ADVAN=6", "TRANS1 TOL=6")
+  expect_equal(update_sub_advan_tol(input_no_tol), expected_no_tol)
+
+  # Test Case: Single line still works
+  expect_equal(update_sub_advan_tol("$SUB ADVAN2"), "$SUB ADVAN=6 TOL=6")
+
+  # Test Case: Case insensitivity across vector
+  input_caps <- c("$sub advan13", "tol 1")
+  expect_equal(update_sub_advan_tol(input_caps), c("$sub ADVAN=6", "TOL=6"))
 })

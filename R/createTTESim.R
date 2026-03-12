@@ -193,16 +193,20 @@ createTTESim <- function(modFile,
   }
 
 
-  if (replaceSUB) {
+  if (replaceSUB){
     # Get $SUBROUTINE
     linesSub <- PMXFrem::findrecord(line, "\\$SUB")
     if (length(linesSub) > 0) {
-      linesSub <- gsub("ADVAN\\s*=\\s*\\d+", "ADVAN=6", linesSub) # Replace ADVAN = XX with ADVAN=6
-      linesSub <- gsub("ADVAN\\d+", "ADVAN=6", linesSub) # Replace ADVANXX with ADVAN6
+      linesSub <- update_sub_advan_tol(linesSub)
       line <- PMXFrem::findrecord(line, "\\$SUB", replace = linesSub)
     }
   } else {
-    warning("Note that other ADVAN's than ADVAN6 might not work properly with MTIME simulations")
+    warning(
+      c("Note that other settings ADVAN6 TOL<=6 might not work properly with MTIME simulations: ",
+        "ADVAN6 does not overshoot (unlike ADVAN13) ",
+        "and erroneous simulation tables can be obtained if TOL is too high. ",
+        "Make sure to check simulated data with `checkTTESim()`.")
+      )
   }
 
   # Get $PK
@@ -518,4 +522,24 @@ wrap_abs <- function(x, timepVar){
     replacement = "ABS(\\1)"
   )
   ans
+}
+
+#' Update NONMEM $SUBROUTINES to ADVAN=6 TOL=6
+#' @param linesSub A string containing the $SUBROUTINES line
+#' @return A string with ADVAN=6 and TOL=6 enforced
+update_sub_advan_tol <- function(linesSub) {
+  # Vectorized replacement for ADVAN
+  linesSub <- gsub("ADVAN(=|\\s+)?\\d+", "ADVAN=6", linesSub, ignore.case = TRUE)
+
+  # Check if TOL exists anywhere in the vector
+  if (any(grepl("TOL", linesSub, ignore.case = TRUE))) {
+    # Replace existing TOL wherever it is found
+    linesSub <- gsub("TOL(=|\\s+)?\\d+", "TOL=6", linesSub, ignore.case = TRUE)
+  } else {
+    # Append TOL=6 to the last element of the vector if missing entirely
+    linesSub[length(linesSub)] <- paste(linesSub[length(linesSub)], "TOL=6")
+  }
+
+  # Clean up whitespace on each line
+  return(trimws(gsub("\\s+", " ", linesSub)))
 }
