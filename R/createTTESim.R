@@ -495,7 +495,7 @@ createTTESim <- function(modFile,
   }
 }
 
-make_simtab_name <- function(x, prefix = "vpctab", suffix = ""){
+make_simtab_name <- function(x, prefix = "vpctab", suffix = ".csv"){
   paste0(
     prefix,
     tools::file_path_sans_ext(basename(x)),

@@ -105,15 +105,15 @@ test_that("createTTESim stops if modFile does not exist", {
 test_that("createTTESim make correct simfile name", {
   expect_equal(
     make_simtab_name("run101.mod"),
-    "vpctabrun101"
+    "vpctabrun101.csv"
   )
   expect_equal(
     make_simtab_name("path/to/model/run101.mod"),
-    "vpctabrun101"
+    "vpctabrun101.csv"
   )
   expect_equal(
     make_simtab_name("run101.mod", prefix = "simtab"),
-    "simtabrun101"
+    "simtabrun101.csv"
   )
   expect_equal(
     make_simtab_name("run101.mod", prefix = "", suffix = "sim"),
