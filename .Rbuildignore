@@ -5,3 +5,6 @@ draftstuff.R
 
 ^README\.Rmd$
 ^data-raw$
+
+^\.github$
+^Makefile$
