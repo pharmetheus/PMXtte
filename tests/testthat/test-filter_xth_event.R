@@ -3,18 +3,8 @@ rttedata <- dplyr::filter(rttedata, EVID == 0, TYPE == 2)
 
 test_that("filter_xth_event() works", {
   expect_error(
-    filter_xth_event(rttedata, event_col = "DVV"),
-    "event_col.*DVV not found"
-  )
-
-  expect_error(
-    filter_xth_event(rttedata, evcount_col = "EVCOUNTT"),
-    "evcount_col.*EVCOUNTT not found"
-  )
-
-  expect_error(
-    filter_xth_event(rttedata, time_col = "TSFDX"),
-    NA
+    filter_xth_event(rttedata, id_col = "IDDD"),
+    "id_col.*IDDD not found"
   )
 
   expect_error(
@@ -28,15 +18,8 @@ test_that("filter_xth_event() works", {
   )
 
   expect_equal(
-    filter_xth_event(rttedata, 1),
+    filter_xth_event(rttedata, 1) %>% select(-TSLE, -RTTE),
     filter(rttedata, INCLFIRST==1)
-  )
-})
-
-test_that("deal with missing EVCOUNT", {
-  expect_equal(
-    filter_xth_event(rttedata %>% select(-EVCOUNT)) %>% relocate("EVCOUNT"),
-    filter_xth_event(rttedata) %>% relocate("EVCOUNT")
   )
 })
 

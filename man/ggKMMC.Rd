@@ -80,10 +80,10 @@ derData <- readr::read_csv(
   dplyr::rename(TIME = TSFDW, SEX = SEXN, DOSE = DOSEN, COSEASON = COSEAS
  )
 odata <- dplyr::filter(derData, EVID == 0, TYPE == 2, STUDYIDN == 1) \%>\%
-  filter_xth_event(1)
+  filter_xth_event(1, time_since_last_event=NULL)
 sdata <- readRDS(system.file('extdata/vpcdat.rds', package= 'PMXtte')) \%>\%
   dplyr::group_by(ITER) \%>\%
-  filter_xth_event(1) \%>\%
+  filter_xth_event(1, time_since_last_event=NULL) \%>\%
   dplyr::ungroup() \%>\%
   dplyr::mutate(TIME = TIME / (24*7), SEX = SEX+1)
 

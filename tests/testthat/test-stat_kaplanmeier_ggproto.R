@@ -254,6 +254,92 @@ test_that("StatKaplanMeierRiskTable works", {
     c(-10, 0)
   )
 
+ # If earliest record is at a late time ("far" from 0)
+  ggda3 <- data.frame(
+    x = simplettedata$TIME,
+    y = 1
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda3) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))
+    )$data[[1]]$x,
+    c(0, 25, 50, 75, 100)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda3 %>% filter(x > 20)) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y)) +
+        scale_x_continuous(limits = c(0,NA)) # this is a fix that works with bugged
+    )$data[[1]]$x,
+    c(0, 25, 50, 75, 100)
+  )
+
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda3 %>% filter(x > 30)) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))
+    )$data[[1]]$x, # bugged was already 40  60  80 100
+    c(0, 25, 50, 75, 100)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda3 %>% filter(x > 20)) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y))
+    )$data[[1]]$x, # bugged was 0  40  60  80 100
+    c(0, 25, 50, 75, 100)
+  )
+
+  expect_equal(
+    ggplot_build(
+      ggplot(ggda3 %>% filter(x > 20)) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y)) +
+        scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100))
+    )$data[[1]]$x,
+    c(0, 20, 40, 60, 80, 100)
+  )
+
+  expect_equal(
+    suppressWarnings(
+      ggplot_build(ggplot(ggda3 %>% filter(x > 20)) +
+        stat_kaplanmeier_risktable(aes(x = x, y = y)) +
+        scale_x_continuous(limits = c(50, 90))
+    ))$data[[1]]$x,
+    c(50, 60, 70, 80, 90)
+  )
+
+  expect_equal(
+    ggplot_build(ggKAP(
+      ggda3 %>%
+        filter(x > 20),
+      time_var = "x", dv_var = "y", show_se = F, show_median = F, arrange = FALSE
+    )$risktab)$data[[1]]$x,
+    c(0, 25, 50, 75, 100)
+  )
+
+  expect_equal(
+    ggplot_build(ggKAP(
+      ggda3 %>%
+        filter(x > 20),
+      time_var = "x", dv_var = "y", show_se = F, show_median = F, arrange = FALSE,
+      scale_x_break_by = 10
+    )$risktab)$data[[1]]$x,
+    c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90) # 10 and 20 show up despite no event yet
+  )
+
+  expect_equal(
+    ggplot_build(ggKAP(
+      ggda3 %>%
+        filter(x > 20),
+      time_var = "x", dv_var = "y", show_se = F, show_median = F, arrange = FALSE,
+      scale_x_breaks = c(10, 33, 66)
+    )$risktab)$data[[1]]$x,
+    c(10, 33,66) # 10 shows up despite no event yet
+  )
 })
 
 

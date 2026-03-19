@@ -25,7 +25,7 @@ test_that('similar plots', {
 
   # VPC for time to first event data
   odata1 <- odata %>% filter_xth_event(1)
-  sdata1 <- sdata %>% filter_xth_event(1)
+  sdata1 <- sdata %>% filter_xth_event(1, time_since_last_event = NULL)
 
   svg()
   p1 <- suppressWarnings(ggKMvpc(odata1,
