@@ -1,4 +1,5 @@
-# PMXtte development version
+# PMXtte 0.14.6
+
 * `filter_xth_event()` was refactored:
   + `filter_xth_event(event = 1)` now accepts a vector of length > 1, useful to keep the time to Xth first events, in order to study times to multiple events all at once: for instance `filter_xth_event(event = c(1,2,3))` to preserve 1st, 2nd and 3rd events.
   + New `filter_xth_event(iter_col = "ITER")` to apply the logic over replicates of the data, typically simulated data for VPC.
