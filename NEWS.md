@@ -1,4 +1,6 @@
-# PMXtte development version
+# PMXtte 0.14.7
+
+* Fixes technical issues of version and tag of the package.
 
 # PMXtte 0.14.6
 
