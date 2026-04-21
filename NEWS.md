@@ -1,3 +1,7 @@
+# PMXtte 1.0.0
+
+* Bump to version 1.0.0 to be compliant with the versioning of the packages used in production.
+
 # PMXtte 0.14.7
 
 * Fixes technical issues of version and tag of the package.
